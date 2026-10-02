@@ -344,6 +344,18 @@
     </div>`;
   }
 
+  function renderOffer() {
+    const o = config.offer;
+    if (!o) return '';
+    return `<div class="card offer">
+      <div class="kicker">${esc(o.kicker)}</div>
+      <h2>${esc(o.title)}</h2>
+      <ol class="guide-list">${o.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+      <div class="offer-row"><span class="offer-tag" id="offer-hashtag">${esc(o.hashtag)}</span><button class="btn ghost small" data-action="copy-hashtag">Copy</button></div>
+      <div class="offer-row"><a class="offer-tag" href="mailto:${esc(o.email)}?subject=${encodeURIComponent(o.hashtag + ' – my post')}">${esc(o.email)}</a><button class="btn ghost small" data-action="copy-email">Copy</button></div>
+    </div>`;
+  }
+
   function renderFollow() {
     const social = config.social || { links: [], invite: '' };
     return `<div class="stack">
@@ -352,6 +364,7 @@
         <h1>That’s it. Start small.</h1>
         <p class="muted">Your card is saved on this phone. Ask clearly, check carefully, finish something useful.</p>
       </div>
+      ${renderOffer()}
       <div class="card follow">
         <div class="kicker">Keep going</div>
         <h2>${esc(social.invite)}</h2>
@@ -472,6 +485,11 @@
     }
   }
 
+  function copyText(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => notice(done, ''), () => notice('Press and hold the text to copy it.', 'warn'));
+    else notice('Press and hold the text to copy it.', 'warn');
+  }
+
   const actions = {
     letter: () => { letterOpen = true; render(); },
     'letter-close': () => {
@@ -520,6 +538,8 @@
         notice('Sharing is not available here — use Download instead.', 'warn');
       }
     },
+    'copy-hashtag': () => copyText(config.offer.hashtag, 'Hashtag copied.'),
+    'copy-email': () => copyText(config.offer.email, 'Email address copied.'),
     'copy-prompt': () => {
       const text = config.guide.prompt;
       const done = () => notice('Prompt copied. Paste it into ChatGPT or Claude.', '');

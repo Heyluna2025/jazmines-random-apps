@@ -89,6 +89,13 @@
 .guide-list li { margin: 6px 0; color: var(--lavender-100); }
 .prompt-box { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95rem; line-height: 1.5; padding: 14px; border-radius: var(--radius-sm); background: rgba(0, 0, 0, 0.25); border: 1px dashed var(--border); margin: 8px 0 10px; user-select: all; }
 .rules { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.offer { background: var(--lavender-300); color: var(--violet-900); border-color: transparent; }
+.offer .kicker { color: var(--violet-600); }
+.offer h2 { font-size: 1.2rem; line-height: 1.3; }
+.offer .guide-list li { color: var(--violet-800); }
+.offer-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.offer-tag { flex: 1 1 auto; min-width: 0; font-weight: 900; font-size: 1.05rem; color: var(--violet-900); word-break: break-all; text-decoration: none; }
+.offer .btn.ghost { color: var(--violet-800); border-color: var(--violet-600); flex: 0 0 auto; }
 .follow h2 { font-size: 1.25rem; margin-bottom: 14px; }
 .follow .btn { justify-content: space-between; }
 .follow .btn::after { content: "↗"; opacity: 0.6; }

@@ -153,6 +153,19 @@ const SOCIAL = {
   ],
 };
 
+// The offer on the final screen.
+const OFFER = {
+  kicker: 'A gift for today',
+  title: '7 days of free access to 200+ hours of how to earn with AI at the AI Empowered Club',
+  steps: [
+    'Post what you learned from Coach Jazmine today, with a selfie or a photo of this event.',
+    'Add the hashtag below.',
+    'Email a screenshot of your post to the address below.',
+  ],
+  hashtag: '#AIBestieRYEC',
+  email: 'admin@aiempoweredclub.com',
+};
+
 // The "build your own" guide students read on their phones after the card.
 const GUIDE = {
   title: 'Build and launch your own',
@@ -231,4 +244,4 @@ const WELCOME = {
   },
 };
 
-module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, SLIDE_COUNT: SLIDES.length };
+module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, OFFER, SLIDE_COUNT: SLIDES.length };
