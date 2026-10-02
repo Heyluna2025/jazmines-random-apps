@@ -188,6 +188,33 @@ function createApp({ store, presenterPassword, presenterPath = null, phoneLimit 
 
   // ----- public API (audience + projector) ---------------------------------
 
+  // Is the database connected and answering? Open /api/health on a phone.
+  // It does a real round trip, so "ok" means the backend works, and on
+  // failure it shows the exact error to fix.
+  app.get('/api/health', wrap(async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const started = Date.now();
+    const out = {
+      storage: store.kind,
+      shared: store.kind !== 'memory',
+      commit: (process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7),
+      convexKeyPresent: Boolean(process.env.CONVEX_DEPLOY_KEY),
+      convexEnabled: process.env.CONVEX_ENABLED === '1',
+    };
+    try {
+      await store.ping();
+      out.ok = true;
+      out.ms = Date.now() - started;
+      out.message = out.shared
+        ? `Connected to ${store.kind === 'convex' ? 'Convex' : 'Redis'} — data is shared and saved.`
+        : 'No database connected: data lives in each server’s memory and can be lost.';
+    } catch (err) {
+      out.ok = false;
+      out.error = String(err && err.message ? err.message : err).slice(0, 500);
+    }
+    res.status(out.ok ? 200 : 503).json(out);
+  }));
+
   // Which version is live: open /api/version on a phone to check a deploy.
   app.get('/api/version', (req, res) => {
     res.set('Cache-Control', 'no-store');

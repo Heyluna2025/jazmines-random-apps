@@ -238,6 +238,10 @@ class MemoryStore {
     return entry.count;
   }
 
+  async ping() {
+    return { ok: true };
+  }
+
   async close() {
     clearTimeout(this._saveTimer);
     this._saveTimer = null;

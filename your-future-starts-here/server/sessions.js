@@ -96,10 +96,13 @@ function newSnapshot(code, name, now) {
 // Count votes for one activity and work out the winner. Ties (including
 // "no votes yet") have no winner until the presenter picks one of the leaders.
 function tally(activity, choices) {
-  const counts = choices.map(() => 0);
-  for (const c of Object.values(activity.votes)) {
-    const i = Number(c);
-    if (counts[i] !== undefined) counts[i]++;
+  // Stores that keep running totals pass `counts`; others pass every vote.
+  const counts = choices.map((_, i) => (activity.counts ? Number(activity.counts[i] || 0) : 0));
+  if (!activity.counts) {
+    for (const c of Object.values(activity.votes || {})) {
+      const i = Number(c);
+      if (counts[i] !== undefined) counts[i]++;
+    }
   }
   const total = counts.reduce((a, b) => a + b, 0);
   const max = Math.max(...counts);

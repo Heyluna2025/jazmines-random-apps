@@ -1,59 +1,51 @@
-// Convex backend for the app. These functions are thin: they read and write
-// rows and return the same "snapshot" shape the other stores produce, so the
-// validation and view logic in server/sessions.js is shared by every store.
-// All functions are internal: only the app's server, holding the deploy key, can call them.
+// Convex backend for the app. Built for ~1,000 phones at once:
+// - student writes read and write only their own rows (point lookups) plus
+//   one randomly chosen counter shard, so concurrent writes rarely collide;
+// - totals come from counter shards, so nothing reads every vote;
+// - mutations return only what they changed; the app reads fresh state with
+//   a query afterwards (queries never conflict with writes).
+// All functions are internal: only the app's server, holding the deploy key,
+// can call them.
 import { internalQueryGeneric as query, internalMutationGeneric as mutation } from 'convex/server';
 import { v } from 'convex/values';
 
+const SHARDS = 8;
+const POLL_CHOICES = 5;
+const FEATURE_CHOICES = 4;
+
 const sessionByCode = (db, code) => db.query('sessions').withIndex('by_code', (q) => q.eq('code', code)).unique();
+const rowByPid = (db, table, code, pid) => db.query(table).withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique();
+const voteRow = (db, code, activity, pid) => db.query('votes').withIndex('by_code_activity_pid', (q) => q.eq('code', code).eq('activity', activity).eq('pid', pid)).unique();
 
-async function snapshotOf(db, s) {
-  const [participants, pollVotes, featureVotes, cards, profiles] = await Promise.all([
-    db.query('participants').withIndex('by_code', (q) => q.eq('code', s.code)).collect(),
-    db.query('votes').withIndex('by_code_activity', (q) => q.eq('code', s.code).eq('activity', 'poll')).collect(),
-    db.query('votes').withIndex('by_code_activity', (q) => q.eq('code', s.code).eq('activity', 'feature')).collect(),
-    db.query('cards').withIndex('by_code', (q) => q.eq('code', s.code)).collect(),
-    db.query('profiles').withIndex('by_code', (q) => q.eq('code', s.code)).collect(),
-  ]);
-  const votesMap = (rows) => Object.fromEntries(rows.map((r) => [r.pid, r.choice]));
-  return {
-    code: s.code,
-    name: s.name,
-    createdAt: s.createdAt,
-    updatedAt: s.updatedAt,
-    version: s.version,
-    fields: s.fields,
-    participantCount: participants.length,
-    profileCount: profiles.length,
-    pollVotes: votesMap(pollVotes),
-    featureVotes: votesMap(featureVotes),
-    completedCount: cards.length,
-  };
+async function addCounter(db, code, key, delta) {
+  const shard = Math.floor(Math.random() * SHARDS);
+  const row = await db.query('counters').withIndex('by_code_key_shard', (q) => q.eq('code', code).eq('key', key).eq('shard', shard)).unique();
+  if (row) await db.patch(row._id, { value: row.value + delta });
+  else await db.insert('counters', { code, key, shard, value: delta });
 }
 
-async function bump(db, s, patch = {}) {
-  const fields = { ...s.fields, ...patch };
-  await db.patch(s._id, { fields, version: s.version + 1, updatedAt: Date.now() });
-  return { ...s, fields, version: s.version + 1 };
+async function totals(db, code) {
+  const rows = await db.query('counters').withIndex('by_code', (q) => q.eq('code', code)).collect();
+  const sum = {};
+  for (const r of rows) sum[r.key] = (sum[r.key] || 0) + r.value;
+  return sum;
 }
 
+// Adds the participant if new; returns true when it was new.
 async function ensureParticipant(db, code, pid) {
-  const existing = await db.query('participants').withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique();
-  if (existing) return false;
+  if (await rowByPid(db, 'participants', code, pid)) return false;
   await db.insert('participants', { code, pid, joinedAt: Date.now() });
+  await addCounter(db, code, 'participants', 1);
   return true;
 }
 
-async function deleteRows(db, table, code) {
+async function deleteByCode(db, table, code) {
   const rows = await db.query(table).withIndex('by_code', (q) => q.eq('code', code)).collect();
   for (const r of rows) await db.delete(r._id);
 }
 
-async function deleteVotes(db, code) {
-  for (const activity of ['poll', 'feature']) {
-    const rows = await db.query('votes').withIndex('by_code_activity', (q) => q.eq('code', code).eq('activity', activity)).collect();
-    for (const r of rows) await db.delete(r._id);
-  }
+async function clearSessionData(db, code) {
+  for (const table of ['participants', 'votes', 'cards', 'profiles', 'counters']) await deleteByCode(db, table, code);
 }
 
 async function metaGet(db, key) {
@@ -68,28 +60,61 @@ async function metaSet(db, key, value) {
   else await db.insert('meta', { key, value });
 }
 
-// ----- sessions ------------------------------------------------------------
+// ----- reading ---------------------------------------------------------------
+
+export const ping = query({ args: {}, handler: async () => ({ ok: true }) });
 
 export const getSession = query({
   args: { code: v.string() },
   handler: async ({ db }, { code }) => {
     const s = await sessionByCode(db, code);
-    return s ? snapshotOf(db, s) : null;
+    if (!s) return null;
+    const t = await totals(db, code);
+    const counts = (activity, n) => Array.from({ length: n }, (_, i) => t[`${activity}:${i}`] || 0);
+    return {
+      code: s.code,
+      name: s.name,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+      // Presenter changes bump s.version; every student write bumps "writes".
+      version: s.version * 1e9 + (t.writes || 0),
+      fields: s.fields,
+      participantCount: t.participants || 0,
+      profileCount: t.profiles || 0,
+      completedCount: t.cards || 0,
+      pollCounts: counts('poll', POLL_CHOICES),
+      featureCounts: counts('feature', FEATURE_CHOICES),
+    };
   },
 });
 
 export const listSessions = query({
   args: {},
   handler: async ({ db }) => {
-    const rows = await db.query('sessions').order('desc').collect();
+    const rows = await db.query('sessions').collect();
     const out = [];
     for (const s of rows) {
-      const participants = await db.query('participants').withIndex('by_code', (q) => q.eq('code', s.code)).collect();
-      out.push({ code: s.code, name: s.name, createdAt: s.createdAt, updatedAt: s.updatedAt, slide: s.fields.slide, ended: Boolean(s.fields.ended), participants: participants.length });
+      const t = await totals(db, s.code);
+      out.push({ code: s.code, name: s.name, createdAt: s.createdAt, updatedAt: s.updatedAt, slide: s.fields.slide, ended: Boolean(s.fields.ended), participants: t.participants || 0 });
     }
     return out.sort((a, b) => b.createdAt - a.createdAt);
   },
 });
+
+export const listProfiles = query({
+  args: { code: v.string() },
+  handler: async ({ db }, { code }) => {
+    const rows = await db.query('profiles').withIndex('by_code', (q) => q.eq('code', code)).collect();
+    return rows.map((p) => ({ pid: p.pid, name: p.name, school: p.school, email: p.email, at: p.at })).sort((a, b) => a.at - b.at);
+  },
+});
+
+export const isCardDone = query({
+  args: { code: v.string(), pid: v.string() },
+  handler: async ({ db }, { code, pid }) => Boolean(await rowByPid(db, 'cards', code, pid)),
+});
+
+// ----- presenter writes (touch the session row) -----------------------------
 
 export const createSession = mutation({
   args: { code: v.string(), name: v.string(), fields: v.any() },
@@ -101,17 +126,12 @@ export const createSession = mutation({
   },
 });
 
-export const deleteSession = mutation({
-  args: { code: v.string() },
-  handler: async ({ db }, { code }) => {
+export const commit = mutation({
+  args: { code: v.string(), patch: v.any() },
+  handler: async ({ db }, { code, patch }) => {
     const s = await sessionByCode(db, code);
     if (!s) return false;
-    await deleteRows(db, 'participants', code);
-    await deleteRows(db, 'cards', code);
-    await deleteRows(db, 'profiles', code);
-    await deleteVotes(db, code);
-    await db.delete(s._id);
-    if ((await metaGet(db, 'live')) === code) await metaSet(db, 'live', null);
+    await db.patch(s._id, { fields: { ...s.fields, ...patch }, version: s.version + 1, updatedAt: Date.now() });
     return true;
   },
 });
@@ -120,44 +140,44 @@ export const resetSession = mutation({
   args: { code: v.string(), fields: v.any() },
   handler: async ({ db }, { code, fields }) => {
     const s = await sessionByCode(db, code);
-    if (!s) return null;
-    await deleteRows(db, 'participants', code);
-    await deleteRows(db, 'cards', code);
-    await deleteRows(db, 'profiles', code);
-    await deleteVotes(db, code);
-    const next = await bump(db, s, fields);
-    return snapshotOf(db, next);
+    if (!s) return false;
+    await clearSessionData(db, code);
+    await db.patch(s._id, { fields: { ...s.fields, ...fields }, version: s.version + 1, updatedAt: Date.now() });
+    return true;
   },
 });
 
-// Apply a validated patch of session fields (the store validates first).
-export const commit = mutation({
-  args: { code: v.string(), patch: v.any() },
-  handler: async ({ db }, { code, patch }) => {
+export const deleteSession = mutation({
+  args: { code: v.string() },
+  handler: async ({ db }, { code }) => {
     const s = await sessionByCode(db, code);
-    if (!s) return null;
-    const next = await bump(db, s, patch);
-    return snapshotOf(db, next);
+    if (!s) return false;
+    await clearSessionData(db, code);
+    await db.delete(s._id);
+    if ((await metaGet(db, 'live')) === code) await metaSet(db, 'live', null);
+    return true;
   },
 });
 
-// ----- audience ------------------------------------------------------------
+// ----- student writes (own rows + one counter shard; never the session row)
 
 export const join = mutation({
   args: { code: v.string(), pid: v.string() },
   handler: async ({ db }, { code, pid }) => {
-    let s = await sessionByCode(db, code);
-    if (!s) return null;
-    if (await ensureParticipant(db, code, pid)) s = await bump(db, s);
+    if (!(await sessionByCode(db, code))) return null;
+    if (await ensureParticipant(db, code, pid)) await addCounter(db, code, 'writes', 1);
     const [poll, feature, card, profile] = await Promise.all([
-      db.query('votes').withIndex('by_code_activity_pid', (q) => q.eq('code', code).eq('activity', 'poll').eq('pid', pid)).unique(),
-      db.query('votes').withIndex('by_code_activity_pid', (q) => q.eq('code', code).eq('activity', 'feature').eq('pid', pid)).unique(),
-      db.query('cards').withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique(),
-      db.query('profiles').withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique(),
+      voteRow(db, code, 'poll', pid),
+      voteRow(db, code, 'feature', pid),
+      rowByPid(db, 'cards', code, pid),
+      rowByPid(db, 'profiles', code, pid),
     ]);
     return {
-      my: { poll: poll ? poll.choice : null, feature: feature ? feature.choice : null, cardCompleted: Boolean(card), registered: Boolean(profile), name: profile ? profile.name : null },
-      snapshot: await snapshotOf(db, s),
+      poll: poll ? poll.choice : null,
+      feature: feature ? feature.choice : null,
+      cardCompleted: Boolean(card),
+      registered: Boolean(profile),
+      name: profile ? profile.name : null,
     };
   },
 });
@@ -165,56 +185,49 @@ export const join = mutation({
 export const vote = mutation({
   args: { code: v.string(), activity: v.string(), pid: v.string(), choice: v.number() },
   handler: async ({ db }, { code, activity, pid, choice }) => {
-    let s = await sessionByCode(db, code);
-    if (!s) return null;
-    const existing = await db.query('votes').withIndex('by_code_activity_pid', (q) => q.eq('code', code).eq('activity', activity).eq('pid', pid)).unique();
-    if (existing) await db.patch(existing._id, { choice });
-    else await db.insert('votes', { code, activity, pid, choice });
+    if (!(await sessionByCode(db, code))) return false;
     await ensureParticipant(db, code, pid);
-    s = await bump(db, s);
-    return snapshotOf(db, s);
+    const existing = await voteRow(db, code, activity, pid);
+    if (existing && existing.choice === choice) return true;
+    if (existing) {
+      await db.patch(existing._id, { choice });
+      await addCounter(db, code, `${activity}:${existing.choice}`, -1);
+    } else {
+      await db.insert('votes', { code, activity, pid, choice });
+    }
+    await addCounter(db, code, `${activity}:${choice}`, 1);
+    await addCounter(db, code, 'writes', 1);
+    return true;
   },
 });
 
 export const completeCard = mutation({
   args: { code: v.string(), pid: v.string() },
   handler: async ({ db }, { code, pid }) => {
-    let s = await sessionByCode(db, code);
-    if (!s) return null;
-    const existing = await db.query('cards').withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique();
-    if (existing) return { duplicate: true, snapshot: await snapshotOf(db, s) };
-    await db.insert('cards', { code, pid, at: Date.now() });
+    if (!(await sessionByCode(db, code))) return null;
+    if (await rowByPid(db, 'cards', code, pid)) return { duplicate: true };
     await ensureParticipant(db, code, pid);
-    s = await bump(db, s);
-    return { duplicate: false, snapshot: await snapshotOf(db, s) };
+    await db.insert('cards', { code, pid, at: Date.now() });
+    await addCounter(db, code, 'cards', 1);
+    await addCounter(db, code, 'writes', 1);
+    return { duplicate: false };
   },
-});
-
-export const isCardDone = query({
-  args: { code: v.string(), pid: v.string() },
-  handler: async ({ db }, { code, pid }) => Boolean(await db.query('cards').withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique()),
 });
 
 export const setProfile = mutation({
   args: { code: v.string(), pid: v.string(), name: v.string(), school: v.string(), email: v.string() },
   handler: async ({ db }, { code, pid, name, school, email }) => {
-    let s = await sessionByCode(db, code);
-    if (!s) return null;
-    const at = Date.now();
-    const existing = await db.query('profiles').withIndex('by_code_pid', (q) => q.eq('code', code).eq('pid', pid)).unique();
-    if (existing) await db.patch(existing._id, { name, school, email });
-    else await db.insert('profiles', { code, pid, name, school, email, at });
+    if (!(await sessionByCode(db, code))) return false;
     await ensureParticipant(db, code, pid);
-    s = await bump(db, s);
-    return snapshotOf(db, s);
-  },
-});
-
-export const listProfiles = query({
-  args: { code: v.string() },
-  handler: async ({ db }, { code }) => {
-    const rows = await db.query('profiles').withIndex('by_code', (q) => q.eq('code', code)).collect();
-    return rows.map((p) => ({ pid: p.pid, name: p.name, school: p.school, email: p.email, at: p.at })).sort((a, b) => a.at - b.at);
+    const existing = await rowByPid(db, 'profiles', code, pid);
+    if (existing) {
+      await db.patch(existing._id, { name, school, email });
+    } else {
+      await db.insert('profiles', { code, pid, name, school, email, at: Date.now() });
+      await addCounter(db, code, 'profiles', 1);
+    }
+    await addCounter(db, code, 'writes', 1);
+    return true;
   },
 });
 

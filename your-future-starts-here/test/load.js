@@ -4,7 +4,7 @@
 // (join → sign-in → poll → mistake answer → card) while also polling state,
 // against the real HTTP app. Then it checks that nothing was lost.
 //
-//   node test/load.js [students=1000] [store=redis|memory]
+//   node test/load.js [students=1000] [store=redis|memory|convex]
 //
 // The Redis store runs against the fake Upstash server, so this measures the
 // app's own logic and correctness under concurrency, not the network.
@@ -24,7 +24,17 @@ http.globalAgent.maxSockets = Infinity;
 async function main() {
   let fake = null;
   let store;
-  if (KIND === 'redis') {
+  if (KIND === 'convex') {
+    const path = require('path');
+    const { pathToFileURL } = require('url');
+    const { convexTest } = await import('convex-test');
+    const { ConvexStore } = require('../server/store-convex');
+    const dir = path.join(__dirname, '..', 'convex');
+    const imp = (f) => () => import(pathToFileURL(path.join(dir, f)).href);
+    const schema = (await imp('schema.js')()).default;
+    const t = convexTest(schema, { './sessions.js': imp('sessions.js'), './schema.js': imp('schema.js'), './_generated/api.js': async () => ({}) });
+    store = new ConvexStore({ query: (ref, args) => t.query(ref, args), mutation: (ref, args) => t.mutation(ref, args) });
+  } else if (KIND === 'redis') {
     fake = await startFakeUpstash();
     store = new RedisStore(new Upstash({ url: fake.url, token: fake.token }));
   } else {

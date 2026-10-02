@@ -329,6 +329,10 @@ class RedisStore {
     return Number(count);
   }
 
+  async ping() {
+    return { ok: (await this.r.cmd('PING')) === 'PONG' };
+  }
+
   async close() {}
 }
 
