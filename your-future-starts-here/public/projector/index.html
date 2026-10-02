@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#160b3a">
+<title>Projector · Your Future Starts Here</title>
+<link rel="stylesheet" href="/shared/fonts.css">
+<link rel="stylesheet" href="/shared/base.css">
+<style>
+  html, body { height: 100%; overflow: hidden; }
+  body { font-size: clamp(18px, 2.2vmin, 34px); }
+  .stage { position: relative; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; padding: 3vmin 5vmin; }
+  .brand-bar { display: flex; align-items: center; gap: 1em; color: var(--lavender-300); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.75em; }
+  .brand-bar .logo { font-size: 1.6em; color: #fff; letter-spacing: normal; }
+  .thanks .logo { font-size: 2em; margin-bottom: 0.4em; }
+  .brand-bar .spacer { flex: 1; }
+  .slide { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 4vmin; align-items: center; min-height: 0; }
+  .slide.no-panel { grid-template-columns: 1fr; }
+  .slide h1 { font-size: 2.6em; line-height: 1.08; margin: 0 0 0.4em; }
+  .kicker { font-size: 0.8em; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lavender-300); font-weight: 800; margin-bottom: 0.5em; }
+  .lines p { font-size: 1.25em; margin: 0 0 0.5em; color: var(--lavender-100); }
+  .lines p:first-child { font-size: 1.45em; color: #fff; font-weight: 700; }
+  .columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vmin; margin-top: 1.5em; }
+  .columns .card h2 { font-size: 1.3em; }
+  .columns .card p { font-size: 1em; color: var(--lavender-100); margin: 0; }
+  .panel { min-height: 0; }
+  .panel .card { padding: 3vmin; }
+  .panel .question { font-size: 1.5em; font-weight: 900; margin-bottom: 0.6em; }
+  .panel .bars { gap: 1.2vmin; }
+  .panel .bar-label { font-size: 1.05em; }
+  .panel .bar-value { font-size: 1.05em; }
+  .panel .bar-track { height: 2.6vmin; }
+  .count { font-size: 3.5em; font-weight: 900; line-height: 1; }
+  .count-label { color: var(--text-dim); font-size: 0.95em; }
+  .winner-box { background: var(--lavender-300); color: var(--violet-900); border-radius: var(--radius); padding: 3vmin; text-align: center; }
+  .winner-box .label { font-size: 0.8em; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 800; opacity: 0.7; }
+  .winner-box .value { font-size: 1.8em; font-weight: 900; margin-top: 0.2em; }
+  .join-big { display: grid; grid-template-columns: auto 1fr; gap: 3vmin; align-items: center; }
+  .join-big .qr { width: 36vmin; height: 36vmin; background: white; border-radius: 2vmin; padding: 1.5vmin; }
+  .join-big .url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 900; font-size: 1.25em; line-height: 1.2; overflow-wrap: anywhere; }
+  .join-big .code { font-size: 3em; font-weight: 900; letter-spacing: 0.15em; color: var(--lavender-200); }
+  .footer { display: flex; align-items: center; gap: 2vmin; font-size: 0.75em; color: var(--text-dim); }
+  .footer .mini-qr { width: 9vmin; height: 9vmin; background: white; border-radius: 1vmin; padding: 0.6vmin; }
+  .footer .url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 800; color: var(--lavender-100); }
+  .footer .pill { font-size: 0.8em; }
+  .slide-num { margin-left: auto; font-variant-numeric: tabular-nums; }
+  body.activity-mode .stage { grid-template-rows: auto 1fr auto; }
+  body.activity-mode .slide { grid-template-columns: 1fr; }
+  body.activity-mode .slide-text { display: none; }
+  body.activity-mode .panel .card { padding: 5vmin; }
+  @media (max-aspect-ratio: 1/1) { .slide { grid-template-columns: 1fr; } .columns { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="stage" class="stage"><div class="card"><p class="muted">Connecting…</p></div></div>
+<script src="/shared/net.js"></script>
+<script src="/shared/logo.js"></script>
+<script src="/projector/projector.js"></script>
+</body>
+</html>

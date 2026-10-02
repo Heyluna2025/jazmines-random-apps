@@ -1,0 +1,63 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+  background: rgba(22, 11, 58, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar .brand { font-weight: 800; letter-spacing: 0.04em; color: var(--lavender-200); font-size: 0.95rem; }
+
+.screen {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px 16px calc(32px + env(safe-area-inset-bottom));
+}
+.screen h1 { font-size: 1.7rem; }
+.screen h2 { font-size: 1.3rem; }
+.kicker { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lavender-300); font-weight: 800; margin-bottom: 6px; }
+.question { font-size: 1.45rem; font-weight: 900; margin: 4px 0 12px; }
+.wait { text-align: center; padding: 36px 20px; }
+.wait .big-emoji { font-size: 3.4rem; }
+.winner {
+  margin: 16px 0;
+  padding: 22px;
+  border-radius: var(--radius);
+  background: var(--lavender-300);
+  color: var(--violet-900);
+  text-align: center;
+}
+.winner .label { font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 800; opacity: 0.75; }
+.winner .value { font-size: 1.5rem; font-weight: 900; margin-top: 6px; }
+.examples { padding: 14px 16px; border-radius: var(--radius-sm); background: var(--surface); border: 1px dashed var(--border); margin-bottom: 18px; }
+.examples ul { margin: 6px 0 0; padding-left: 18px; }
+.examples li { margin: 4px 0; color: var(--text-dim); }
+
+/* Action card — the on-screen version is screenshot friendly */
+.action-card {
+  background: var(--lavender-100);
+  color: var(--violet-800);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+  background-image:
+    linear-gradient(rgba(58, 36, 135, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58, 36, 135, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.action-card .ac-title { font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 900; color: var(--violet-600); }
+.action-card .ac-project { font-size: 1.35rem; font-weight: 900; margin: 8px 0 18px; line-height: 1.25; }
+.action-card .ac-row { margin: 12px 0; }
+.action-card .ac-label { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 800; color: var(--lavender-500); }
+.action-card .ac-value { font-size: 1.1rem; font-weight: 800; margin-top: 2px; word-wrap: break-word; }
+.action-card .ac-reminder { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(58, 36, 135, 0.2); font-size: 0.92rem; color: rgba(31, 17, 80, 0.8); }
+.action-card .ac-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 14px; font-size: 0.72rem; font-weight: 800; color: var(--violet-600); letter-spacing: 0.08em; text-transform: uppercase; }
+.action-card .ac-footer span { white-space: nowrap; }
+.action-card .ac-footer .logo { color: var(--violet-700); }
+.card-preview { width: 100%; border-radius: 16px; box-shadow: var(--shadow); display: block; }
