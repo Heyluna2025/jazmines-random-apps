@@ -24,6 +24,10 @@ Optional: set `PRESENTER_PASSWORD` to require a sign-in on the control page. Lea
 
 How it runs on Vercel: pages and assets come from the CDN, `/`, `/join` and `/api/*` go to one serverless function (`api/index.js`), phones poll a state endpoint that the edge caches for one second, and state lives in Upstash Redis. Live updates land on phones within about 2–3 seconds.
 
+## Sign-up list
+
+Students enter name, school and email after the welcome letter. The list is kept in the store (Redis on Vercel) until the session is deleted — it is exempt from the 60-day expiry the rest of a session has — and the controls page has a **Download list (CSV)** button. Public endpoints only ever expose the count.
+
 ## Printed QR code
 
 `docs/qr/` holds a ready-to-paste QR for `https://yourfuturestartshere.xyz`: `join-qr.png` (2048 px) and `join-qr.svg` plain, plus branded light and dark tiles (`join-card-light.png`, `join-card-dark.png`). The domain always opens the session marked live on the presenter page (or the newest open one), so the same QR works for every talk. Regenerate for another address with:

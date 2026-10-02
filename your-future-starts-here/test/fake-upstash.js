@@ -25,6 +25,7 @@ function createDb() {
     EXISTS: (...keys) => keys.filter((k) => data.has(k)).length,
     DEL: (...keys) => keys.reduce((n, k) => n + (data.delete(k) ? 1 : 0), 0),
     EXPIRE: (key) => (data.has(key) ? 1 : 0),
+    PERSIST: (key) => (data.has(key) ? 1 : 0),
     GET: (key) => get(key, 'string'),
     SET: (key, value) => { data.set(key, { type: 'string', value }); return 'OK'; },
     INCR: (key) => {

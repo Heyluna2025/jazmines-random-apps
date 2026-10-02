@@ -260,7 +260,8 @@ class RedisStore {
     const profile = S.cleanProfile(input);
     const [added] = await this._commit(s.code, {}, {
       before: [['HSET', k.prof(s.code), pid, JSON.stringify(profile)], ['HSETNX', k.p(s.code), pid, String(Date.now())]],
-      after: [['EXPIRE', k.prof(s.code), TTL], ['EXPIRE', k.p(s.code), TTL]],
+      // The sign-up list never expires on its own; it goes only when the session is deleted.
+      after: [['PERSIST', k.prof(s.code)], ['EXPIRE', k.p(s.code), TTL]],
     });
     const snapshot = this._after(s);
     if (added) snapshot.profileCount += 1;
