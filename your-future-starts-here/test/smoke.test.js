@@ -85,13 +85,13 @@ for (const kind of ['memory', 'redis']) {
       const a = await json('POST', `/api/sessions/${code}/join`, {});
       const b = await json('POST', `/api/sessions/${code}/join`, {});
       assert.notEqual(a.data.pid, b.data.pid);
-      assert.equal(a.data.state.focus, 'waiting');
+      assert.equal(a.data.state.focus, 'poll', 'the opening poll is open from the start');
       const before = await state();
       assert.equal(before.participantCount, 2);
 
-      // Voting is rejected while the poll is still closed
+      // Voting is rejected while the poll is closed, and resumes when reopened
+      await json('POST', `/api/sessions/${code}/activities/poll`, { action: 'close' }, true);
       assert.equal((await json('POST', `/api/sessions/${code}/vote/poll`, { pid: a.data.pid, choice: 0 })).status, 409);
-
       await json('POST', `/api/sessions/${code}/activities/poll`, { action: 'open' }, true);
       const sa = await state();
       const sb = await state();
@@ -309,11 +309,12 @@ test.describe('open mode (no PRESENTER_PASSWORD)', () => {
     const list = await (await fetch(`${base}/api/sessions`)).json();
     assert.equal(list.sessions.length, 1);
     assert.equal(list.live, code);
-    const open = await fetch(`${base}/api/sessions/${code}/activities/poll`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'open' }),
+    assert.equal((await (await fetch(`${base}/api/sessions/${code}/state`)).json()).state.focus, 'poll', 'poll open on arrival');
+    const close = await fetch(`${base}/api/sessions/${code}/activities/poll`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'close' }),
     });
-    assert.equal(open.status, 200);
-    assert.equal((await (await fetch(`${base}/api/sessions/${code}/state`)).json()).state.focus, 'poll');
+    assert.equal(close.status, 200);
+    assert.equal((await (await fetch(`${base}/api/sessions/${code}/state`)).json()).state.activities.poll.status, 'closed');
 
     // Second visit reuses the session rather than creating another
     assert.equal((await fetch(`${base}/join`, { redirect: 'manual' })).headers.get('location'), `/a/${code}`);

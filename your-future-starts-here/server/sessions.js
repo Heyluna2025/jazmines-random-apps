@@ -41,11 +41,13 @@ const cleanName = (name) => String(name || '').trim().slice(0, 60) || 'Untitled 
 // A session is described by flat fields. "poll:status" style keys map onto
 // activities.poll.status in a snapshot and are hash fields in Redis, so both
 // stores apply exactly the same patches.
+// The opening poll starts open, so phones that scan early can answer at once
+// without the presenter pressing anything.
 const RESET_PATCH = {
   slide: 1,
   ended: false,
   endedAt: null,
-  'poll:status': 'pending',
+  'poll:status': 'open',
   'poll:revealed': false,
   'poll:winnerOverride': null,
   'feature:status': 'pending',

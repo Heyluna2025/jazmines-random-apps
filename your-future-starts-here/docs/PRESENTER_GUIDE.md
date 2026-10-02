@@ -18,7 +18,7 @@ The control page shows the current slide, a hint for each one, and the three act
 
 | Slide | Say / do on stage | Tap on the control page | Phones show |
 | --- | --- | --- | --- |
-| 1 · What would you love to become? | Point at the QR code and the short link. Give it two minutes. | **Open poll** as soon as you're on the slide. | The five choices → "You're in!" after tapping Submit. |
+| 1 · What would you love to become? | Point at the QR code and the short link. Give it two minutes. | Nothing — the poll is already open when a session starts. | The five choices → "You're in!" after tapping Submit. |
 | 2 · Meet your future self | Talk through the result. | **Close poll**, then **Reveal results**. | "Poll closed, look at the big screen". |
 | 3–5 | Story · What is AI · One business has many jobs | **Next** only. | Waiting screen with the slide title. |
 | 6 · Let's build something | Introduce the snack app, ask for votes. | **Open voting** → after ~30 s **Close voting** → **Reveal winner**. If it's a tie, pick one of the leaders (buttons appear). | The three features → "Vote counted!" → the winning feature. |
