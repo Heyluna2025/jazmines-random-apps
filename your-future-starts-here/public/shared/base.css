@@ -31,6 +31,9 @@
 [hidden] { display: none !important; }
 
 html, body { margin: 0; min-height: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* No double-tap zoom or 300 ms tap delay on buttons and links (iOS + Android) */
+button, a, input, select, textarea, label, .choice, .chip { touch-action: manipulation; }
 
 body {
   font-family: var(--font);
@@ -64,7 +67,7 @@ button { font: inherit; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
-  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
 }
 .card.solid { background: var(--surface-solid); }
 .card.light {
@@ -206,6 +209,11 @@ label.field > span.help { display: block; color: var(--text-dim); font-size: 0.9
 .spacer { flex: 1; }
 .center { text-align: center; }
 .big-emoji { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
+
+/* Fixed backgrounds jitter or are ignored on phones; let the grid scroll there */
+@media (hover: none) and (pointer: coarse) {
+  body { background-attachment: scroll; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }

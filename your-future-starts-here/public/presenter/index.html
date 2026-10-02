@@ -36,7 +36,7 @@
   .grid > .notice { margin: 0; }
 
   /* Thumb-reach bar for running the talk from a phone */
-  .quickbar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(16, 8, 44, 0.96); border-top: 1px solid var(--border); backdrop-filter: blur(8px); }
+  .quickbar { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(16, 8, 44, 0.96); border-top: 1px solid var(--border); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .quickbar .qb-title { min-width: 0; }
   .quickbar .qb-title strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .quickbar .qb-action { grid-column: 1 / -1; }

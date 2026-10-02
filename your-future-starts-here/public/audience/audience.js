@@ -68,7 +68,7 @@
     render();
     poller = poll({
       url: `/api/sessions/${code}/state`,
-      interval: 2500,
+      interval: 6000,
       initial: state,
       onState: (s) => { state = s; render(); },
       onStatus: setConn,

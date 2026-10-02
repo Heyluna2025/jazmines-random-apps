@@ -344,7 +344,7 @@ test.describe('hardening', () => {
 
   test.before(async () => {
     store = new MemoryStore();
-    server = http.createServer(createApp({ store, presenterPassword: null, presenterPath: 'secret123', writeLimit: 5 }));
+    server = http.createServer(createApp({ store, presenterPassword: null, presenterPath: 'secret123', phoneLimit: 3, networkLimit: 8 }));
     await new Promise((r) => server.listen(0, '127.0.0.1', r));
     base = `http://127.0.0.1:${server.address().port}`;
   });
@@ -375,12 +375,20 @@ test.describe('hardening', () => {
     assert.match(csv, /"'=HYPERLINK\(""http:\/\/evil"",""x""\)","'\+1\+1","a@b.ph"/);
   });
 
-  test('public writes are rate limited per IP', async () => {
+  test('public writes are rate limited per phone, with a high per-network cap', async () => {
     const first = await fetch(`${base}/join`, { redirect: 'manual' });
     const code = first.headers.get('location').slice(3);
-    const statuses = [];
-    for (let i = 0; i < 6; i++) statuses.push((await post(`/api/sessions/${code}/join`, {})).status);
-    assert.equal(statuses.includes(429), true, `got ${statuses}`);
+    // One phone hammering: blocked after its own limit
+    const pid = 'a'.repeat(32);
+    const phone = [];
+    for (let i = 0; i < 4; i++) phone.push((await post(`/api/sessions/${code}/join`, { pid })).status);
+    assert.deepEqual(phone.slice(0, 3), [200, 200, 200]);
+    assert.equal(phone[3], 429);
+    // Other phones on the same network still get through until the network cap
+    const others = [];
+    for (let i = 0; i < 5; i++) others.push((await post(`/api/sessions/${code}/join`, {})).status);
+    assert.equal(others.includes(429), true, `got ${others}`);
+    assert.equal(others[0], 200);
     // Reads are not limited
     assert.equal((await fetch(`${base}/api/sessions/${code}/state`)).status, 200);
   });

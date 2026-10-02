@@ -27,23 +27,29 @@ function csvCell(value) {
   return `"${s.replace(/"/g, '""')}"`;
 }
 
-// Per-instance, per-IP limit on the public write endpoints. Generous because
-// a whole classroom can share one school IP; it only stops scripted floods.
-function rateLimiter({ limit, windowMs }) {
+// Limits on the public write endpoints, per server instance. Two counters:
+// per phone (participant id) to stop one device hammering, and a very high
+// per-network cap so a whole school on one Wi-Fi is never blocked — it only
+// stops scripted floods.
+function rateLimiter({ perPhone, perNetwork, windowMs }) {
   const hits = new Map();
-  return (req, res, next) => {
-    const now = Date.now();
-    const key = req.ip || 'unknown';
+  const over = (key, limit, now) => {
     let entry = hits.get(key);
     if (!entry || now > entry.resetAt) {
       entry = { count: 0, resetAt: now + windowMs };
       hits.set(key, entry);
-      if (hits.size > 5000) for (const [k, e] of hits) if (now > e.resetAt) hits.delete(k);
+      if (hits.size > 20000) for (const [k, e] of hits) if (now > e.resetAt) hits.delete(k);
     }
     entry.count += 1;
-    if (entry.count > limit) {
-      res.set('Retry-After', String(Math.ceil((entry.resetAt - now) / 1000)));
-      return res.status(429).json({ error: 'Too many requests from this network. Wait a moment and try again.' });
+    return entry.count > limit ? entry : null;
+  };
+  return (req, res, next) => {
+    const now = Date.now();
+    const pid = req.body && typeof req.body.pid === 'string' ? req.body.pid.slice(0, 64) : null;
+    const hit = (pid && over(`p:${pid}`, perPhone, now)) || over(`n:${req.ip || 'unknown'}`, perNetwork, now);
+    if (hit) {
+      res.set('Retry-After', String(Math.ceil((hit.resetAt - now) / 1000)));
+      return res.status(429).json({ error: 'Too many requests. Wait a moment and try again.' });
     }
     next();
   };
@@ -51,12 +57,12 @@ function rateLimiter({ limit, windowMs }) {
 
 const DEFAULT_PRESENTER_PATH = 'exqi9dmadqqr';
 
-function createApp({ store, presenterPassword, presenterPath = null, writeLimit = 600 }) {
+function createApp({ store, presenterPassword, presenterPath = null, phoneLimit = 60, networkLimit = 30000 }) {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', true);
   const authRequired = Boolean(presenterPassword);
-  const publicWrites = rateLimiter({ limit: writeLimit, windowMs: 60 * 1000 });
+  const publicWrites = rateLimiter({ perPhone: phoneLimit, perNetwork: networkLimit, windowMs: 60 * 1000 });
 
   // Baseline security headers for everything the app serves.
   app.use((req, res, next) => {
