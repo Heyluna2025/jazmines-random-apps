@@ -1,4 +1,5 @@
 {
+  "buildCommand": "npm run deploy:convex",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/", "destination": "/api" },

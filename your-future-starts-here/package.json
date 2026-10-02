@@ -7,13 +7,18 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "test": "node --test test/smoke.test.js"
+    "test": "node --test test/smoke.test.js test/convex.test.js",
+    "deploy:convex": "node scripts/deploy-convex.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "convex": "^1.46.0",
     "express": "^4.19.2",
     "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "convex-test": "^0.0.60"
   }
 }
