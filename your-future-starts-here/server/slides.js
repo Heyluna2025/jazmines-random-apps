@@ -322,7 +322,6 @@ const WELCOME = {
   },
   roadmap: [
     { title: 'Find your path', text: 'Pick what you’d love to become and get your own path and business ideas to start with.' },
-    { title: 'Spot the AI’s mistake', text: 'Try an app an AI built, find the bug it hid, and see how many others caught it.' },
     { title: 'Your first small project', text: 'Fill in one card: who you’ll help, with what, and your first step.' },
     { title: 'Launch your own', text: 'The exact steps, tools and AI to turn that card into a real app.' },
   ],

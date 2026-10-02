@@ -4,7 +4,7 @@
 
   // Self-paced phone flow. The phone keeps its own place (step); the server
   // keeps everyone's answers so the results each phone shows are shared.
-  const STEPS = ['welcome', 'register', 'poll', 'pollResults', 'feature', 'featureResults', 'card', 'guide', 'follow'];
+  const STEPS = ['welcome', 'register', 'poll', 'pollResults', 'card', 'guide', 'follow'];
 
   const code = codeFromLocation();
   const app = document.getElementById('app');
@@ -20,11 +20,12 @@
   let config = null;
   let poller = null;
   let state = null;
-  let my = { poll: null, feature: null, cardCompleted: false };
+  let my = { poll: null, cardCompleted: false };
   let card = readJson(CARD_KEY);
   let draft = readJson(DRAFT_KEY) || {};
   let step = localStorage.getItem(STEP_KEY) || 'welcome';
-  const ui = { pollPick: null, featurePick: null, busy: false, notice: null, imageUrl: null, imageBlob: null };
+  if (!STEPS.includes(step)) step = 'card'; // phones saved on a step that no longer exists
+  const ui = { pollPick: null, busy: false, notice: null, imageUrl: null, imageBlob: null };
 
   function readJson(key) {
     try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
@@ -62,7 +63,6 @@
     // Skip ahead if this phone already answered (e.g. after a reload)
     if (step === 'register' && my.registered) step = 'poll';
     if (step === 'welcome' && my.poll !== null) step = 'pollResults';
-    if (step === 'pollResults' && my.feature !== null) step = 'featureResults';
     // The note from Coach Jazmine greets each phone once
     if (step === 'welcome' && config.welcome && config.welcome.letter && !localStorage.getItem(LETTER_KEY)) letterOpen = true;
     render();
@@ -117,8 +117,6 @@
       register: renderRegister,
       poll: renderPoll,
       pollResults: renderPollResults,
-      feature: renderFeature,
-      featureResults: renderFeatureResults,
       card: renderCard,
       guide: renderGuide,
       follow: renderFollow,
@@ -130,7 +128,7 @@
 
   function progressBar() {
     const i = stepIndex();
-    const labels = ['Start', 'You', 'Dream', 'Your path', 'Find it', 'Answer', 'Card', 'Build', 'Follow'];
+    const labels = ['Start', 'You', 'Dream', 'Your path', 'Card', 'Build', 'Follow'];
     return `<div class="progress" aria-label="Step ${i + 1} of ${STEPS.length}">
       ${STEPS.map((s, n) => `<span class="dot ${n < i ? 'done' : ''} ${n === i ? 'now' : ''}" title="${labels[n]}"></span>`).join('')}
       <span class="progress-label">${labels[i]} · ${i + 1}/${STEPS.length}</span>
@@ -259,69 +257,8 @@
         <div class="kicker">How everyone answered · live</div>
         ${st.counts ? barChart(a.choices, st.counts, st.total) : '<p class="muted">Results are hidden right now.</p>'}
         <p class="faint" style="margin-top:12px">${st.total} answer${st.total === 1 ? '' : 's'} so far. Every path can become a business.</p>
-        ${nav('poll', 'feature')}
+        ${nav('poll', 'card', 'My project')}
       </div>
-    </div>`;
-  }
-
-  // A small copy of the AI-built snack app, right inside the step. It has the
-  // same deliberate bug as the full demo: the total ignores quantities.
-  const MINI_SNACKS = [
-    { id: 'banana', name: 'Banana Cue', emoji: '🍌', price: 15 },
-    { id: 'kwek', name: 'Kwek-Kwek', emoji: '🥚', price: 25 },
-    { id: 'buko', name: 'Buko Juice', emoji: '🥥', price: 30 },
-  ];
-  const mini = Object.fromEntries(MINI_SNACKS.map((s) => [s.id, 0]));
-  const peso = (n) => `₱${n.toFixed(2)}`;
-
-  function miniApp() {
-    const buggyTotal = MINI_SNACKS.filter((s) => mini[s.id] > 0).reduce((sum, s) => sum + s.price, 0);
-    return `<div class="mini-app" aria-label="Snack app built by AI">
-      <div class="mini-head"><span>🛒 School Fair Snacks</span><span class="mini-tag">built by AI</span></div>
-      ${MINI_SNACKS.map((s) => `<div class="mini-row">
-        <span class="mini-emoji">${s.emoji}</span>
-        <span class="mini-name">${esc(s.name)}<small>${peso(s.price)} each</small></span>
-        <span class="mini-step">
-          <button type="button" data-mini="${s.id}" data-d="-1" ${mini[s.id] ? '' : 'disabled'} aria-label="Remove one ${esc(s.name)}">−</button>
-          <b>${mini[s.id]}</b>
-          <button type="button" data-mini="${s.id}" data-d="1" aria-label="Add one ${esc(s.name)}">+</button>
-        </span>
-      </div>`).join('')}
-      <div class="mini-total"><span>Total</span><strong>${peso(buggyTotal)}</strong></div>
-    </div>`;
-  }
-
-  function renderFeature() {
-    const a = config.activities.feature;
-    const st = state.activities.feature;
-    const picked = ui.featurePick ?? my.feature;
-    return `<div class="card">
-      <div class="kicker">2 · ${esc(a.title)}</div>
-      <p class="muted">An AI built this snack-ordering app for a school fair. One thing in it is wrong. Be the customer: tap <b>+</b> to order, then check the total yourself.</p>
-      ${miniApp()}
-      <p class="faint" style="margin-top:8px">Tip: order 2 or 3 of the same snack. Does the total add up?</p>
-      <div class="question" style="margin-top:18px">${esc(a.question)}</div>
-      ${closedNote(st)}
-      ${choiceList(a.choices, picked)}
-      <button class="btn block" data-action="feature-submit" ${picked === null || ui.busy || st.status !== 'open' ? 'disabled' : ''}>${ui.busy ? 'Sending…' : my.feature !== null ? 'Change my answer' : 'Submit my answer'}</button>
-      ${nav('pollResults', my.feature !== null ? 'featureResults' : null, 'See the answer')}
-    </div>`;
-  }
-
-  function renderFeatureResults() {
-    const a = config.activities.feature;
-    const st = state.activities.feature;
-    const right = my.feature === a.answer;
-    const caught = st.counts && st.total ? Math.round((st.counts[a.answer] / st.total) * 100) : null;
-    return `<div class="card">
-      <div class="kicker">The answer</div>
-      <div class="winner"><div class="label">${my.feature === null ? 'The mistake was' : right ? 'You caught it! 🎉 The mistake was' : 'Good try — the mistake was'}</div>
-        <div class="value">${esc(a.choices[a.answer])}</div></div>
-      <p>${esc(a.explain)}</p>
-      ${caught !== null ? `<p class="muted"><strong>${caught}%</strong> of ${st.total} ${st.total === 1 ? 'person' : 'people'} caught it. Here’s what everyone said:</p>` : ''}
-      ${st.counts ? barChart(a.choices, st.counts, st.total) : ''}
-      <div class="examples" style="margin-top:14px"><strong>The lesson</strong><p style="margin:6px 0 0">${esc(a.lesson)}</p></div>
-      ${nav('feature', 'card', 'My project')}
     </div>`;
   }
 
@@ -352,7 +289,7 @@
     const a = config.activities.card;
     if (card) return renderSavedCard();
     return `<div class="card">
-      <div class="kicker">3 · ${esc(a.title)}</div>
+      <div class="kicker">2 · ${esc(a.title)}</div>
       <div class="question">${esc(a.prompt)}</div>
       ${pathIdeaChips() || `<div class="examples"><strong>Examples</strong><ul>${a.examples.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`}
       <form id="card-form" autocomplete="off">
@@ -371,7 +308,7 @@
         </div>
         <button class="btn block" type="submit">Make my card</button>
       </form>
-      ${nav('featureResults', null)}
+      ${nav('pollResults', null)}
     </div>`;
   }
 
@@ -392,14 +329,14 @@
         <p class="faint">On a phone you can also press and hold the image to save it.</p>
       </div>` : '<p class="faint">Tip: a screenshot works too.</p>'}
       <p class="muted">${done} ${done === 1 ? 'person has' : 'people have'} made a card so far.</p>
-      <div class="card">${nav('featureResults', 'guide', 'How to build one')}</div>
+      <div class="card">${nav('pollResults', 'guide', 'How to build one')}</div>
     </div>`;
   }
 
   function renderGuide() {
     const g = config.guide;
     return `<div class="card">
-      <div class="kicker">4 · ${esc(g.title)}</div>
+      <div class="kicker">3 · ${esc(g.title)}</div>
       <p class="muted">${esc(g.intro)}</p>
       ${g.sections.map((s) => `<h2 class="guide-h">${esc(s.title)}</h2><ol class="guide-list">${s.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ol>`).join('')}
       <h2 class="guide-h">A prompt to start with</h2>
@@ -456,18 +393,10 @@
       if (step === 'card') { render(); window.scrollTo(0, y); notice('Filled in from your path. Make it your own!', ''); }
       else { render(); window.scrollTo(0, y); }
     }));
-    app.querySelectorAll('[data-mini]').forEach((b) => b.addEventListener('click', () => {
-      const id = b.dataset.mini;
-      mini[id] = Math.max(0, Math.min(9, mini[id] + Number(b.dataset.d)));
-      const y = window.scrollY;
-      render();
-      window.scrollTo(0, y);
-    }));
     app.querySelectorAll('[data-pick]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const i = Number(btn.dataset.pick);
         if (step === 'poll') ui.pollPick = i;
-        else if (step === 'feature') ui.featurePick = i;
         else { draft.step = i; writeJson(DRAFT_KEY, draft); }
         render();
       });
@@ -607,7 +536,6 @@
       render();
     },
     'poll-submit': () => submitVote('poll', ui.pollPick ?? my.poll, 'pollResults'),
-    'feature-submit': () => submitVote('feature', ui.featurePick ?? my.feature, 'featureResults'),
     'card-edit': () => {
       draft = { who: card.who, what: card.what, step: card.step };
       writeJson(DRAFT_KEY, draft);
