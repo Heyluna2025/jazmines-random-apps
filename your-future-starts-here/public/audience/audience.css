@@ -110,6 +110,20 @@
 @keyframes bestie-burst { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .bestie-title { color: var(--violet-800); -webkit-text-fill-color: var(--violet-800); } }
 
+/* The in-step snack app for "Spot the AI's mistake" */
+.mini-app { margin-top: 14px; border-radius: 18px; background: var(--lavender-100); color: var(--violet-800); padding: 14px 16px; box-shadow: var(--shadow); }
+.mini-head { display: flex; justify-content: space-between; align-items: center; font-weight: 900; margin-bottom: 6px; }
+.mini-tag { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; background: var(--violet-700); color: #fff; padding: 3px 8px; border-radius: 999px; }
+.mini-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(58, 36, 135, 0.15); }
+.mini-emoji { font-size: 1.6rem; }
+.mini-name { font-weight: 800; display: flex; flex-direction: column; }
+.mini-name small { font-weight: 700; color: var(--lavender-500); }
+.mini-step { display: inline-flex; align-items: center; border: 2px solid var(--lavender-400); border-radius: 999px; }
+.mini-step button { width: 42px; height: 42px; border: 0; background: transparent; color: var(--violet-800); font-size: 1.4rem; font-weight: 900; cursor: pointer; }
+.mini-step button:disabled { opacity: 0.3; }
+.mini-step b { min-width: 22px; text-align: center; }
+.mini-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; font-size: 1.25rem; font-weight: 900; }
+
 /* Self-paced flow */
 .progress { display: flex; align-items: center; gap: 6px; margin: 0 0 14px; }
 .progress .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); }

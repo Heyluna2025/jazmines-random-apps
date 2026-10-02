@@ -164,7 +164,14 @@ function createApp({ store, presenterPassword, presenterPath = null, writeLimit 
   });
   app.get('/x/:code', sendPage('projector/index.html'));
   app.get('/demo', sendPage('demo/index.html'));
-  app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h' }));
+  // Pages, scripts and styles revalidate on every load so phones never mix an
+  // old script with new content; fonts never change and can cache for a year.
+  app.use(express.static(PUBLIC_DIR, {
+    index: false,
+    setHeaders: (res, filePath) => {
+      res.set('Cache-Control', /\.woff2$/.test(filePath) ? 'public, max-age=31536000, immutable' : 'no-cache');
+    },
+  }));
 
   // Short join link printed beside the QR code: https://host/CODE
   app.get('/:code', (req, res, next) => {

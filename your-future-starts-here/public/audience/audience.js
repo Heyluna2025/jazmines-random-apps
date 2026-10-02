@@ -234,7 +234,32 @@
     </div>`;
   }
 
-  const demoLink = () => `${config.activities.feature.demo}&from=app&code=${encodeURIComponent(code)}`;
+  // A small copy of the AI-built snack app, right inside the step. It has the
+  // same deliberate bug as the full demo: the total ignores quantities.
+  const MINI_SNACKS = [
+    { id: 'banana', name: 'Banana Cue', emoji: '🍌', price: 15 },
+    { id: 'kwek', name: 'Kwek-Kwek', emoji: '🥚', price: 25 },
+    { id: 'buko', name: 'Buko Juice', emoji: '🥥', price: 30 },
+  ];
+  const mini = Object.fromEntries(MINI_SNACKS.map((s) => [s.id, 0]));
+  const peso = (n) => `₱${n.toFixed(2)}`;
+
+  function miniApp() {
+    const buggyTotal = MINI_SNACKS.filter((s) => mini[s.id] > 0).reduce((sum, s) => sum + s.price, 0);
+    return `<div class="mini-app" aria-label="Snack app built by AI">
+      <div class="mini-head"><span>🛒 School Fair Snacks</span><span class="mini-tag">built by AI</span></div>
+      ${MINI_SNACKS.map((s) => `<div class="mini-row">
+        <span class="mini-emoji">${s.emoji}</span>
+        <span class="mini-name">${esc(s.name)}<small>${peso(s.price)} each</small></span>
+        <span class="mini-step">
+          <button type="button" data-mini="${s.id}" data-d="-1" ${mini[s.id] ? '' : 'disabled'} aria-label="Remove one ${esc(s.name)}">−</button>
+          <b>${mini[s.id]}</b>
+          <button type="button" data-mini="${s.id}" data-d="1" aria-label="Add one ${esc(s.name)}">+</button>
+        </span>
+      </div>`).join('')}
+      <div class="mini-total"><span>Total</span><strong>${peso(buggyTotal)}</strong></div>
+    </div>`;
+  }
 
   function renderFeature() {
     const a = config.activities.feature;
@@ -242,9 +267,9 @@
     const picked = ui.featurePick ?? my.feature;
     return `<div class="card">
       <div class="kicker">2 · ${esc(a.title)}</div>
-      <p class="muted">${esc(a.intro)}</p>
-      <a class="btn block" href="${demoLink()}">🔍 Open the snack app →</a>
-      <p class="faint" style="margin-top:8px">Tip: add more than one of the same snack and watch the total.</p>
+      <p class="muted">An AI built this snack-ordering app for a school fair. One thing in it is wrong. Be the customer: tap <b>+</b> to order, then check the total yourself.</p>
+      ${miniApp()}
+      <p class="faint" style="margin-top:8px">Tip: order 2 or 3 of the same snack. Does the total add up?</p>
       <div class="question" style="margin-top:18px">${esc(a.question)}</div>
       ${closedNote(st)}
       ${choiceList(a.choices, picked)}
@@ -266,7 +291,6 @@
       ${caught !== null ? `<p class="muted"><strong>${caught}%</strong> of ${st.total} ${st.total === 1 ? 'person' : 'people'} caught it. Here’s what everyone said:</p>` : ''}
       ${st.counts ? barChart(a.choices, st.counts, st.total) : ''}
       <div class="examples" style="margin-top:14px"><strong>The lesson</strong><p style="margin:6px 0 0">${esc(a.lesson)}</p></div>
-      <a class="btn ghost block" href="${demoLink()}" style="margin-top:12px">See it again in the app →</a>
       ${nav('feature', 'card', 'My project')}
     </div>`;
   }
@@ -382,6 +406,13 @@
 
   function bind() {
     app.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => goTo(b.dataset.go)));
+    app.querySelectorAll('[data-mini]').forEach((b) => b.addEventListener('click', () => {
+      const id = b.dataset.mini;
+      mini[id] = Math.max(0, Math.min(9, mini[id] + Number(b.dataset.d)));
+      const y = window.scrollY;
+      render();
+      window.scrollTo(0, y);
+    }));
     app.querySelectorAll('[data-pick]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const i = Number(btn.dataset.pick);
