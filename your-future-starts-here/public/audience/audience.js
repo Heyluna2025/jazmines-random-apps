@@ -56,7 +56,8 @@
       my = joined.my;
       state = joined.state;
     } catch (err) {
-      return fatal(err.status === 404 ? 'Session not found. Check the link.' : 'Could not reach the session. Check your connection and try again.', err.status === 404);
+      if (err.status === 404) return rejoinLive();
+      return fatal('Could not reach the session. Check your connection and try again.', false);
     }
     // Skip ahead if this phone already answered (e.g. after a reload)
     if (step === 'register' && my.registered) step = 'poll';
@@ -76,8 +77,25 @@
 
   function setConn(status) {
     if (status === 'live') { conn.textContent = 'Live'; conn.className = 'pill live'; }
-    else if (status === 'gone') { conn.textContent = 'Session removed'; conn.className = 'pill danger'; }
+    else if (status === 'gone') { conn.textContent = 'Rejoining…'; conn.className = 'pill warn'; rejoinLive(); }
     else { conn.textContent = 'Reconnecting…'; conn.className = 'pill warn'; }
+  }
+
+  // If the server no longer knows this session, hop to whatever session is live
+  // now. Guarded so a server that keeps forgetting can't bounce the phone forever.
+  function rejoinLive() {
+    const key = 'yfsh:rejoinAt';
+    let last = 0;
+    try { last = Number(sessionStorage.getItem(key) || 0); } catch { /* ignore */ }
+    if (Date.now() - last < 15000) {
+      conn.textContent = 'Session unavailable';
+      conn.className = 'pill danger';
+      ui.notice = { text: 'The session keeps dropping. Please tell Coach Jazmine — the app needs its database connected.', kind: 'danger' };
+      render();
+      return;
+    }
+    try { sessionStorage.setItem(key, String(Date.now())); } catch { /* ignore */ }
+    location.replace('/');
   }
 
   function fatal(message, offerHome) {
@@ -382,6 +400,7 @@
           goTo('poll');
           return;
         } catch (err) {
+          if (err.status === 404) return rejoinLive();
           ui.notice = { text: err.message, kind: 'danger' };
         }
         ui.busy = false;
@@ -434,6 +453,7 @@
       goTo(nextStep);
       return;
     } catch (err) {
+      if (err.status === 404) return rejoinLive();
       ui.notice = { text: err.status === 409 ? 'This question is closed right now.' : err.message, kind: 'danger' };
     }
     ui.busy = false;
