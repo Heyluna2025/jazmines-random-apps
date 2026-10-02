@@ -19,11 +19,56 @@ function safeEqual(a, b) {
   return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
 }
 
-function createApp({ store, presenterPassword, presenterPath = null }) {
+// Spreadsheet apps run cells that start with = + - @ (or tab/CR) as formulas.
+// Prefix them so a sign-up named "=HYPERLINK(...)" stays plain text in Excel.
+function csvCell(value) {
+  let s = String(value ?? '');
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
+// Per-instance, per-IP limit on the public write endpoints. Generous because
+// a whole classroom can share one school IP; it only stops scripted floods.
+function rateLimiter({ limit, windowMs }) {
+  const hits = new Map();
+  return (req, res, next) => {
+    const now = Date.now();
+    const key = req.ip || 'unknown';
+    let entry = hits.get(key);
+    if (!entry || now > entry.resetAt) {
+      entry = { count: 0, resetAt: now + windowMs };
+      hits.set(key, entry);
+      if (hits.size > 5000) for (const [k, e] of hits) if (now > e.resetAt) hits.delete(k);
+    }
+    entry.count += 1;
+    if (entry.count > limit) {
+      res.set('Retry-After', String(Math.ceil((entry.resetAt - now) / 1000)));
+      return res.status(429).json({ error: 'Too many requests from this network. Wait a moment and try again.' });
+    }
+    next();
+  };
+}
+
+const DEFAULT_PRESENTER_PATH = 'exqi9dmadqqr';
+
+function createApp({ store, presenterPassword, presenterPath = null, writeLimit = 600 }) {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', true);
   const authRequired = Boolean(presenterPassword);
+  const publicWrites = rateLimiter({ limit: writeLimit, windowMs: 60 * 1000 });
+
+  // Baseline security headers for everything the app serves.
+  app.use((req, res, next) => {
+    res.set({
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'X-Frame-Options': 'DENY',
+      'Content-Security-Policy': "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'",
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    });
+    next();
+  });
 
   // Vercel's Node runtime may already have parsed the JSON body; parse it ourselves otherwise.
   const jsonBody = express.json({ limit: '10kb' });
@@ -60,7 +105,7 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
       if (!(await store.hasToken(token))) return res.status(401).json({ error: 'Presenter sign-in required.' });
       return next();
     }
-    if (presenterPath && token !== presenterPath) return res.status(401).json({ error: 'Presenter controls are at a private address.' });
+    if (presenterPath && !(token && safeEqual(token, presenterPath))) return res.status(401).json({ error: 'Presenter controls are at a private address.' });
     next();
   });
 
@@ -108,8 +153,8 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
   app.get('/enter', sendPage('enter.html'));
   app.get('/a/:code', sendPage('audience/index.html'));
   const presenterPage = (req, res) => {
-    res.set('Cache-Control', 'no-store');
-    if (presenterPath && req.params.slug !== presenterPath) return res.status(404).type('text').send('Not found');
+    res.set({ 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' });
+    if (presenterPath && !(req.params.slug && safeEqual(req.params.slug, presenterPath))) return res.status(404).type('text').send('Not found');
     res.sendFile(path.join(PUBLIC_DIR, 'presenter/index.html'));
   };
   app.get('/c/:slug', presenterPage);
@@ -144,18 +189,18 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
     res.json({ state: S.publicState(s), joinUrl: joinUrl(req, s.code) });
   }));
 
-  app.post('/api/sessions/:code/join', codeParam, noStore, wrap(async (req, res) => {
+  app.post('/api/sessions/:code/join', publicWrites, codeParam, noStore, wrap(async (req, res) => {
     const { pid, my, snapshot } = await store.join(req.sessionCode, (req.body || {}).pid);
     res.json({ pid, my, state: S.publicState(snapshot) });
   }));
 
-  app.post('/api/sessions/:code/vote/:activity', codeParam, noStore, wrap(async (req, res) => {
+  app.post('/api/sessions/:code/vote/:activity', publicWrites, codeParam, noStore, wrap(async (req, res) => {
     const body = req.body || {};
     const { choice, snapshot } = await store.vote(req.sessionCode, req.params.activity, body.pid, body.choice);
     res.json({ ok: true, choice, state: S.publicState(snapshot) });
   }));
 
-  app.post('/api/sessions/:code/profile', codeParam, noStore, wrap(async (req, res) => {
+  app.post('/api/sessions/:code/profile', publicWrites, codeParam, noStore, wrap(async (req, res) => {
     const body = req.body || {};
     const { profile, snapshot } = await store.setProfile(req.sessionCode, body.pid, body);
     res.json({ ok: true, name: profile.name, state: S.publicState(snapshot) });
@@ -167,12 +212,11 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
 
   app.get('/api/sessions/:code/profiles.csv', noStore, requirePresenter, codeParam, wrap(async (req, res) => {
     const rows = await store.listProfiles(req.sessionCode);
-    const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const csv = ['Name,School,Email,Joined', ...rows.map((p) => [p.name, p.school, p.email, new Date(p.at).toISOString()].map(cell).join(','))].join('\r\n');
+    const csv = ['Name,School,Email,Joined', ...rows.map((p) => [p.name, p.school, p.email, new Date(p.at).toISOString()].map(csvCell).join(','))].join('\r\n');
     res.type('text/csv').set('Content-Disposition', `attachment; filename="participants-${req.sessionCode}.csv"`).send(`﻿${csv}`);
   }));
 
-  app.post('/api/sessions/:code/card-complete', codeParam, noStore, wrap(async (req, res) => {
+  app.post('/api/sessions/:code/card-complete', publicWrites, codeParam, noStore, wrap(async (req, res) => {
     const { duplicate, snapshot } = await store.completeCard(req.sessionCode, (req.body || {}).pid);
     res.json({ ok: true, completed: true, duplicate, state: S.publicState(snapshot) });
   }));
@@ -201,7 +245,13 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
     res.json({ token });
   }));
 
-  app.get('/api/auth/check', noStore, requirePresenter, (req, res) => res.json({ ok: true, authRequired, privatePath: Boolean(presenterPath), ...storageInfo() }));
+  app.get('/api/auth/check', noStore, requirePresenter, (req, res) => res.json({
+    ok: true,
+    authRequired,
+    privatePath: Boolean(presenterPath),
+    defaultPath: presenterPath === DEFAULT_PRESENTER_PATH,
+    ...storageInfo(),
+  }));
 
   // The session the presenter page opens by default (same rule as the bare domain).
   app.get('/api/sessions/live', noStore, requirePresenter, wrap(async (req, res) => {

@@ -21,6 +21,7 @@
   let loginError = null;
   let liveCode = null; // session the printed QR points at (list view)
   let authRequired = false; // only true when the host sets PRESENTER_PASSWORD
+  let securityNote = null; // shown while the default controls address is in use
   let toastTimer = null;
 
   const auth = () => ({ token });
@@ -37,6 +38,7 @@
       const check = await api('GET', '/api/auth/check', undefined, auth());
       authRequired = Boolean(check.authRequired);
       storageNote = noteFor(check);
+      if (check.defaultPath) securityNote = 'Security: this controls address is the default one written in the app’s code. Set your own PRESENTER_PATH in Vercel → Environment Variables and redeploy, then use the new address.';
     } catch (err) {
       if (err.status !== 401) throw err;
       if (pathSecret) throw new Error('This controls address is not valid.');
@@ -197,7 +199,7 @@
     bind();
   }
 
-  const banner = () => (storageNote ? `<div class="notice warn span-all">${esc(storageNote)}</div>` : '');
+  const banner = () => [securityNote, storageNote].filter(Boolean).map((n) => `<div class="notice warn span-all">${esc(n)}</div>`).join('');
 
   function renderLogin() {
     return `<div class="login card stack">

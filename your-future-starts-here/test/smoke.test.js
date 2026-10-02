@@ -337,6 +337,55 @@ test.describe('private controls address (PRESENTER_PATH)', () => {
   });
 });
 
+test.describe('hardening', () => {
+  let server;
+  let base;
+  let store;
+
+  test.before(async () => {
+    store = new MemoryStore();
+    server = http.createServer(createApp({ store, presenterPassword: null, presenterPath: 'secret123', writeLimit: 5 }));
+    await new Promise((r) => server.listen(0, '127.0.0.1', r));
+    base = `http://127.0.0.1:${server.address().port}`;
+  });
+
+  test.after(async () => {
+    await new Promise((r) => server.close(r));
+    await store.close();
+  });
+
+  const post = (url, body) => fetch(base + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+  test('security headers on pages and API', async () => {
+    for (const url of ['/enter', '/api/config', '/c/secret123']) {
+      const res = await fetch(base + url);
+      assert.equal(res.headers.get('x-content-type-options'), 'nosniff', url);
+      assert.equal(res.headers.get('x-frame-options'), 'DENY', url);
+      assert.match(res.headers.get('content-security-policy'), /frame-ancestors 'none'/, url);
+    }
+    assert.equal((await fetch(`${base}/c/secret123`)).headers.get('x-robots-tag'), 'noindex, nofollow');
+  });
+
+  test('sign-up CSV neutralises spreadsheet formulas', async () => {
+    const first = await fetch(`${base}/`, { redirect: 'manual' });
+    const code = first.headers.get('location').slice(3);
+    const join = await (await post(`/api/sessions/${code}/join`, {})).json();
+    await post(`/api/sessions/${code}/profile`, { pid: join.pid, name: '=HYPERLINK("http://evil","x")', school: '+1+1', email: 'a@b.ph' });
+    const csv = await (await fetch(`${base}/api/sessions/${code}/profiles.csv`, { headers: { Authorization: 'Bearer secret123' } })).text();
+    assert.match(csv, /"'=HYPERLINK\(""http:\/\/evil"",""x""\)","'\+1\+1","a@b.ph"/);
+  });
+
+  test('public writes are rate limited per IP', async () => {
+    const first = await fetch(`${base}/join`, { redirect: 'manual' });
+    const code = first.headers.get('location').slice(3);
+    const statuses = [];
+    for (let i = 0; i < 6; i++) statuses.push((await post(`/api/sessions/${code}/join`, {})).status);
+    assert.equal(statuses.includes(429), true, `got ${statuses}`);
+    // Reads are not limited
+    assert.equal((await fetch(`${base}/api/sessions/${code}/state`)).status, 200);
+  });
+});
+
 test.describe('open mode (no PRESENTER_PASSWORD)', () => {
   let server;
   let base;
