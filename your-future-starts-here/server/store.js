@@ -19,7 +19,8 @@ function convexUrl(env) {
 // in-process store with a JSON file.
 function createStore(env = process.env) {
   const convex = convexUrl(env);
-  if (convex && env.CONVEX_DEPLOY_KEY) {
+  // Convex is opt-in (CONVEX_ENABLED=1) until it has been verified live.
+  if (convex && env.CONVEX_DEPLOY_KEY && env.CONVEX_ENABLED === '1') {
     const { ConvexHttpClient } = require('convex/browser');
     const client = new ConvexHttpClient(convex);
     // The functions are internal; the deploy key is what lets this server call them.
