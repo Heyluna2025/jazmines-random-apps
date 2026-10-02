@@ -45,6 +45,15 @@
   .modal .card { max-width: 420px; }
   .change-tag { display: inline-block; background: var(--lavender-300); color: var(--violet-900); font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
 
+  /* Coach bubble that walks students through the demo */
+  .coach { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+  .coach-card { pointer-events: auto; max-width: 520px; margin: 0 auto; background: var(--lavender-100); color: var(--violet-800); border-radius: 18px; padding: 16px 18px; box-shadow: var(--shadow); border: 2px solid var(--lavender-300); }
+  .coach-step { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 900; color: var(--lavender-500); }
+  .coach-card p { margin: 6px 0 12px; font-size: 1.05rem; line-height: 1.45; }
+  .coach-card .btn.ghost { color: var(--violet-700); border-color: var(--lavender-400); }
+  .spotlight { outline: 4px solid var(--lavender-300); outline-offset: 4px; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(16, 8, 44, 0.45); position: relative; z-index: 35; }
+  body.touring .wrap { padding-bottom: 220px; }
+
   @media (max-width: 600px) {
     body { font-size: 16px; }
     .bar { gap: 8px 14px; padding: 8px 12px; font-size: 0.85rem; }
@@ -62,14 +71,26 @@
 </head>
 <body>
 <div class="bar" id="bar">
+  <a class="btn small" id="backBtn" href="/" hidden>← Back to my project</a>
   <span data-logo="sm"></span>
-  <strong>Presenter controls</strong>
-  <label>Branch <select id="branch"></select></label>
+  <strong id="barTitle">Try it yourself</strong>
+  <label>Feature <select id="branch"></select></label>
   <label class="toggle"><input type="checkbox" id="aiChange"> Apply the AI-assisted change</label>
-  <label class="toggle"><input type="checkbox" id="mistake"> Sneak in a mistake (for “Would you trust this?”)</label>
+  <label class="toggle"><input type="checkbox" id="mistake"> Sneak in a mistake — can you spot it?</label>
   <span class="spacer"></span>
   <button class="btn ghost small" id="resetOrder">Reset order</button>
-  <a class="btn ghost small" href="/presenter">Back to presenter ↗</a>
+  <button class="btn ghost small" id="tipsBtn">💡 Show tips</button>
+</div>
+<div class="coach" id="coach" hidden>
+  <div class="coach-card">
+    <div class="coach-step" id="coachStep"></div>
+    <p id="coachText"></p>
+    <div class="row">
+      <button class="btn ghost small" id="coachSkip">Skip tips</button>
+      <span class="spacer"></span>
+      <button class="btn small" id="coachNext">Next</button>
+    </div>
+  </div>
 </div>
 <div class="wrap">
   <div class="phone" id="phone"></div>

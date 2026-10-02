@@ -220,7 +220,7 @@
         ? `<div class="winner"><div class="label">Leading right now</div><div class="value">${esc(a.choices[winner])}</div></div>`
         : `<div class="winner"><div class="label">It’s a tie</div><div class="value">Vote to break it</div></div>`}
       ${st.counts ? barChart(a.choices, st.counts, st.total) : ''}
-      ${branch ? `<a class="btn block" href="/demo?branch=${esc(branch.key)}&change=1&bar=0" target="_blank" rel="noopener">Try the snack app with this feature ↗</a>` : ''}
+      ${branch ? `<a class="btn block" href="/demo?branch=${esc(branch.key)}&from=app&code=${esc(code)}">Try the snack app with this feature →</a>` : ''}
       <div class="examples" style="margin-top:14px"><strong>Would you trust it? Check:</strong><ul>
         <li>Is the total correct?</li><li>Can sold-out snacks still be ordered?</li><li>Does the button do what it says?</li></ul>
         <p class="faint" style="margin:8px 0 0">AI guesses. It’s fast, not always right. You’re the one in charge.</p></div>

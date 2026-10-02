@@ -58,6 +58,15 @@
   const mistakeBox = document.getElementById('mistake');
 
   if (params.get('bar') === '0') bar.hidden = true;
+
+  // Coming from the phone flow: a way back, and the coach tips on first visit
+  const fromApp = params.get('from') === 'app';
+  const backBtn = document.getElementById('backBtn');
+  if (fromApp) {
+    const code = (params.get('code') || '').toUpperCase();
+    backBtn.href = /^[A-HJ-NP-Z2-9]{4}$/.test(code) ? `/a/${code}` : '/';
+    backBtn.hidden = false;
+  }
   for (const [key, b] of Object.entries(BRANCHES)) branchSel.add(new Option(b.label, key));
   branchSel.value = ui.branch;
   aiChangeBox.checked = ui.aiChange;
@@ -161,6 +170,47 @@
     if (clear) clear.onclick = () => { for (const k in qty) qty[k] = 0; render(); };
     document.getElementById('order').onclick = showOrderModal;
   }
+
+  // ----- coach tips: a short tour that teaches what the demo shows --------
+
+  const TIPS = [
+    { target: '.phone', text: '👋 This is a snack-ordering app we asked an AI to build for a school fair. Pretend you’re a customer. Everything here is pretend — no real orders.' },
+    { target: '.stepper', text: 'Tap + to add a snack and − to remove it. Notice what updates on the screen when you do.' },
+    { target: '#aiChange', text: 'This is version 1 — the AI’s first try. Flip “Apply the AI-assisted change” to see what one clear request added. Then tap around again.' },
+    { target: '#mistake', text: 'Now flip “Sneak in a mistake”. Something is wrong on purpose. Can you find it? AI guesses fast — checking is your job.' },
+    { target: '.side', text: 'Scroll down: the side panel shows the exact words we asked the AI. Short, specific, one thing at a time. That’s “ask clearly”.' },
+    { target: '#backBtn', text: 'Done? Go back and make your own project card. That card is the start of your own app.' },
+  ];
+  const TIPS_KEY = 'yfsh:demoTipsSeen';
+  const coach = document.getElementById('coach');
+  let tip = -1;
+
+  function clearSpot() { document.querySelectorAll('.spotlight').forEach((el) => el.classList.remove('spotlight')); }
+
+  function showTip(i) {
+    clearSpot();
+    if (i < 0 || i >= TIPS.length) { tip = -1; coach.hidden = true; document.body.classList.remove('touring'); try { localStorage.setItem(TIPS_KEY, '1'); } catch { /* ignore */ } return; }
+    tip = i;
+    const t = TIPS[i];
+    const el = document.querySelector(t.target);
+    if (el && !el.hidden) { el.classList.add('spotlight'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    document.getElementById('coachStep').textContent = `Tip ${i + 1} of ${TIPS.length}`;
+    document.getElementById('coachText').textContent = t.text;
+    document.getElementById('coachNext').textContent = i === TIPS.length - 1 ? 'Done' : 'Next';
+    coach.hidden = false;
+    document.body.classList.add('touring');
+  }
+
+  document.getElementById('coachNext').onclick = () => showTip(tip + 1);
+  document.getElementById('coachSkip').onclick = () => showTip(-1);
+  document.getElementById('tipsBtn').onclick = () => showTip(0);
+  // Re-apply the spotlight after the prototype re-renders (its buttons are rebuilt)
+  const origRender = render;
+  render = function () { origRender(); if (tip >= 0) { const el = document.querySelector(TIPS[tip].target); if (el) el.classList.add('spotlight'); } };
+
+  let tipsSeen = false;
+  try { tipsSeen = Boolean(localStorage.getItem(TIPS_KEY)); } catch { /* ignore */ }
+  if (fromApp && !tipsSeen) setTimeout(() => showTip(0), 400);
 
   function showOrderModal() {
     const modal = document.createElement('div');
