@@ -413,7 +413,7 @@
           localStorage.removeItem(draftKey);
           if (poller && res.state) poller.apply(res.state);
           ui.busy = false;
-          goTo('poll');
+          welcomeBestie(res.name, () => goTo('poll'));
           return;
         } catch (err) {
           if (err.status === 404) return rejoinLive();
@@ -447,6 +447,31 @@
       const focusName = document.activeElement && document.activeElement.name;
       if (focusName && form[focusName]) form[focusName].focus();
     }
+  }
+
+  // Animated "Welcome, bestie!" bubble after sign-in. Tap anywhere to skip;
+  // otherwise it moves on by itself.
+  function welcomeBestie(name, done) {
+    const first = String(name || '').trim().split(/\s+/)[0];
+    const el = document.createElement('div');
+    el.className = 'bestie';
+    el.setAttribute('role', 'status');
+    el.innerHTML = `<div class="bestie-sparkles" aria-hidden="true">${'<i></i>'.repeat(12)}</div>
+      <div class="bestie-bubble">
+        <div class="bestie-wave" aria-hidden="true">👋</div>
+        <div class="bestie-title">Welcome, bestie!</div>
+        ${first ? `<div class="bestie-name">Hi ${esc(first)} — let’s build your future 💜</div>` : ''}
+      </div>`;
+    document.body.appendChild(el);
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      el.classList.add('out');
+      setTimeout(() => { el.remove(); done(); }, 350);
+    };
+    el.addEventListener('click', finish);
+    setTimeout(finish, 2600);
   }
 
   function notice(text, kind) {
