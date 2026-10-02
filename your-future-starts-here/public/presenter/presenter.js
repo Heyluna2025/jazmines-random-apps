@@ -5,7 +5,10 @@
   const TOKEN_KEY = 'yfsh:presenterToken';
   const app = document.getElementById('app');
 
-  let token = localStorage.getItem(TOKEN_KEY);
+  // At /c/<secret> the secret in the address doubles as the presenter token.
+  const BASE = location.pathname.startsWith('/c/') ? '/c/' + location.pathname.split('/')[2] : '/presenter';
+  const pathSecret = BASE.startsWith('/c/') ? BASE.slice(3) : null;
+  let token = pathSecret || localStorage.getItem(TOKEN_KEY);
   let config = null;
   let view = 'login'; // login | list | control
   let sessions = [];
@@ -36,6 +39,7 @@
       storageNote = noteFor(check);
     } catch (err) {
       if (err.status !== 401) throw err;
+      if (pathSecret) throw new Error('This controls address is not valid.');
       authRequired = true;
       token = null;
       localStorage.removeItem(TOKEN_KEY);
@@ -56,7 +60,7 @@
     view = 'list';
     code = null;
     stopPolling();
-    history.replaceState(null, '', '/presenter');
+    history.replaceState(null, '', BASE);
     try {
       const res = await api('GET', '/api/sessions', undefined, auth());
       sessions = res.sessions;
@@ -73,7 +77,7 @@
     code = c;
     view = 'control';
     state = null;
-    history.replaceState(null, '', `/p/${code}`);
+    history.replaceState(null, '', pathSecret ? `${BASE}?code=${code}` : `/p/${code}`);
     let res;
     try {
       res = await api('GET', `/api/sessions/${code}/presenter-state`, undefined, auth());
@@ -120,8 +124,8 @@
       loginError = null;
       try {
         const res = await api('POST', '/api/auth/login', { password: form.password.value });
-        token = res.token;
-        localStorage.setItem(TOKEN_KEY, token);
+        token = pathSecret || res.token;
+        if (res.token) localStorage.setItem(TOKEN_KEY, res.token);
         if (code) openSession(code); else showList();
       } catch (err) {
         loginError = err.message;

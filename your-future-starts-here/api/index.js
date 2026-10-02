@@ -5,6 +5,6 @@
 
 const { createApp } = require('../server/app');
 const { createStore } = require('../server/store');
-const { presenterPassword } = require('../server/config');
+const { presenterPassword, presenterPath } = require('../server/config');
 
-module.exports = createApp({ store: createStore(), presenterPassword });
+module.exports = createApp({ store: createStore(), presenterPassword, presenterPath });

@@ -25,8 +25,13 @@ if (!presenterPassword && !process.env.VERCEL) {
   console.log('[auth] Presenter controls are open (set PRESENTER_PASSWORD to require a sign-in).');
 }
 
+// The controls live at /c/<PRESENTER_PATH>, an address nobody can guess.
+// Change it any time by setting PRESENTER_PATH in the host's environment.
+const presenterPath = (process.env.PRESENTER_PATH || 'exqi9dmadqqr').replace(/[^A-Za-z0-9_-]/g, '');
+
 module.exports = {
   presenterPassword,
+  presenterPath,
   PORT: Number(process.env.PORT) || 3000,
   HOST: process.env.HOST || '0.0.0.0',
 };

@@ -19,7 +19,7 @@ function safeEqual(a, b) {
   return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
 }
 
-function createApp({ store, presenterPassword }) {
+function createApp({ store, presenterPassword, presenterPath = null }) {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', true);
@@ -52,9 +52,15 @@ function createApp({ store, presenterPassword }) {
   const noStore = (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); };
   const storageInfo = () => ({ storage: store.kind, ephemeral: store.kind === 'memory' && ON_VERCEL });
 
+  // Presenter calls carry either a sign-in token (when a password is set) or
+  // the secret path itself (when the controls live at /c/<path>).
   const requirePresenter = wrap(async (req, res, next) => {
-    if (!authRequired) return next();
-    if (!(await store.hasToken(bearer(req)))) return res.status(401).json({ error: 'Presenter sign-in required.' });
+    const token = bearer(req);
+    if (authRequired) {
+      if (!(await store.hasToken(token))) return res.status(401).json({ error: 'Presenter sign-in required.' });
+      return next();
+    }
+    if (presenterPath && token !== presenterPath) return res.status(401).json({ error: 'Presenter controls are at a private address.' });
     next();
   });
 
@@ -101,7 +107,16 @@ function createApp({ store, presenterPassword }) {
   app.get('/join', toLive);
   app.get('/enter', sendPage('enter.html'));
   app.get('/a/:code', sendPage('audience/index.html'));
-  app.get(['/presenter', '/p/:code'], sendPage('presenter/index.html'));
+  const presenterPage = (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    if (presenterPath && req.params.slug !== presenterPath) return res.status(404).type('text').send('Not found');
+    res.sendFile(path.join(PUBLIC_DIR, 'presenter/index.html'));
+  };
+  app.get('/c/:slug', presenterPage);
+  app.get(['/presenter', '/p/:code'], (req, res) => {
+    if (presenterPath) return res.status(404).type('text').send('Not found');
+    presenterPage(req, res);
+  });
   app.get('/x/:code', sendPage('projector/index.html'));
   app.get('/demo', sendPage('demo/index.html'));
   app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h' }));
@@ -169,7 +184,7 @@ function createApp({ store, presenterPassword }) {
     res.json({ token });
   }));
 
-  app.get('/api/auth/check', noStore, requirePresenter, (req, res) => res.json({ ok: true, authRequired, ...storageInfo() }));
+  app.get('/api/auth/check', noStore, requirePresenter, (req, res) => res.json({ ok: true, authRequired, privatePath: Boolean(presenterPath), ...storageInfo() }));
 
   // The session the presenter page opens by default (same rule as the bare domain).
   app.get('/api/sessions/live', noStore, requirePresenter, wrap(async (req, res) => {

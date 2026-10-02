@@ -7,7 +7,7 @@ It works with zero setup: the bare domain drops students straight into the live 
 | Screen | URL | Who uses it |
 | --- | --- | --- |
 | Audience | `/` (also `/join`, `/a/CODE`, short link `/CODE`) | Students, on their phones |
-| Presenter controls | `/presenter` (→ `/p/CODE`) | Jazmine, from her phone or laptop |
+| Presenter controls | `/c/<secret>` (see `PRESENTER_PATH`; `/presenter` answers 404) | Jazmine, from her phone or laptop |
 | Big screen | `/x/CODE` | The projector; `?mode=activity` shows only the live panel |
 
 Plus the snack-ordering prototype used in the demo (`/demo`) and a typed-code fallback page (`/enter`).
@@ -51,7 +51,8 @@ Any host that runs Node 18+ works (Render, Railway, Fly, Docker — a `Dockerfil
 
 | Variable | What it does |
 | --- | --- |
-| `PRESENTER_PASSWORD` | Optional. When set, the presenter controls require this password. |
+| `PRESENTER_PATH` | The secret part of the controls address, `/c/<PRESENTER_PATH>`. A default is baked in; set your own in production and keep it private. |
+| `PRESENTER_PASSWORD` | Optional. When set, the controls additionally require this password. |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | Upstash Redis REST credentials (`UPSTASH_REDIS_REST_URL`/`_TOKEN` also work). Optional on a single long-lived server; required on serverless hosts. |
 | `PUBLIC_URL` | Public address of the app, for the QR code. Optional when the host sends `X-Forwarded-Proto`/`Host`. |
 | `DATA_FILE` | Where the in-memory store mirrors sessions (default `./data/sessions.json`). |

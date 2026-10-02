@@ -273,6 +273,44 @@ for (const kind of ['memory', 'redis']) {
   });
 }
 
+test.describe('private controls address (PRESENTER_PATH)', () => {
+  let server;
+  let base;
+  let store;
+
+  test.before(async () => {
+    store = new MemoryStore();
+    server = http.createServer(createApp({ store, presenterPassword: null, presenterPath: 'secret123' }));
+    await new Promise((r) => server.listen(0, '127.0.0.1', r));
+    base = `http://127.0.0.1:${server.address().port}`;
+  });
+
+  test.after(async () => {
+    await new Promise((r) => server.close(r));
+    await store.close();
+  });
+
+  test('controls only answer at /c/<secret>, and the secret is the API credential', async () => {
+    assert.equal((await fetch(`${base}/presenter`)).status, 404);
+    assert.equal((await fetch(`${base}/c/wrong`)).status, 404);
+    const page = await fetch(`${base}/c/secret123`);
+    assert.equal(page.status, 200);
+    assert.match(await page.text(), /presenter\.js/);
+
+    assert.equal((await fetch(`${base}/api/sessions`)).status, 401);
+    assert.equal((await fetch(`${base}/api/sessions`, { headers: { Authorization: 'Bearer wrong' } })).status, 401);
+    const ok = await fetch(`${base}/api/auth/check`, { headers: { Authorization: 'Bearer secret123' } });
+    assert.equal(ok.status, 200);
+    assert.deepEqual(await ok.json().then((d) => [d.authRequired, d.privatePath]), [false, true]);
+
+    // Students are unaffected
+    const first = await fetch(`${base}/`, { redirect: 'manual' });
+    assert.equal(first.status, 302);
+    const code = first.headers.get('location').slice(3);
+    assert.equal((await fetch(`${base}/api/sessions/${code}/state`)).status, 200);
+  });
+});
+
 test.describe('open mode (no PRESENTER_PASSWORD)', () => {
   let server;
   let base;

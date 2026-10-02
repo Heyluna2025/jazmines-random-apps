@@ -9,7 +9,7 @@ const { createStore } = require('./store');
 const config = require('./config');
 
 const store = createStore();
-const app = createApp({ store, presenterPassword: config.presenterPassword });
+const app = createApp({ store, presenterPassword: config.presenterPassword, presenterPath: config.presenterPath });
 const server = http.createServer(app);
 
 function shutdown() {
@@ -24,7 +24,7 @@ process.on('SIGTERM', shutdown);
 server.listen(config.PORT, config.HOST, () => {
   console.log(`Your Future Starts Here — listening on http://localhost:${config.PORT} (${store.kind} store)`);
   console.log('  Audience join page:  /  (or /a/CODE)');
-  console.log('  Presenter controls:  /presenter');
+  console.log(`  Presenter controls:  /c/${config.presenterPath}`);
   console.log('  Projector view:      /x/CODE');
   console.log('  Snack demo:          /demo');
 });
