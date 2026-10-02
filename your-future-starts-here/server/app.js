@@ -188,8 +188,19 @@ function createApp({ store, presenterPassword, presenterPath = null, phoneLimit 
 
   // ----- public API (audience + projector) ---------------------------------
 
+  // Which version is live: open /api/version on a phone to check a deploy.
+  app.get('/api/version', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.json({
+      commit: (process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7),
+      message: process.env.VERCEL_GIT_COMMIT_MESSAGE ? process.env.VERCEL_GIT_COMMIT_MESSAGE.split('\n')[0] : null,
+      storage: store.kind,
+    });
+  });
+
   app.get('/api/config', (req, res) => {
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=3600');
+    // Short browser cache so new wording reaches phones within the minute.
+    res.set('Cache-Control', 'public, max-age=0, s-maxage=60');
     res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES, social: SOCIAL, guide: GUIDE, welcome: WELCOME, register: REGISTER, offer: OFFER, paths: PATHS });
   });
 

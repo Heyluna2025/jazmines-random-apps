@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run deploy:convex",
+  "buildCommand": "node scripts/build.js",
   "regions": ["sin1"],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
