@@ -25,6 +25,7 @@ const k = {
   p: (code) => `yfsh:p:${code}`,
   v: (code, activity) => `yfsh:v:${code}:${activity}`,
   c: (code) => `yfsh:c:${code}`,
+  prof: (code) => `yfsh:prof:${code}`,
   rl: (ip) => `yfsh:rl:${ip}`,
 };
 
@@ -57,7 +58,7 @@ class RedisStore {
 
   // ----- reading -----------------------------------------------------------
 
-  _parse(code, h, participantCount, pollVotes, featureVotes, completedCount) {
+  _parse(code, h, participantCount, pollVotes, featureVotes, completedCount, profileCount = 0) {
     if (!h || !h.name) return null;
     return {
       code,
@@ -69,6 +70,7 @@ class RedisStore {
       ended: h.ended === '1',
       endedAt: num(h.endedAt),
       participantCount: Number(participantCount || 0),
+      profileCount: Number(profileCount || 0),
       activities: {
         poll: {
           status: h['poll:status'],
@@ -90,14 +92,15 @@ class RedisStore {
   async getSession(code) {
     code = String(code || '').toUpperCase();
     if (!S.isCode(code)) return null;
-    const [h, participants, pollVotes, featureVotes, completed] = await this.r.pipeline([
+    const [h, participants, pollVotes, featureVotes, completed, profiles] = await this.r.pipeline([
       ['HGETALL', k.s(code)],
       ['HLEN', k.p(code)],
       ['HGETALL', k.v(code, 'poll')],
       ['HGETALL', k.v(code, 'feature')],
       ['SCARD', k.c(code)],
+      ['HLEN', k.prof(code)],
     ]);
-    return this._parse(code, fromPairs(h), participants, fromPairs(pollVotes), fromPairs(featureVotes), completed);
+    return this._parse(code, fromPairs(h), participants, fromPairs(pollVotes), fromPairs(featureVotes), completed, profiles);
   }
 
   async _require(code) {
@@ -166,7 +169,7 @@ class RedisStore {
   async deleteSession(code) {
     const s = await this._require(code);
     await this.r.pipeline([
-      ['DEL', k.s(s.code), k.p(s.code), k.v(s.code, 'poll'), k.v(s.code, 'feature'), k.c(s.code)],
+      ['DEL', k.s(s.code), k.p(s.code), k.v(s.code, 'poll'), k.v(s.code, 'feature'), k.c(s.code), k.prof(s.code)],
       ['ZREM', k.index, s.code],
     ]);
     if ((await this.getLive()) === s.code) await this.r.cmd('DEL', k.live);
@@ -186,10 +189,11 @@ class RedisStore {
   async resetSession(code) {
     const s = await this._require(code);
     await this._commit(s.code, S.RESET_PATCH, {
-      before: [['DEL', k.p(s.code), k.v(s.code, 'poll'), k.v(s.code, 'feature'), k.c(s.code)]],
+      before: [['DEL', k.p(s.code), k.v(s.code, 'poll'), k.v(s.code, 'feature'), k.c(s.code), k.prof(s.code)]],
     });
     const after = this._after(s, S.RESET_PATCH);
     after.participantCount = 0;
+    after.profileCount = 0;
     after.activities.poll.votes = {};
     after.activities.feature.votes = {};
     after.activities.card.completedCount = 0;
@@ -229,22 +233,48 @@ class RedisStore {
   async join(code, pid) {
     const s = await this._require(code);
     if (!S.isPid(pid)) pid = S.newPid();
-    const [isNew, poll, feature, done] = await this._commit(s.code, {}, {
+    const [isNew, poll, feature, done, prof] = await this._commit(s.code, {}, {
       before: [
         ['HSETNX', k.p(s.code), pid, String(Date.now())],
         ['HGET', k.v(s.code, 'poll'), pid],
         ['HGET', k.v(s.code, 'feature'), pid],
         ['SISMEMBER', k.c(s.code), pid],
+        ['HGET', k.prof(s.code), pid],
       ],
       after: [['EXPIRE', k.p(s.code), TTL]],
     });
     const snapshot = this._after(s);
     if (isNew) snapshot.participantCount += 1;
+    let profile = null;
+    try { profile = prof ? JSON.parse(prof) : null; } catch { profile = null; }
     return {
       pid,
-      my: { poll: num(poll), feature: num(feature), cardCompleted: Number(done) === 1 },
+      my: { poll: num(poll), feature: num(feature), cardCompleted: Number(done) === 1, registered: Boolean(profile), name: profile ? profile.name : null },
       snapshot,
     };
+  }
+
+  async setProfile(code, pid, input) {
+    const s = await this._require(code);
+    if (!S.isPid(pid)) throw new S.StoreError(400, 'Join the session first.');
+    const profile = S.cleanProfile(input);
+    const [added] = await this._commit(s.code, {}, {
+      before: [['HSET', k.prof(s.code), pid, JSON.stringify(profile)], ['HSETNX', k.p(s.code), pid, String(Date.now())]],
+      after: [['EXPIRE', k.prof(s.code), TTL], ['EXPIRE', k.p(s.code), TTL]],
+    });
+    const snapshot = this._after(s);
+    if (added) snapshot.profileCount += 1;
+    return { profile, snapshot };
+  }
+
+  async listProfiles(code) {
+    const s = await this._require(code);
+    const raw = fromPairs(await this.r.cmd('HGETALL', k.prof(s.code)));
+    const out = [];
+    for (const [pid, json] of Object.entries(raw)) {
+      try { out.push({ pid, ...JSON.parse(json) }); } catch { /* skip bad row */ }
+    }
+    return out.sort((a, b) => a.at - b.at);
   }
 
   async vote(code, activityId, pid, choice) {

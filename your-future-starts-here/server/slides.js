@@ -147,7 +147,7 @@ const DEMO_BRANCHES = [
 const SOCIAL = {
   invite: 'Enjoyed this? Follow Jazmine for more.',
   links: [
-    { key: 'instagram', label: 'Instagram', handle: '@jazminedeluna', url: 'https://www.instagram.com/jazminedeluna' },
+    { key: 'instagram', label: 'Instagram', handle: '@jazminedeluna_', url: 'https://www.instagram.com/jazminedeluna_' },
     { key: 'facebook', label: 'Facebook', handle: 'Jazmine De Luna', url: 'https://www.facebook.com/search/top/?q=Jazmine%20De%20Luna%20Your%20AI%20Bestie' },
     { key: 'tiktok', label: 'TikTok', handle: '@jazmine.ai', url: 'https://www.tiktok.com/@jazmine.ai' },
   ],
@@ -193,6 +193,19 @@ const GUIDE = {
 
 // The welcome screen: what this is for, why it exists, the roadmap, and the
 // note from Coach Jazmine that pops up the first time a phone opens the app.
+// The sign-in form students fill in before the poll.
+const REGISTER = {
+  title: 'Before we start',
+  intro: 'Tell Coach Jazmine who you are so she can send you the build guide and cheer you on.',
+  fields: {
+    name: { label: 'Your name', placeholder: 'e.g. Maria Santos' },
+    school: { label: 'Your school', placeholder: 'e.g. Quezon City High School' },
+    email: { label: 'Email address', placeholder: 'you@example.com' },
+  },
+  consent: 'By continuing you agree that Coach Jazmine may contact you about this program. Only she sees this; it is never shown to other students.',
+  button: 'Continue',
+};
+
 const WELCOME = {
   tagline: 'Ten minutes on your phone. One small project you could start this week.',
   why: {
@@ -218,4 +231,4 @@ const WELCOME = {
   },
 };
 
-module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, SLIDE_COUNT: SLIDES.length };
+module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, SLIDE_COUNT: SLIDES.length };

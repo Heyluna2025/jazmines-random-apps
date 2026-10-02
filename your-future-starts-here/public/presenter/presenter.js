@@ -148,6 +148,16 @@
     activity(id, action, extra = {}) { return call('POST', `/api/sessions/${code}/activities/${id}`, { action, ...extra }); },
     end() { return call('POST', `/api/sessions/${code}/end`); },
     resume() { return call('POST', `/api/sessions/${code}/resume`); },
+    async csv() {
+      try {
+        const res = await fetch(`/api/sessions/${code}/profiles.csv`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+        if (!res.ok) throw new Error('Could not download the list.');
+        const url = URL.createObjectURL(await res.blob());
+        const a = Object.assign(document.createElement('a'), { href: url, download: `participants-${code}.csv` });
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      } catch (err) { toast(err.message); }
+    },
     async live() {
       await call('POST', `/api/sessions/${code}/live`);
       toast('The printed QR now opens this session.');
@@ -291,6 +301,8 @@
         </div>
         <div class="row" style="margin-top:14px">
           <div><div class="stat">${s.participantCount}</div><div class="stat-label">phones joined</div></div>
+          <div><div class="stat">${s.profileCount || 0}</div><div class="stat-label">signed in (name, school, email)</div></div>
+          <button class="btn ghost small" data-act="csv" ${s.profileCount ? '' : 'disabled'}>Download list (CSV)</button>
         </div>
         <div class="stack" style="margin-top:14px">
           ${s.isLive && !s.ended

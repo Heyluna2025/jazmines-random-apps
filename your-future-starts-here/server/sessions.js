@@ -35,6 +35,17 @@ function newPid() {
 }
 
 const isCode = (code) => CODE_RE.test(String(code || ''));
+
+// Name / school / email a student gives at the start. Trimmed, bounded, email checked.
+function cleanProfile(input = {}) {
+  const name = String(input.name || '').trim().slice(0, 80);
+  const school = String(input.school || '').trim().slice(0, 100);
+  const email = String(input.email || '').trim().toLowerCase().slice(0, 120);
+  if (!name) throw new StoreError(400, 'Please enter your name.');
+  if (!school) throw new StoreError(400, 'Please enter your school.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new StoreError(400, 'That email address doesn’t look right.');
+  return { name, school, email, at: Date.now() };
+}
 const isPid = (pid) => PID_RE.test(String(pid || ''));
 const cleanName = (name) => String(name || '').trim().slice(0, 60) || 'Untitled session';
 
@@ -185,6 +196,7 @@ function publicState(s) {
     ended: s.ended,
     focus: computeFocus(s),
     participantCount: s.participantCount,
+    profileCount: s.profileCount || 0,
     activities: {
       poll: {
         status: s.activities.poll.status,
@@ -237,7 +249,7 @@ function listEntry(s) {
 }
 
 module.exports = {
-  StoreError, notFound, randomCode, newPid, isCode, isPid, cleanName,
+  StoreError, notFound, randomCode, newPid, isCode, isPid, cleanName, cleanProfile,
   RESET_PATCH, setField, applyPatch, newSnapshot,
   tally, computeFocus, planSlide, planActivity, planEnd, planResume, checkVote,
   publicState, presenterState, listEntry, CODE_RE, PID_RE,

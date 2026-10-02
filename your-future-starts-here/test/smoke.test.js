@@ -133,6 +133,32 @@ for (const kind of ['memory', 'redis']) {
       assert.equal(again.data.state.participantCount, 2);
     });
 
+    test('students sign in with name, school and email; the presenter can download the list', async () => {
+      const a = await json('POST', `/api/sessions/${code}/join`, {});
+      assert.equal(a.data.my.registered, false);
+      assert.equal((await json('POST', `/api/sessions/${code}/profile`, { pid: a.data.pid, name: 'Maria', school: 'QC High', email: 'not-an-email' })).status, 400);
+      assert.equal((await json('POST', `/api/sessions/${code}/profile`, { pid: a.data.pid, name: '', school: 'QC High', email: 'm@x.ph' })).status, 400);
+      const ok = await json('POST', `/api/sessions/${code}/profile`, { pid: a.data.pid, name: ' Maria Santos ', school: 'QC High', email: 'Maria@Example.PH' });
+      assert.equal(ok.status, 200);
+      assert.equal(ok.data.name, 'Maria Santos');
+      assert.equal(ok.data.state.profileCount, 1);
+      // Re-submitting updates rather than duplicates
+      await json('POST', `/api/sessions/${code}/profile`, { pid: a.data.pid, name: 'Maria Santos', school: 'QC Science High', email: 'maria@example.ph' });
+      assert.equal((await state()).profileCount, 1);
+      const again = await json('POST', `/api/sessions/${code}/join`, { pid: a.data.pid });
+      assert.equal(again.data.my.registered, true);
+      assert.equal(again.data.my.name, 'Maria Santos');
+
+      // Only the presenter sees the list; public state carries just the count
+      assert.equal((await json('GET', `/api/sessions/${code}/profiles`)).status, 401);
+      const list = await json('GET', `/api/sessions/${code}/profiles`, undefined, true);
+      assert.deepEqual(list.data.profiles.map((p) => [p.name, p.school, p.email]), [['Maria Santos', 'QC Science High', 'maria@example.ph']]);
+      const csv = await fetch(`${base}/api/sessions/${code}/profiles.csv`, { headers: { Authorization: `Bearer ${token}` } });
+      assert.match(csv.headers.get('content-type'), /text\/csv/);
+      assert.match(await csv.text(), /"Maria Santos","QC Science High","maria@example.ph"/);
+      assert.equal(JSON.stringify((await json('GET', `/api/sessions/${code}/state`)).data).includes('maria@example.ph'), false);
+    });
+
     test('public state is edge-cacheable for a second; presenter data is never cached', async () => {
       const pub = await fetch(`${base}/api/sessions/${code}/state`);
       assert.match(pub.headers.get('cache-control'), /s-maxage=1(,|$)/);

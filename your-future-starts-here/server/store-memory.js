@@ -66,7 +66,9 @@ class MemoryStore {
   _snapshot(r) {
     const s = structuredClone(r);
     s.participantCount = Object.keys(r.participants).length;
+    s.profileCount = Object.keys(r.profiles || {}).length;
     delete s.participants;
+    delete s.profiles;
     s.activities.card.completedCount = Object.keys(r.activities.card.completed).length;
     delete s.activities.card.completed;
     return s;
@@ -93,6 +95,7 @@ class MemoryStore {
     delete r.participantCount;
     delete r.activities.card.completedCount;
     r.participants = {};
+    r.profiles = {};
     r.activities.card.completed = {};
     this.records.set(code, r);
     this._scheduleSave();
@@ -131,6 +134,7 @@ class MemoryStore {
   async resetSession(code) {
     const r = this._record(code);
     r.participants = {};
+    r.profiles = {};
     r.activities.poll.votes = {};
     r.activities.feature.votes = {};
     r.activities.card.completed = {};
@@ -170,11 +174,28 @@ class MemoryStore {
   }
 
   _my(r, pid) {
+    const profile = (r.profiles || {})[pid] || null;
     return {
       poll: r.activities.poll.votes[pid] ?? null,
       feature: r.activities.feature.votes[pid] ?? null,
       cardCompleted: Boolean(r.activities.card.completed[pid]),
+      registered: Boolean(profile),
+      name: profile ? profile.name : null,
     };
+  }
+
+  async setProfile(code, pid, input) {
+    const r = this._record(code);
+    if (!S.isPid(pid)) throw new S.StoreError(400, 'Join the session first.');
+    if (!r.profiles) r.profiles = {};
+    r.profiles[pid] = S.cleanProfile(input);
+    this._touchParticipant(r, pid);
+    return { profile: r.profiles[pid], snapshot: this._commit(r) };
+  }
+
+  async listProfiles(code) {
+    const r = this._record(code);
+    return Object.entries(r.profiles || {}).map(([pid, p]) => ({ pid, ...p })).sort((a, b) => a.at - b.at);
   }
 
   async vote(code, activityId, pid, choice) {

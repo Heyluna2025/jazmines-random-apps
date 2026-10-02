@@ -4,7 +4,7 @@
 
   // Self-paced phone flow. The phone keeps its own place (step); the server
   // keeps everyone's answers so the results each phone shows are shared.
-  const STEPS = ['welcome', 'poll', 'pollResults', 'feature', 'featureResults', 'card', 'guide', 'follow'];
+  const STEPS = ['welcome', 'register', 'poll', 'pollResults', 'feature', 'featureResults', 'card', 'guide', 'follow'];
 
   const code = codeFromLocation();
   const app = document.getElementById('app');
@@ -59,6 +59,7 @@
       return fatal(err.status === 404 ? 'Session not found. Check the link.' : 'Could not reach the session. Check your connection and try again.', err.status === 404);
     }
     // Skip ahead if this phone already answered (e.g. after a reload)
+    if (step === 'register' && my.registered) step = 'poll';
     if (step === 'welcome' && my.poll !== null) step = 'pollResults';
     if (step === 'pollResults' && my.feature !== null) step = 'featureResults';
     // The note from Coach Jazmine greets each phone once
@@ -95,6 +96,7 @@
     if (!state) return;
     const views = {
       welcome: renderWelcome,
+      register: renderRegister,
       poll: renderPoll,
       pollResults: renderPollResults,
       feature: renderFeature,
@@ -110,7 +112,7 @@
 
   function progressBar() {
     const i = stepIndex();
-    const labels = ['Start', 'Poll', 'Results', 'Vote', 'Winner', 'Card', 'Build', 'Follow'];
+    const labels = ['Start', 'You', 'Poll', 'Results', 'Vote', 'Winner', 'Card', 'Build', 'Follow'];
     return `<div class="progress" aria-label="Step ${i + 1} of ${STEPS.length}">
       ${STEPS.map((s, n) => `<span class="dot ${n < i ? 'done' : ''} ${n === i ? 'now' : ''}" title="${labels[n]}"></span>`).join('')}
       <span class="progress-label">${labels[i]} · ${i + 1}/${STEPS.length}</span>
@@ -140,9 +142,29 @@
       <div class="card">
         <div class="kicker">What happens next</div>
         <ol class="roadmap">${w.roadmap.map((r) => `<li><strong>${esc(r.title)}</strong><span>${esc(r.text)}</span></li>`).join('')}</ol>
-        ${nav(null, 'poll', 'Let’s go')}
+        ${nav(null, my.registered ? 'poll' : 'register', 'Let’s go')}
       </div>
       ${letterOpen && w.letter ? renderLetter(w.letter) : ''}
+    </div>`;
+  }
+
+  function renderRegister() {
+    const r = config.register;
+    const d = readJson(`yfsh:regdraft:${code}`) || {};
+    return `<div class="card">
+      <div class="kicker">${esc(r.title)}</div>
+      <p class="muted">${esc(r.intro)}</p>
+      <form id="register-form" autocomplete="on">
+        <label class="field"><span class="label">${esc(r.fields.name.label)}</span>
+          <input class="input" name="name" id="reg-name" maxlength="80" autocomplete="name" placeholder="${esc(r.fields.name.placeholder)}" value="${esc(d.name || '')}" required></label>
+        <label class="field"><span class="label">${esc(r.fields.school.label)}</span>
+          <input class="input" name="school" id="reg-school" maxlength="100" autocomplete="organization" placeholder="${esc(r.fields.school.placeholder)}" value="${esc(d.school || '')}" required></label>
+        <label class="field"><span class="label">${esc(r.fields.email.label)}</span>
+          <input class="input" name="email" id="reg-email" type="email" maxlength="120" autocomplete="email" inputmode="email" placeholder="${esc(r.fields.email.placeholder)}" value="${esc(d.email || '')}" required></label>
+        <p class="faint">${esc(r.consent)}</p>
+        <button class="btn block" type="submit" ${ui.busy ? 'disabled' : ''}>${ui.busy ? 'Saving…' : esc(r.button)}</button>
+      </form>
+      ${nav('welcome', null)}
     </div>`;
   }
 
@@ -341,6 +363,33 @@
         if (actions[btn.dataset.action]) actions[btn.dataset.action]();
       });
     });
+    const reg = document.getElementById('register-form');
+    if (reg) {
+      const draftKey = `yfsh:regdraft:${code}`;
+      reg.addEventListener('input', () => writeJson(draftKey, { name: reg.name.value, school: reg.school.value, email: reg.email.value }));
+      reg.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        ui.busy = true; ui.notice = null; render();
+        try {
+          const res = await apiRetry('POST', `/api/sessions/${code}/profile`, {
+            pid, name: reg.name.value, school: reg.school.value, email: reg.email.value,
+          }, { onRetry: () => notice('Slow connection — retrying…', 'warn') });
+          my.registered = true;
+          my.name = res.name;
+          localStorage.removeItem(draftKey);
+          if (poller && res.state) poller.apply(res.state);
+          ui.busy = false;
+          goTo('poll');
+          return;
+        } catch (err) {
+          ui.notice = { text: err.message, kind: 'danger' };
+        }
+        ui.busy = false;
+        render();
+      });
+      const focusName = document.activeElement && document.activeElement.name;
+      if (focusName && reg[focusName]) reg[focusName].focus();
+    }
     const form = document.getElementById('card-form');
     if (form) {
       form.addEventListener('input', () => {

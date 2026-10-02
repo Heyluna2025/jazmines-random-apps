@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const express = require('express');
 const QRCode = require('qrcode');
 const S = require('./sessions');
-const { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME } = require('./slides');
+const { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER } = require('./slides');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const ON_VERCEL = Boolean(process.env.VERCEL);
@@ -132,7 +132,7 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
 
   app.get('/api/config', (req, res) => {
     res.set('Cache-Control', 'public, max-age=60, s-maxage=3600');
-    res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES, social: SOCIAL, guide: GUIDE, welcome: WELCOME });
+    res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES, social: SOCIAL, guide: GUIDE, welcome: WELCOME, register: REGISTER });
   });
 
   app.get('/api/sessions/:code/state', codeParam, wrap(async (req, res) => {
@@ -153,6 +153,23 @@ function createApp({ store, presenterPassword, presenterPath = null }) {
     const body = req.body || {};
     const { choice, snapshot } = await store.vote(req.sessionCode, req.params.activity, body.pid, body.choice);
     res.json({ ok: true, choice, state: S.publicState(snapshot) });
+  }));
+
+  app.post('/api/sessions/:code/profile', codeParam, noStore, wrap(async (req, res) => {
+    const body = req.body || {};
+    const { profile, snapshot } = await store.setProfile(req.sessionCode, body.pid, body);
+    res.json({ ok: true, name: profile.name, state: S.publicState(snapshot) });
+  }));
+
+  app.get('/api/sessions/:code/profiles', noStore, requirePresenter, codeParam, wrap(async (req, res) => {
+    res.json({ profiles: await store.listProfiles(req.sessionCode) });
+  }));
+
+  app.get('/api/sessions/:code/profiles.csv', noStore, requirePresenter, codeParam, wrap(async (req, res) => {
+    const rows = await store.listProfiles(req.sessionCode);
+    const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csv = ['Name,School,Email,Joined', ...rows.map((p) => [p.name, p.school, p.email, new Date(p.at).toISOString()].map(cell).join(','))].join('\r\n');
+    res.type('text/csv').set('Content-Disposition', `attachment; filename="participants-${req.sessionCode}.csv"`).send(`﻿${csv}`);
   }));
 
   app.post('/api/sessions/:code/card-complete', codeParam, noStore, wrap(async (req, res) => {
