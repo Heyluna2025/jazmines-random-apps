@@ -35,7 +35,7 @@ window.YFSHCard = (() => {
     ctx.closePath();
   }
 
-  function render({ project, who, step, reminder }) {
+  function render({ project, who, step, reminder, follow = '' }) {
     const canvas = document.createElement('canvas');
     canvas.width = W;
     canvas.height = H;
@@ -107,21 +107,23 @@ window.YFSHCard = (() => {
     ctx.fillStyle = '#2a1868';
     drawLines(ctx, remLines, x + 30, y + 54, 42);
 
-    // Footer: logo on the left; the tagline sits to its right when there is
-    // room, otherwise above it (fallback fonts are wider than the real one).
+    // Footer: a follow line above, then the logo with the tagline to its right
+    // when there is room (fallback fonts are wider than the real one).
     const footerBottom = cardY + cardH - inner + 10;
     const logoH = 64;
+    if (follow) {
+      ctx.fillStyle = '#5b3fa6';
+      ctx.font = `800 26px ${FONT}`;
+      drawLines(ctx, wrap(ctx, follow, maxW).slice(0, 2), x, footerBottom - logoH - 48, 34);
+    }
     const logoW = drawLogo(ctx, x, footerBottom - logoH, logoH, '#2a1868');
     const tagline = 'YOUR FUTURE STARTS HERE';
     ctx.fillStyle = '#8f74d9';
     ctx.font = `800 24px ${FONT}`;
-    const tagW = ctx.measureText(tagline).width;
-    if (logoW + 40 + tagW <= maxW) {
+    if (logoW + 40 + ctx.measureText(tagline).width <= maxW) {
       ctx.textAlign = 'right';
       ctx.fillText(tagline, x + maxW, footerBottom - 22);
       ctx.textAlign = 'left';
-    } else {
-      ctx.fillText(tagline, x, footerBottom - logoH - 26);
     }
 
     return canvas;

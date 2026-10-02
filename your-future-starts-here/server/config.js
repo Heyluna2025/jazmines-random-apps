@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
 // Minimal .env loader so local runs don't need an extra dependency.
 function loadDotEnv(file) {
@@ -19,14 +18,11 @@ function loadDotEnv(file) {
 
 loadDotEnv(path.join(__dirname, '..', '.env'));
 
-let presenterPassword = process.env.PRESENTER_PASSWORD || null;
+// Presenter controls are open unless a password is set. Set PRESENTER_PASSWORD
+// in the host's environment to require a sign-in.
+const presenterPassword = process.env.PRESENTER_PASSWORD || null;
 if (!presenterPassword && !process.env.VERCEL) {
-  // Local convenience only. On a serverless host a random password would differ
-  // per instance, so there the login explains how to set one instead.
-  presenterPassword = crypto.randomBytes(6).toString('base64url');
-  console.warn('\n[auth] PRESENTER_PASSWORD is not set. Using a temporary password for this run:');
-  console.warn(`[auth]   ${presenterPassword}`);
-  console.warn('[auth] Set PRESENTER_PASSWORD in .env or your host settings for a stable password.\n');
+  console.log('[auth] Presenter controls are open (set PRESENTER_PASSWORD to require a sign-in).');
 }
 
 module.exports = {

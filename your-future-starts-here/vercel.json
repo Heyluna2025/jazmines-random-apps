@@ -1,6 +1,9 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/", "destination": "/api" },
+    { "source": "/join", "destination": "/api" },
+    { "source": "/enter", "destination": "/enter.html" },
     { "source": "/presenter", "destination": "/presenter/index.html" },
     { "source": "/p/:code", "destination": "/presenter/index.html" },
     { "source": "/x/:code", "destination": "/projector/index.html" },

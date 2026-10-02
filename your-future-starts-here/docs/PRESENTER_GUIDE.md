@@ -4,14 +4,13 @@ Everything you need to set up, rehearse and run the participation app during the
 
 ## Before the event
 
-1. **Deploy the app** (see the README) and set `PRESENTER_PASSWORD`. Keep the password somewhere you can type it on a phone.
-2. **Sign in** at `https://<your-app>/presenter`.
-3. **Create two sessions**: one named *Rehearsal* and one for the real talk (e.g. *School visit — 10 Oct*). Sessions don't interfere with each other, and each has its own code and QR.
-4. **Open the projector view** for the real session on the laptop that will drive the screen: `Open projector view ↗` from the control page. Press F11 (or ⌃⌘F on a Mac) for full screen.
-5. **Test the QR code from a phone that is not signed in** — use mobile data, not the venue Wi-Fi — and confirm it opens the audience page with the correct code. The short link under the QR (e.g. `yourapp.com/K7PX`) works for anyone who'd rather type.
-6. **Rehearse with at least three devices**: your laptop (projector), your phone (presenter controls), and two other phones as students. Run the whole sequence below once, then press *Reset all responses…* on the rehearsal session or simply use the fresh real session on the day.
-7. **Open the three demo branches** once each (`/demo?branch=quantities`, `/demo?branch=total`, `/demo?branch=soldout`) so you know the "Apply the AI-assisted change" and "Sneak in a mistake" toggles.
-8. **Save screenshots** of the projector views and the three demo branches (before/after) as the offline fallback.
+1. **Deploy the app** (see the README). No password is needed: `https://yourfuturestartshere.xyz/presenter` opens the controls directly.
+2. **Open `/presenter`.** It lands on the live session (one is created automatically the first time). `← Sessions` lists all sessions; make a separate *Rehearsal* one if you like, then tap **Point the printed QR here** on whichever session should receive phones. The printed QR and the bare domain always open that session (or the newest open one).
+3. **Open the projector view** for the session on the laptop that will drive the screen: `Open projector view ↗` from the control page. Press F11 (or ⌃⌘F on a Mac) for full screen.
+4. **Test the QR code from a phone** — use mobile data, not the venue Wi-Fi — and confirm it opens the audience page. Typing `yourfuturestartshere.xyz` does the same; the 4-letter code on the big screen is only a fallback for `/enter`.
+5. **Rehearse with at least three devices**: your laptop (projector), your phone (presenter controls), and two other phones as students. Run the whole sequence below once, then press *Reset all responses…* or use a fresh session on the day.
+6. **Open the three demo branches** once each (`/demo?branch=quantities`, `/demo?branch=total`, `/demo?branch=soldout`) so you know the "Apply the AI-assisted change" and "Sneak in a mistake" toggles.
+7. **Save screenshots** of the projector views and the three demo branches (before/after) as the offline fallback.
 
 ## Run of show
 
@@ -33,7 +32,8 @@ The control page shows the current slide, a hint for each one, and the three act
 Tips:
 
 - On a phone, the bar at the bottom of the control page has Previous/Next and the one action you most likely need next on the current slide (Open poll, Close voting, Reveal winner…).
-- Arrow keys change slides on the control page and on the projector (the projector only responds in a browser where you're signed in — the audience page never does).
+- Arrow keys change slides on the control page and on the projector (the audience page never does).
+- Anyone who knows the `/presenter` address can use the controls. If that worries you, set `PRESENTER_PASSWORD` in Vercel and the page asks for it.
 - Going back a slide never deletes answers. Reopening a closed activity lets students change their answer again.
 - *Hide results* / *Hide winner* takes a reveal back if you tapped too early.
 - Phones and the big screen pick up changes within about 2–3 seconds. Give a reveal a beat before you talk about it.

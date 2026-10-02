@@ -16,6 +16,8 @@
   let connStatus = 'live';
   let storageNote = null;
   let loginError = null;
+  let liveCode = null; // session the printed QR points at (list view)
+  let authRequired = false; // only true when the host sets PRESENTER_PASSWORD
   let toastTimer = null;
 
   const auth = () => ({ token });
@@ -28,16 +30,22 @@
 
   async function boot() {
     config = await api('GET', '/api/config');
-    if (token) {
-      try {
-        storageNote = noteFor(await api('GET', '/api/auth/check', undefined, auth()));
-      } catch (err) {
-        if (err.status === 401) { token = null; localStorage.removeItem(TOKEN_KEY); }
-      }
+    try {
+      const check = await api('GET', '/api/auth/check', undefined, auth());
+      authRequired = Boolean(check.authRequired);
+      storageNote = noteFor(check);
+    } catch (err) {
+      if (err.status !== 401) throw err;
+      authRequired = true;
+      token = null;
+      localStorage.removeItem(TOKEN_KEY);
+      view = 'login';
+      return render();
     }
-    if (!token) { view = 'login'; return render(); }
     if (code) return openSession(code);
-    return showList();
+    // Straight into the live session; the list is one tap away.
+    const live = await api('GET', '/api/sessions/live', undefined, auth());
+    return live.code ? openSession(live.code) : showList();
   }
 
   function stopPolling() {
@@ -52,6 +60,7 @@
     try {
       const res = await api('GET', '/api/sessions', undefined, auth());
       sessions = res.sessions;
+      liveCode = res.live;
       storageNote = noteFor(res);
     } catch (err) {
       if (err.status === 401) return act.logout();
@@ -135,6 +144,10 @@
     activity(id, action, extra = {}) { return call('POST', `/api/sessions/${code}/activities/${id}`, { action, ...extra }); },
     end() { return call('POST', `/api/sessions/${code}/end`); },
     resume() { return call('POST', `/api/sessions/${code}/resume`); },
+    async live() {
+      await call('POST', `/api/sessions/${code}/live`);
+      toast('The printed QR now opens this session.');
+    },
     async reset() {
       const confirm = prompt(`Reset ALL responses for this session and go back to slide 1?\nType the session code (${code}) to confirm.`);
       if (confirm === null) return;
@@ -192,7 +205,7 @@
   function renderList() {
     return `<div class="top">${window.YFSHLogo.html({ size: 'sm' })}<h1>Sessions</h1><span class="spacer"></span>
       <a class="btn ghost small" href="/demo" target="_blank">Snack demo ↗</a>
-      <button class="btn ghost small" data-act="logout">Sign out</button></div>
+      ${authRequired ? '<button class="btn ghost small" data-act="logout">Sign out</button>' : ''}</div>
     <div class="grid">
       ${banner()}
       <div class="card">
@@ -208,6 +221,7 @@
         ${sessions.length ? sessions.map((s) => `<div class="session-row">
           <span class="code">${esc(s.code)}</span>
           <strong>${esc(s.name)}</strong>
+          ${s.code === liveCode && !s.ended ? '<span class="pill live">printed QR</span>' : ''}
           <span class="muted">${s.participants} joined · slide ${s.slide}${s.ended ? ' · ended' : ''}</span>
           <span class="faint">${new Date(s.createdAt).toLocaleString()}</span>
           <span class="spacer"></span>
@@ -255,7 +269,7 @@
       ${connPill}
       ${s.ended ? '<span class="pill danger">Ended</span>' : ''}
       <span class="spacer"></span>
-      <button class="btn ghost small" data-act="logout">Sign out</button>
+      ${authRequired ? '<button class="btn ghost small" data-act="logout">Sign out</button>' : ''}
     </div>
 
     <div class="grid">
@@ -273,6 +287,12 @@
         </div>
         <div class="row" style="margin-top:14px">
           <div><div class="stat">${s.participantCount}</div><div class="stat-label">phones joined</div></div>
+        </div>
+        <div class="stack" style="margin-top:14px">
+          ${s.isLive && !s.ended
+            ? '<span class="pill live">Printed QR opens this session</span>'
+            : `<button class="btn ghost small" data-act="live" ${s.ended ? 'disabled' : ''}>Point the printed QR here</button>`}
+          <p class="faint" style="margin:0">The QR in your slides opens <span class="join-url" style="font-size:0.85rem">${esc((s.staticJoinUrl || '').replace(/^https?:\/\//, ''))}</span>, which sends phones to the session marked live (or the newest open one).</p>
         </div>
       </div>
 

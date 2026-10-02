@@ -142,4 +142,15 @@ const DEMO_BRANCHES = [
   { key: 'soldout', label: 'See which snacks are sold out' },
 ];
 
-module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SLIDE_COUNT: SLIDES.length };
+// Shown at the end of the talk: on students' phones (slide 10 and after the
+// session ends), on the big screen, and as a line on the saved card.
+const SOCIAL = {
+  invite: 'Enjoyed this? Follow Jazmine for more.',
+  links: [
+    { key: 'instagram', label: 'Instagram', handle: '@jazminedeluna', url: 'https://www.instagram.com/jazminedeluna' },
+    { key: 'facebook', label: 'Facebook', handle: 'Jazmine De Luna', url: 'https://www.facebook.com/search/top/?q=Jazmine%20De%20Luna%20Your%20AI%20Bestie' },
+    { key: 'tiktok', label: 'TikTok', handle: '@jazmine.ai', url: 'https://www.tiktok.com/@jazmine.ai' },
+  ],
+};
+
+module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, SLIDE_COUNT: SLIDES.length };

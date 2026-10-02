@@ -11,6 +11,7 @@
 //   yfsh:v:{code}:{act}    hash  participant id -> choice
 //   yfsh:c:{code}          set   participant ids that completed a card
 //   yfsh:tokens            set   presenter tokens
+//   yfsh:live              str   session code the printed /join link points at
 //   yfsh:rl:{ip}           int   login attempts in the current window
 
 const S = require('./sessions');
@@ -19,6 +20,7 @@ const TTL = 60 * 24 * 3600;
 const k = {
   index: 'yfsh:sessions',
   tokens: 'yfsh:tokens',
+  live: 'yfsh:live',
   s: (code) => `yfsh:s:${code}`,
   p: (code) => `yfsh:p:${code}`,
   v: (code, activity) => `yfsh:v:${code}:${activity}`,
@@ -167,6 +169,18 @@ class RedisStore {
       ['DEL', k.s(s.code), k.p(s.code), k.v(s.code, 'poll'), k.v(s.code, 'feature'), k.c(s.code)],
       ['ZREM', k.index, s.code],
     ]);
+    if ((await this.getLive()) === s.code) await this.r.cmd('DEL', k.live);
+  }
+
+  // ----- printed /join link ------------------------------------------------
+
+  async setLive(code) {
+    if (code) await this.r.cmd('SET', k.live, String(code).toUpperCase());
+    else await this.r.cmd('DEL', k.live);
+  }
+
+  async getLive() {
+    return (await this.r.cmd('GET', k.live)) || null;
   }
 
   async resetSession(code) {

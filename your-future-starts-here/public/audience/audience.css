@@ -61,3 +61,6 @@
 .action-card .ac-footer span { white-space: nowrap; }
 .action-card .ac-footer .logo { color: var(--violet-700); }
 .card-preview { width: 100%; border-radius: 16px; box-shadow: var(--shadow); display: block; }
+.follow h2 { font-size: 1.25rem; margin-bottom: 14px; }
+.follow .btn { justify-content: space-between; }
+.follow .btn::after { content: "↗"; opacity: 0.6; }

@@ -232,5 +232,91 @@ for (const kind of ['memory', 'redis']) {
       assert.equal(page.status, 200);
       assert.match(await page.text(), /audience\.js/);
     });
+
+    test('the bare domain and /join open the live session', async () => {
+      const where = async (p = '/') => {
+        const res = await fetch(base + p, { redirect: 'manual' });
+        assert.equal(res.status, 302);
+        assert.equal(res.headers.get('cache-control'), 'no-store');
+        return res.headers.get('location');
+      };
+      const a = await json('POST', '/api/sessions', { name: 'A' }, true);
+      await new Promise((r) => setTimeout(r, 5));
+      const b = await json('POST', '/api/sessions', { name: 'B' }, true);
+      assert.equal(await where('/'), `/a/${b.data.code}`, 'newest open session by default');
+      assert.equal(await where('/join'), `/a/${b.data.code}`);
+
+      assert.equal((await json('POST', `/api/sessions/${a.data.code}/live`, undefined, true)).status, 200);
+      assert.equal((await json('POST', `/api/sessions/${a.data.code}/live`)).status, 401);
+      assert.equal(await where(), `/a/${a.data.code}`);
+      assert.equal((await json('GET', '/api/sessions/live', undefined, true)).data.code, a.data.code);
+      const pres = await json('GET', `/api/sessions/${a.data.code}/presenter-state`, undefined, true);
+      assert.equal(pres.data.state.isLive, true);
+      assert.equal(pres.data.state.staticJoinUrl, base);
+      assert.equal((await json('GET', '/api/sessions', undefined, true)).data.live, a.data.code);
+
+      await json('POST', `/api/sessions/${a.data.code}/end`, undefined, true);
+      assert.equal(await where(), `/a/${b.data.code}`, 'an ended live session falls back to the newest open one');
+
+      // Everything ended: late scans still land on the live session's ending
+      for (const s of (await json('GET', '/api/sessions', undefined, true)).data.sessions) {
+        if (!s.ended) await json('POST', `/api/sessions/${s.code}/end`, undefined, true);
+      }
+      assert.equal(await where(), `/a/${a.data.code}`);
+      await json('DELETE', `/api/sessions/${a.data.code}`, { confirm: a.data.code }, true);
+      assert.equal((await json('GET', '/api/sessions', undefined, true)).data.live, null, 'deleting the live session clears the pointer');
+      const enter = await fetch(`${base}/enter?nolive=1`);
+      assert.equal(enter.status, 200);
+      assert.match(await enter.text(), /Session code/);
+    });
   });
 }
+
+test.describe('open mode (no PRESENTER_PASSWORD)', () => {
+  let server;
+  let base;
+  let store;
+
+  test.before(async () => {
+    store = new MemoryStore();
+    server = http.createServer(createApp({ store, presenterPassword: null }));
+    await new Promise((r) => server.listen(0, '127.0.0.1', r));
+    base = `http://127.0.0.1:${server.address().port}`;
+  });
+
+  test.after(async () => {
+    await new Promise((r) => server.close(r));
+    await store.close();
+  });
+
+  test('works with zero setup: no sign-in, a session appears on first visit', async () => {
+    const check = await fetch(`${base}/api/auth/check`);
+    assert.equal(check.status, 200);
+    assert.equal((await check.json()).authRequired, false);
+    const config = await (await fetch(`${base}/api/config`)).json();
+    assert.deepEqual(config.social.links.map((l) => l.label), ['Instagram', 'Facebook', 'TikTok']);
+
+    const first = await fetch(`${base}/`, { redirect: 'manual' });
+    assert.equal(first.status, 302);
+    const location = first.headers.get('location');
+    assert.match(location, /^\/a\/[A-HJ-NP-Z2-9]{4}$/);
+    const code = location.slice(3);
+
+    // Presenter endpoints open without a token and land on the same session
+    const live = await fetch(`${base}/api/sessions/live`);
+    assert.equal(live.status, 200);
+    assert.equal((await live.json()).code, code);
+    const list = await (await fetch(`${base}/api/sessions`)).json();
+    assert.equal(list.sessions.length, 1);
+    assert.equal(list.live, code);
+    const open = await fetch(`${base}/api/sessions/${code}/activities/poll`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'open' }),
+    });
+    assert.equal(open.status, 200);
+    assert.equal((await (await fetch(`${base}/api/sessions/${code}/state`)).json()).state.focus, 'poll');
+
+    // Second visit reuses the session rather than creating another
+    assert.equal((await fetch(`${base}/join`, { redirect: 'manual' })).headers.get('location'), `/a/${code}`);
+    assert.equal((await (await fetch(`${base}/api/sessions`)).json()).sessions.length, 1);
+  });
+});

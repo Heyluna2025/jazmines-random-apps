@@ -215,6 +215,20 @@
     </div>`;
   }
 
+  // The follow-Jazmine invitation, shown once the talk is wrapping up.
+  function followBlock() {
+    const social = config.social;
+    if (!social || !social.links || !social.links.length) return '';
+    return `<div class="card follow">
+      <div class="kicker">Keep going</div>
+      <h2>${esc(social.invite)}</h2>
+      <div class="stack">${social.links.map((l) =>
+        `<a class="btn ghost block" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} · ${esc(l.handle)}</a>`).join('')}</div>
+    </div>`;
+  }
+
+  const atTheEnd = () => state.ended || state.slide >= 10;
+
   function renderSavedCard() {
     const ended = state.ended;
     return `<div class="stack">
@@ -232,15 +246,19 @@
         </div>
         <p class="faint">On a phone you can also press and hold the image to save it.</p>
       </div>` : '<p class="faint">Tip: a screenshot works too.</p>'}
+      ${atTheEnd() ? followBlock() : ''}
     </div>`;
   }
 
   function renderEnded() {
     if (card) return renderSavedCard();
-    return `<div class="card wait">
-      <div class="big-emoji">💜</div>
-      <h1>Thanks for joining!</h1>
-      <p class="muted">The session has ended. Keep asking clearly, checking carefully, and finishing something useful.</p>
+    return `<div class="stack">
+      <div class="card wait">
+        <div class="big-emoji">💜</div>
+        <h1>Thanks for joining!</h1>
+        <p class="muted">The session has ended. Keep asking clearly, checking carefully, and finishing something useful.</p>
+      </div>
+      ${followBlock()}
     </div>`;
   }
 
@@ -341,11 +359,13 @@
         try { await Promise.all([document.fonts.load('900 58px Nunito'), document.fonts.load('400 40px "Bebas Neue"')]); }
         catch { /* fall back to system fonts */ }
       }
+      const handles = ((config.social && config.social.links) || []).filter((l) => l.handle.startsWith('@'));
       const canvas = window.YFSHCard.render({
         project: projectSentence(card),
         who: card.who,
         step: a.firstSteps[card.step],
         reminder: a.reminder,
+        follow: handles.length ? `Follow Jazmine: ${handles.map((l) => `${l.label} ${l.handle}`).join('  ·  ')}` : '',
       });
       const blob = await window.YFSHCard.toBlob(canvas);
       if (ui.imageUrl) URL.revokeObjectURL(ui.imageUrl);

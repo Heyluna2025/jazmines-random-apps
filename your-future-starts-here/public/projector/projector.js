@@ -56,6 +56,7 @@
           <h1>${esc(slide.title)}</h1>
           ${slide.lines ? `<div class="lines">${slide.lines.map((l) => `<p>${esc(l)}</p>`).join('')}</div>` : ''}
           ${slide.columns ? `<div class="columns">${slide.columns.map((c) => `<div class="card"><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></div>`).join('')}</div>` : ''}
+          ${state.slide === state.slideCount ? socialBlock() : ''}
         </div>
         ${panel ? `<div class="panel">${panel}</div>` : ''}
       </div>
@@ -66,13 +67,25 @@
       </div>`;
   }
 
+  // Follow-Jazmine handles for the last slide and the thank-you panel.
+  function socialBlock() {
+    const social = config.social;
+    if (!social || !social.links || !social.links.length) return '';
+    return `<div class="social">
+      <div class="social-lead">${esc(social.invite)}</div>
+      <div class="social-pills">${social.links.map((l) =>
+        `<span class="social-pill"><span class="net">${esc(l.label)}</span>${esc(l.handle)}</span>`).join('')}</div>
+    </div>`;
+  }
+
   function renderPanel(slide) {
     const A = config.activities;
     const act = state.activities;
     if (state.ended) {
       return `<div class="card center thanks">${window.YFSHLogo.html({ size: 'inherit' })}
         <div class="count">${act.card.completed}</div><div class="count-label">first small projects started today</div>
-        <p class="muted" style="margin-top:1em">Thank you! 💜</p></div>`;
+        <p class="muted" style="margin-top:1em">Thank you! 💜</p>
+        ${state.slide === state.slideCount ? '' : socialBlock()}</div>`;
     }
     const focus = activityMode ? focusForActivityMode() : slide.activity;
 
@@ -138,16 +151,17 @@
     return f;
   }
 
-  // Arrow keys change slides only when this browser is signed in as presenter.
+  // Arrow keys change slides when this browser may control the session: always
+  // when the controls are open, or when it is signed in as presenter.
   const token = localStorage.getItem('yfsh:presenterToken');
-  if (token) {
+  api('GET', '/api/auth/check', undefined, { token }).then(() => {
     document.addEventListener('keydown', (e) => {
       const delta = e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ' ? 1 : e.key === 'ArrowLeft' || e.key === 'PageUp' ? -1 : 0;
       if (!delta) return;
       e.preventDefault();
       api('POST', `/api/sessions/${code}/slide`, { delta }, { token }).catch(() => {});
     });
-  }
+  }).catch(() => { /* not a presenter here */ });
 
   boot();
 })();

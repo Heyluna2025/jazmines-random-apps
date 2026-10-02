@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const express = require('express');
 const QRCode = require('qrcode');
 const S = require('./sessions');
-const { SLIDES, ACTIVITIES, DEMO_BRANCHES } = require('./slides');
+const { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL } = require('./slides');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const ON_VERCEL = Boolean(process.env.VERCEL);
@@ -23,6 +23,7 @@ function createApp({ store, presenterPassword }) {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', true);
+  const authRequired = Boolean(presenterPassword);
 
   // Vercel's Node runtime may already have parsed the JSON body; parse it ourselves otherwise.
   const jsonBody = express.json({ limit: '10kb' });
@@ -52,6 +53,7 @@ function createApp({ store, presenterPassword }) {
   const storageInfo = () => ({ storage: store.kind, ephemeral: store.kind === 'memory' && ON_VERCEL });
 
   const requirePresenter = wrap(async (req, res, next) => {
+    if (!authRequired) return next();
     if (!(await store.hasToken(bearer(req)))) return res.status(401).json({ error: 'Presenter sign-in required.' });
     next();
   });
@@ -70,14 +72,39 @@ function createApp({ store, presenterPassword }) {
     next();
   };
 
+  // The session the bare domain, /join and the presenter page open: the one
+  // marked live while it runs, else the newest open one, else the live one even
+  // after it ended (so late scans see the ending, not an empty room). With no
+  // session at all, one is created so the app works with zero setup.
+  async function resolveJoin({ create = false } = {}) {
+    const live = await store.getLive();
+    const liveSession = live ? await store.getSession(live) : null;
+    if (liveSession && !liveSession.ended) return liveSession.code;
+    const open = (await store.listSessions()).find((s) => !s.ended);
+    if (open) return open.code;
+    if (liveSession) return liveSession.code;
+    if (!create) return null;
+    const s = await store.createSession('Live session');
+    await store.setLive(s.code);
+    return s.code;
+  }
+
   // ----- pages (the Node server; on Vercel these are rewrites in vercel.json)
 
   const sendPage = (file) => (req, res) => res.sendFile(path.join(PUBLIC_DIR, file));
+  const toLive = wrap(async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const code = await resolveJoin({ create: true });
+    res.redirect(302, code ? `/a/${code}` : '/enter?nolive=1');
+  });
+  app.get('/', toLive);
+  app.get('/join', toLive);
+  app.get('/enter', sendPage('enter.html'));
   app.get('/a/:code', sendPage('audience/index.html'));
   app.get(['/presenter', '/p/:code'], sendPage('presenter/index.html'));
   app.get('/x/:code', sendPage('projector/index.html'));
   app.get('/demo', sendPage('demo/index.html'));
-  app.use(express.static(PUBLIC_DIR, { index: 'index.html', maxAge: '1h' }));
+  app.use(express.static(PUBLIC_DIR, { index: false, maxAge: '1h' }));
 
   // Short join link printed beside the QR code: https://host/CODE
   app.get('/:code', (req, res, next) => {
@@ -90,7 +117,7 @@ function createApp({ store, presenterPassword }) {
 
   app.get('/api/config', (req, res) => {
     res.set('Cache-Control', 'public, max-age=60, s-maxage=3600');
-    res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES });
+    res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES, social: SOCIAL });
   });
 
   app.get('/api/sessions/:code/state', codeParam, wrap(async (req, res) => {
@@ -132,9 +159,7 @@ function createApp({ store, presenterPassword }) {
   // ----- presenter API -----------------------------------------------------
 
   app.post('/api/auth/login', noStore, wrap(async (req, res) => {
-    if (!presenterPassword) {
-      return res.status(503).json({ error: 'The presenter password is not set on the server. Add PRESENTER_PASSWORD in your host settings (Vercel: Settings → Environment Variables), then redeploy.' });
-    }
+    if (!authRequired) return res.json({ token: null, authRequired: false });
     const attempts = await store.loginAttempt(req.ip || 'unknown');
     if (attempts > 10) return res.status(429).json({ error: 'Too many attempts. Try again in 15 minutes.' });
     const password = String((req.body || {}).password || '');
@@ -144,10 +169,27 @@ function createApp({ store, presenterPassword }) {
     res.json({ token });
   }));
 
-  app.get('/api/auth/check', noStore, requirePresenter, (req, res) => res.json({ ok: true, ...storageInfo() }));
+  app.get('/api/auth/check', noStore, requirePresenter, (req, res) => res.json({ ok: true, authRequired, ...storageInfo() }));
+
+  // The session the presenter page opens by default (same rule as the bare domain).
+  app.get('/api/sessions/live', noStore, requirePresenter, wrap(async (req, res) => {
+    res.json({ code: await resolveJoin({ create: true }) });
+  }));
 
   app.get('/api/sessions', noStore, requirePresenter, wrap(async (req, res) => {
-    res.json({ sessions: await store.listSessions(), baseUrl: publicBaseUrl(req), ...storageInfo() });
+    res.json({
+      sessions: await store.listSessions(),
+      baseUrl: publicBaseUrl(req),
+      live: await store.getLive(),
+      staticJoinUrl: publicBaseUrl(req),
+      ...storageInfo(),
+    });
+  }));
+
+  app.post('/api/sessions/:code/live', noStore, requirePresenter, codeParam, wrap(async (req, res) => {
+    if (!(await store.getSession(req.sessionCode))) throw S.notFound();
+    await store.setLive(req.sessionCode);
+    res.json({ ok: true, live: req.sessionCode });
   }));
 
   app.post('/api/sessions', noStore, requirePresenter, wrap(async (req, res) => {
@@ -158,7 +200,10 @@ function createApp({ store, presenterPassword }) {
   app.get('/api/sessions/:code/presenter-state', noStore, requirePresenter, codeParam, wrap(async (req, res) => {
     const s = await store.getSession(req.sessionCode);
     if (!s) throw S.notFound();
-    res.json({ state: S.presenterState(s), joinUrl: joinUrl(req, s.code), ...storageInfo() });
+    const state = S.presenterState(s);
+    state.isLive = (await store.getLive()) === s.code;
+    state.staticJoinUrl = publicBaseUrl(req);
+    res.json({ state, joinUrl: joinUrl(req, s.code), ...storageInfo() });
   }));
 
   app.post('/api/sessions/:code/slide', noStore, requirePresenter, codeParam, wrap(async (req, res) => {

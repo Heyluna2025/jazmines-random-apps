@@ -21,20 +21,22 @@
   <div class="brand">AI and the Future of Work</div>
   <h1>Your Future Starts Here</h1>
   <p class="muted">Scan the QR code on the big screen, or type the session code.</p>
+  <p id="nolive" class="notice warn" hidden>No session is live right now. Ask for the 4-letter code on the screen, or scan again in a moment.</p>
   <form id="join" class="card stack" autocomplete="off">
     <label class="field">
       <span class="label">Session code</span>
-      <input class="input code-input" name="code" maxlength="4" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="ABCD" required>
+      <input class="input code-input" name="code" id="code" maxlength="4" inputmode="text" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="ABCD" required>
     </label>
     <p id="err" class="notice danger" hidden></p>
     <button class="btn block" type="submit">Join</button>
   </form>
-  <footer class="faint">Presenter? <a href="/presenter">Sign in</a></footer>
+  <footer class="faint">Presenter? <a href="/presenter">Open the controls</a></footer>
 </main>
 <script src="/shared/logo.js"></script>
 <script>
   const form = document.getElementById('join');
   const err = document.getElementById('err');
+  if (new URLSearchParams(location.search).get('nolive')) document.getElementById('nolive').hidden = false;
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const code = form.code.value.trim().toUpperCase();

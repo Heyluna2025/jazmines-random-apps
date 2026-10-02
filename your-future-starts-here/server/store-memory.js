@@ -13,6 +13,7 @@ class MemoryStore {
     this.file = file || null;
     this.records = new Map();
     this.tokens = new Set();
+    this.live = null; // session the printed /join link points at
     this.loginAttempts = new Map();
     this._saveTimer = null;
     this._load();
@@ -26,6 +27,7 @@ class MemoryStore {
       const raw = JSON.parse(fs.readFileSync(this.file, 'utf8'));
       for (const r of raw.sessions || []) this.records.set(r.code, r);
       for (const t of raw.tokens || []) this.tokens.add(t);
+      this.live = raw.live || null;
     } catch (err) {
       if (err.code !== 'ENOENT') console.warn(`[store] could not read ${this.file}: ${err.message}`);
     }
@@ -45,7 +47,7 @@ class MemoryStore {
     try {
       fs.mkdirSync(path.dirname(this.file), { recursive: true });
       const tmp = `${this.file}.tmp`;
-      fs.writeFileSync(tmp, JSON.stringify({ sessions: [...this.records.values()], tokens: [...this.tokens] }));
+      fs.writeFileSync(tmp, JSON.stringify({ sessions: [...this.records.values()], tokens: [...this.tokens], live: this.live }));
       fs.renameSync(tmp, this.file);
     } catch (err) {
       console.warn(`[store] could not write ${this.file}: ${err.message}`);
@@ -111,7 +113,19 @@ class MemoryStore {
   async deleteSession(code) {
     const r = this._record(code);
     this.records.delete(r.code);
+    if (this.live === r.code) this.live = null;
     this._scheduleSave();
+  }
+
+  // ----- printed /join link ------------------------------------------------
+
+  async setLive(code) {
+    this.live = code ? String(code).toUpperCase() : null;
+    this._scheduleSave();
+  }
+
+  async getLive() {
+    return this.live;
   }
 
   async resetSession(code) {
