@@ -130,7 +130,7 @@
 
   function progressBar() {
     const i = stepIndex();
-    const labels = ['Start', 'You', 'Poll', 'Results', 'Vote', 'Winner', 'Card', 'Build', 'Follow'];
+    const labels = ['Start', 'You', 'Poll', 'Results', 'Find it', 'Answer', 'Card', 'Build', 'Follow'];
     return `<div class="progress" aria-label="Step ${i + 1} of ${STEPS.length}">
       ${STEPS.map((s, n) => `<span class="dot ${n < i ? 'done' : ''} ${n === i ? 'now' : ''}" title="${labels[n]}"></span>`).join('')}
       <span class="progress-label">${labels[i]} · ${i + 1}/${STEPS.length}</span>
@@ -234,36 +234,39 @@
     </div>`;
   }
 
+  const demoLink = () => `${config.activities.feature.demo}&from=app&code=${encodeURIComponent(code)}`;
+
   function renderFeature() {
     const a = config.activities.feature;
     const st = state.activities.feature;
     const picked = ui.featurePick ?? my.feature;
     return `<div class="card">
       <div class="kicker">2 · ${esc(a.title)}</div>
-      <p class="muted">We asked an AI to build a snack-ordering app for a school fair. One business has many jobs — picking the right first feature is one of them.</p>
-      <div class="question">${esc(a.question)}</div>
+      <p class="muted">${esc(a.intro)}</p>
+      <a class="btn block" href="${demoLink()}">🔍 Open the snack app →</a>
+      <p class="faint" style="margin-top:8px">Tip: add more than one of the same snack and watch the total.</p>
+      <div class="question" style="margin-top:18px">${esc(a.question)}</div>
       ${closedNote(st)}
       ${choiceList(a.choices, picked)}
-      <button class="btn block" data-action="feature-submit" ${picked === null || ui.busy || st.status !== 'open' ? 'disabled' : ''}>${ui.busy ? 'Sending…' : my.feature !== null ? 'Update my vote' : 'Vote'}</button>
-      ${nav('pollResults', my.feature !== null ? 'featureResults' : null, 'See the winner')}
+      <button class="btn block" data-action="feature-submit" ${picked === null || ui.busy || st.status !== 'open' ? 'disabled' : ''}>${ui.busy ? 'Sending…' : my.feature !== null ? 'Change my answer' : 'Submit my answer'}</button>
+      ${nav('pollResults', my.feature !== null ? 'featureResults' : null, 'See the answer')}
     </div>`;
   }
 
   function renderFeatureResults() {
     const a = config.activities.feature;
     const st = state.activities.feature;
-    const winner = st.winner;
-    const branch = winner !== null ? config.demoBranches[winner] : null;
+    const right = my.feature === a.answer;
+    const caught = st.counts && st.total ? Math.round((st.counts[a.answer] / st.total) * 100) : null;
     return `<div class="card">
-      <div class="kicker">The room’s pick · live</div>
-      ${winner !== null
-        ? `<div class="winner"><div class="label">Leading right now</div><div class="value">${esc(a.choices[winner])}</div></div>`
-        : `<div class="winner"><div class="label">It’s a tie</div><div class="value">Vote to break it</div></div>`}
+      <div class="kicker">The answer</div>
+      <div class="winner"><div class="label">${my.feature === null ? 'The mistake was' : right ? 'You caught it! 🎉 The mistake was' : 'Good try — the mistake was'}</div>
+        <div class="value">${esc(a.choices[a.answer])}</div></div>
+      <p>${esc(a.explain)}</p>
+      ${caught !== null ? `<p class="muted"><strong>${caught}%</strong> of ${st.total} ${st.total === 1 ? 'person' : 'people'} caught it. Here’s what everyone said:</p>` : ''}
       ${st.counts ? barChart(a.choices, st.counts, st.total) : ''}
-      ${branch ? `<a class="btn block" href="/demo?branch=${esc(branch.key)}&from=app&code=${esc(code)}">Try the snack app with this feature →</a>` : ''}
-      <div class="examples" style="margin-top:14px"><strong>Would you trust it? Check:</strong><ul>
-        <li>Is the total correct?</li><li>Can sold-out snacks still be ordered?</li><li>Does the button do what it says?</li></ul>
-        <p class="faint" style="margin:8px 0 0">AI guesses. It’s fast, not always right. You’re the one in charge.</p></div>
+      <div class="examples" style="margin-top:14px"><strong>The lesson</strong><p style="margin:6px 0 0">${esc(a.lesson)}</p></div>
+      <a class="btn ghost block" href="${demoLink()}" style="margin-top:12px">See it again in the app →</a>
       ${nav('feature', 'card', 'My project')}
     </div>`;
   }

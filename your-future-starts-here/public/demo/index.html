@@ -17,6 +17,7 @@
   .bar .toggle input { width: 20px; height: 20px; }
   .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 20px; }
   @media (max-width: 820px) { .wrap { grid-template-columns: 1fr; } }
+  body.challenge .wrap { grid-template-columns: minmax(0, 520px); justify-content: center; }
   .phone { background: var(--lavender-100); color: var(--violet-800); border-radius: 28px; padding: 22px; box-shadow: var(--shadow); }
   .phone h1 { font-size: 1.6rem; }
   .demo-badge { display: inline-block; background: var(--violet-700); color: #fff; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 900; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }

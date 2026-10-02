@@ -411,7 +411,7 @@
     if (feature.total === 0) return '<p class="faint" style="margin-top:12px">No votes yet.</p>';
     if (!feature.tie) {
       return `<div class="notice" style="margin-top:14px">Leading: <strong>${esc(def.choices[feature.winner])}</strong>
-        ${feature.revealed ? ` · <a href="/demo?branch=${config.demoBranches[feature.winner].key}" target="_blank">open this demo branch ↗</a>` : ''}</div>`;
+        ${feature.revealed && config.demoBranches[feature.winner] ? ` · <a href="/demo?branch=${config.demoBranches[feature.winner].key}" target="_blank">open this demo branch ↗</a>` : ''}</div>`;
     }
     return `<div class="notice warn" style="margin-top:14px">
       <strong>It’s a tie.</strong> Pick the winner:
@@ -419,7 +419,7 @@
         ${feature.leaders.map((i) => `<button class="btn small ${feature.winnerOverride === i ? '' : 'ghost'}" data-activity="feature" data-action="setWinner" data-choice="${i}">${esc(def.choices[i])}</button>`).join('')}
         ${feature.winnerOverride !== null ? '<button class="btn ghost small" data-activity="feature" data-action="setWinner" data-choice="null">Clear</button>' : ''}
       </div>
-      ${feature.winner !== null && feature.revealed ? `<p style="margin:10px 0 0">Showing: <strong>${esc(def.choices[feature.winner])}</strong> · <a href="/demo?branch=${config.demoBranches[feature.winner].key}" target="_blank">open this demo branch ↗</a></p>` : ''}
+      ${feature.winner !== null && feature.revealed && config.demoBranches[feature.winner] ? `<p style="margin:10px 0 0">Showing: <strong>${esc(def.choices[feature.winner])}</strong> · <a href="/demo?branch=${config.demoBranches[feature.winner].key}" target="_blank">open this demo branch ↗</a></p>` : ''}
     </div>`;
   }
 

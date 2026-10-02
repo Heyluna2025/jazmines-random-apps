@@ -43,11 +43,15 @@
   };
 
   const params = new URLSearchParams(location.search);
-  const ui = {
-    branch: BRANCHES[params.get('branch')] ? params.get('branch') : 'quantities',
-    aiChange: params.get('change') === '1',
-    mistake: params.get('mistake') === '1',
-  };
+  // Challenge mode (from the phone flow): the buggy total, nothing that gives the answer away.
+  const challenge = params.get('challenge') === '1';
+  const ui = challenge
+    ? { branch: 'total', aiChange: false, mistake: true }
+    : {
+      branch: BRANCHES[params.get('branch')] ? params.get('branch') : 'quantities',
+      aiChange: params.get('change') === '1',
+      mistake: params.get('mistake') === '1',
+    };
   const qty = Object.fromEntries(SNACKS.map((s) => [s.id, 0]));
 
   const bar = document.getElementById('bar');
@@ -66,6 +70,13 @@
     const code = (params.get('code') || '').toUpperCase();
     backBtn.href = /^[A-HJ-NP-Z2-9]{4}$/.test(code) ? `/a/${code}` : '/';
     backBtn.hidden = false;
+  }
+  if (challenge) {
+    document.body.classList.add('challenge');
+    backBtn.textContent = '← Back to answer';
+    document.getElementById('barTitle').textContent = 'Find the mistake';
+    for (const el of [branchSel, aiChangeBox, mistakeBox]) el.closest('label').hidden = true;
+    side.hidden = true;
   }
   for (const [key, b] of Object.entries(BRANCHES)) branchSel.add(new Option(b.label, key));
   branchSel.value = ui.branch;
@@ -173,7 +184,11 @@
 
   // ----- coach tips: a short tour that teaches what the demo shows --------
 
-  const TIPS = [
+  const TIPS = challenge ? [
+    { target: '.phone', text: '🔍 An AI built this snack app for a school fair. One thing in it is wrong. Pretend you’re a customer and find it — nothing here is a real order.' },
+    { target: '.stepper', text: 'Add 2 or 3 of the same snack, then add a different one. Do the maths yourself and compare it with the total at the bottom.' },
+    { target: '#backBtn', text: 'Found it — or stuck? Tap “Back to answer” and pick what you think is wrong.' },
+  ] : [
     { target: '.phone', text: '👋 This is a snack-ordering app we asked an AI to build for a school fair. Pretend you’re a customer. Everything here is pretend — no real orders.' },
     { target: '.stepper', text: 'Tap + to add a snack and − to remove it. Notice what updates on the screen when you do.' },
     { target: '#aiChange', text: 'This is version 1 — the AI’s first try. Flip “Apply the AI-assisted change” to see what one clear request added. Then tap around again.' },
@@ -181,7 +196,7 @@
     { target: '.side', text: 'Scroll down: the side panel shows the exact words we asked the AI. Short, specific, one thing at a time. That’s “ask clearly”.' },
     { target: '#backBtn', text: 'Done? Go back and make your own project card. That card is the start of your own app.' },
   ];
-  const TIPS_KEY = 'yfsh:demoTipsSeen';
+  const TIPS_KEY = challenge ? 'yfsh:challengeTipsSeen' : 'yfsh:demoTipsSeen';
   const coach = document.getElementById('coach');
   let tip = -1;
 

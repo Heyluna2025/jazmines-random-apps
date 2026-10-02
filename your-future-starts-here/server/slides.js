@@ -103,11 +103,23 @@ const ACTIVITIES = {
     choices: ['Creative work', 'Running a business', 'Technology', 'Helping people', 'Still figuring it out'],
     slide: 1,
   },
+  // "Spot the AI's mistake": students open the snack app, which has one
+  // deliberate bug, and say what is wrong. `answer` is the correct choice.
   feature: {
     id: 'feature',
-    title: 'Choose our app feature',
-    question: 'Which feature should we explore together?',
-    choices: ['Choose snacks and quantities', 'See the total price', 'See which snacks are sold out'],
+    title: 'Spot the AI’s mistake',
+    intro: 'We asked an AI to build a snack-ordering app for a school fair. It looks fine — but there’s one mistake hiding in it. Open it, order a few snacks, and find it.',
+    question: 'What’s wrong with the snack app?',
+    choices: [
+      'The total is wrong when you order more than one',
+      'You can order snacks that are sold out',
+      'The order button doesn’t work',
+      'I couldn’t find a mistake',
+    ],
+    answer: 0,
+    explain: 'Order 3 Kwek-Kwek at ₱25 and the total should be ₱75 — the app says ₱25. The AI added each snack’s price once and forgot to multiply by how many you ordered. It looked right, so it would have shipped.',
+    lesson: 'AI is fast, not always right. Before you trust anything AI made, test it like a customer would.',
+    demo: '/demo?challenge=1',
     slide: 6,
   },
   card: {
@@ -227,7 +239,7 @@ const WELCOME = {
   },
   roadmap: [
     { title: 'Explore your future', text: 'Tap what you’re curious about and see what everyone else picked.' },
-    { title: 'Build something together', text: 'Vote on a feature for a snack-ordering app, then try it and check if it’s right.' },
+    { title: 'Spot the AI’s mistake', text: 'Try an app an AI built, find the bug it hid, and see how many others caught it.' },
     { title: 'Your first small project', text: 'Fill in one card: who you’ll help, with what, and your first step.' },
     { title: 'Launch your own', text: 'The exact steps, tools and AI to turn that card into a real app.' },
   ],
