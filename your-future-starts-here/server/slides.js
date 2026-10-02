@@ -191,4 +191,31 @@ const GUIDE = {
   rules: ['Ask clearly.', 'Check carefully.', 'Finish something useful.'],
 };
 
-module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, SLIDE_COUNT: SLIDES.length };
+// The welcome screen: what this is for, why it exists, the roadmap, and the
+// note from Coach Jazmine that pops up the first time a phone opens the app.
+const WELCOME = {
+  tagline: 'Ten minutes on your phone. One small project you could start this week.',
+  why: {
+    title: 'Why I made this',
+    text: 'I had to start again more than once. Every time, what pulled me through was building something small for someone real. AI makes that easier than it has ever been — so I made this to prove it to you in ten minutes, not someday.',
+  },
+  roadmap: [
+    { title: 'Explore your future', text: 'Tap what you’re curious about and see what everyone else picked.' },
+    { title: 'Build something together', text: 'Vote on a feature for a snack-ordering app, then try it and check if it’s right.' },
+    { title: 'Your first small project', text: 'Fill in one card: who you’ll help, with what, and your first step.' },
+    { title: 'Launch your own', text: 'The exact steps, tools and AI to turn that card into a real app.' },
+  ],
+  letter: {
+    title: 'A note from Coach Jazmine',
+    paragraphs: [
+      'Hi, it’s Jazmine. 💜',
+      'If you’re holding this phone wondering whether this is for you — it is. You don’t need to be good at tech or business yet. You need one person you’d like to help, and the nerve to take one small step.',
+      'I built this app with AI in a day, and I’ll show you how, so you can build your own. Not someday. This week.',
+      'Ask clearly. Check carefully. Finish something useful. I’m cheering for you.',
+    ],
+    signoff: '— Coach Jazmine, your AI bestie',
+    button: 'Let’s go',
+  },
+};
+
+module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, SLIDE_COUNT: SLIDES.length };

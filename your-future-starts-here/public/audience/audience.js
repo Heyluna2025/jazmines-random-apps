@@ -61,6 +61,8 @@
     // Skip ahead if this phone already answered (e.g. after a reload)
     if (step === 'welcome' && my.poll !== null) step = 'pollResults';
     if (step === 'pollResults' && my.feature !== null) step = 'featureResults';
+    // The note from Coach Jazmine greets each phone once
+    if (step === 'welcome' && config.welcome && config.welcome.letter && !localStorage.getItem(LETTER_KEY)) letterOpen = true;
     render();
     poller = poll({
       url: `/api/sessions/${code}/state`,
@@ -121,13 +123,37 @@
     ${next ? `<button class="btn" data-go="${next}">${esc(nextLabel)} →</button>` : ''}
   </div>`;
 
+  const LETTER_KEY = `yfsh:letterSeen:${code}`;
+  let letterOpen = false;
+
   function renderWelcome() {
-    return `<div class="card">
-      <div class="kicker">AI and the Future of Work</div>
-      <h1>Your Future Starts Here</h1>
-      <p class="muted">Three quick things on your phone, about ten minutes: what you’re curious about, a vote on an app we built, and one small project you could start this week. Then, how to build an app like this yourself.</p>
-      <p class="faint">${state.participantCount} ${state.participantCount === 1 ? 'person has' : 'people have'} joined so far.</p>
-      ${nav(null, 'poll', 'Let’s go')}
+    const w = config.welcome || { roadmap: [], why: null, letter: null };
+    return `<div class="stack">
+      <div class="card">
+        <div class="kicker">AI and the Future of Work</div>
+        <h1>Your Future Starts Here</h1>
+        <p class="muted">${esc(w.tagline || '')}</p>
+        <p class="faint">${state.participantCount} ${state.participantCount === 1 ? 'person has' : 'people have'} joined so far.</p>
+        ${w.letter ? '<button class="btn ghost small" data-action="letter">💌 Read the note from Coach Jazmine</button>' : ''}
+      </div>
+      ${w.why ? `<div class="card why"><div class="kicker">${esc(w.why.title)}</div><p>${esc(w.why.text)}</p></div>` : ''}
+      <div class="card">
+        <div class="kicker">What happens next</div>
+        <ol class="roadmap">${w.roadmap.map((r) => `<li><strong>${esc(r.title)}</strong><span>${esc(r.text)}</span></li>`).join('')}</ol>
+        ${nav(null, 'poll', 'Let’s go')}
+      </div>
+      ${letterOpen && w.letter ? renderLetter(w.letter) : ''}
+    </div>`;
+  }
+
+  function renderLetter(l) {
+    return `<div class="modal" data-action="letter-close" role="dialog" aria-modal="true" aria-label="${esc(l.title)}">
+      <div class="letter" data-stop>
+        <div class="kicker">${esc(l.title)}</div>
+        ${l.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
+        <p class="signoff">${esc(l.signoff)}</p>
+        <button class="btn block" data-action="letter-close">${esc(l.button || 'Close')}</button>
+      </div>
     </div>`;
   }
 
@@ -310,7 +336,10 @@
       });
     });
     app.querySelectorAll('[data-action]').forEach((btn) => {
-      btn.addEventListener('click', () => actions[btn.dataset.action] && actions[btn.dataset.action]());
+      btn.addEventListener('click', (e) => {
+        if (btn.classList.contains('modal') && e.target !== btn) return; // taps inside the letter
+        if (actions[btn.dataset.action]) actions[btn.dataset.action]();
+      });
     });
     const form = document.getElementById('card-form');
     if (form) {
@@ -375,6 +404,12 @@
   }
 
   const actions = {
+    letter: () => { letterOpen = true; render(); },
+    'letter-close': () => {
+      letterOpen = false;
+      try { localStorage.setItem(LETTER_KEY, '1'); } catch { /* ignore */ }
+      render();
+    },
     'poll-submit': () => submitVote('poll', ui.pollPick ?? my.poll, 'pollResults'),
     'feature-submit': () => submitVote('feature', ui.featurePick ?? my.feature, 'featureResults'),
     'card-edit': () => {
