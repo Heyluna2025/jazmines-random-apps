@@ -39,7 +39,7 @@
     e.preventDefault();
     const code = form.code.value.trim().toUpperCase();
     err.hidden = true;
-    if (!/^[A-Z2-9]{4}$/.test(code)) { err.textContent = 'Codes are 4 letters or numbers.'; err.hidden = false; return; }
+    if (!/^[A-HJ-NP-Z2-9]{4}$/.test(code)) { err.textContent = 'Codes are 4 letters or numbers (no O, 0, I or 1).'; err.hidden = false; return; }
     const res = await fetch(`/api/sessions/${code}/state`).catch(() => null);
     if (!res || !res.ok) { err.textContent = 'Session not found. Check the code on the screen.'; err.hidden = false; return; }
     location.href = `/a/${code}`;

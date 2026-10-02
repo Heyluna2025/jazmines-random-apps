@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const { api, connect, esc, barChart } = window.YFSH;
+  const { api, poll, codeFromLocation, esc, barChart } = window.YFSH;
 
   const TOKEN_KEY = 'yfsh:presenterToken';
   const app = document.getElementById('app');
@@ -9,65 +9,86 @@
   let config = null;
   let view = 'login'; // login | list | control
   let sessions = [];
-  let baseUrl = location.origin;
-  let code = codeFromPath();
+  let code = codeFromLocation();
   let state = null;
   let joinUrl = '';
-  let socket = null;
-  let connStatus = 'reconnecting';
+  let poller = null;
+  let connStatus = 'live';
+  let storageNote = null;
+  let loginError = null;
   let toastTimer = null;
 
-  function codeFromPath() {
-    const m = location.pathname.match(/^\/p\/([A-Za-z0-9]{4})$/);
-    return m ? m[1].toUpperCase() : null;
-  }
-
   const auth = () => ({ token });
+
+  const noteFor = (res) => (res && res.ephemeral
+    ? 'Shared storage is not set up yet, so sessions live in one server instance’s memory and can disappear between requests. Fine for a quick look. Before the talk, add Upstash Redis under Vercel → Storage and redeploy.'
+    : null);
 
   // ----- boot ---------------------------------------------------------------
 
   async function boot() {
     config = await api('GET', '/api/config');
     if (token) {
-      try { await api('GET', '/api/auth/check', undefined, auth()); }
-      catch { token = null; localStorage.removeItem(TOKEN_KEY); }
+      try {
+        storageNote = noteFor(await api('GET', '/api/auth/check', undefined, auth()));
+      } catch (err) {
+        if (err.status === 401) { token = null; localStorage.removeItem(TOKEN_KEY); }
+      }
     }
     if (!token) { view = 'login'; return render(); }
     if (code) return openSession(code);
     return showList();
   }
 
+  function stopPolling() {
+    if (poller) { poller.stop(); poller = null; }
+  }
+
   async function showList() {
     view = 'list';
     code = null;
-    if (socket) { socket.close(); socket = null; }
+    stopPolling();
     history.replaceState(null, '', '/presenter');
-    const res = await api('GET', '/api/sessions', undefined, auth());
-    sessions = res.sessions;
-    baseUrl = res.baseUrl;
+    try {
+      const res = await api('GET', '/api/sessions', undefined, auth());
+      sessions = res.sessions;
+      storageNote = noteFor(res);
+    } catch (err) {
+      if (err.status === 401) return act.logout();
+      toast(err.message);
+    }
     render();
   }
 
   async function openSession(c) {
     code = c;
     view = 'control';
+    state = null;
     history.replaceState(null, '', `/p/${code}`);
+    let res;
     try {
-      const res = await api('GET', `/api/sessions/${code}/presenter-state`, undefined, auth());
-      state = res.state;
-      joinUrl = res.joinUrl;
+      res = await api('GET', `/api/sessions/${code}/presenter-state`, undefined, auth());
     } catch (err) {
+      if (err.status === 401) return act.logout();
       toast(err.message);
       return showList();
     }
+    state = res.state;
+    joinUrl = res.joinUrl;
+    storageNote = noteFor(res);
+    connStatus = 'live';
     render();
-    if (socket) socket.close();
-    socket = connect({
-      code,
-      role: 'presenter',
+    stopPolling();
+    poller = poll({
+      url: `/api/sessions/${code}/presenter-state`,
       token,
+      interval: 1500,
+      initial: state,
       onState: (s) => { state = s; render(); },
-      onStatus: (s) => { connStatus = s; render(); if (s === 'gone') showList(); },
+      onStatus: (s) => {
+        if (s === 'gone') { toast('This session is no longer available.'); return showList(); }
+        if (s !== connStatus) { connStatus = s; render(); }
+      },
     });
   }
 
@@ -75,9 +96,11 @@
 
   async function call(method, url, body) {
     try {
-      return await api(method, url, body, auth());
+      const data = await api(method, url, body, auth());
+      if (poller) poller.refresh(); // show the result right away instead of on the next poll
+      return data;
     } catch (err) {
-      if (err.status === 401) { token = null; localStorage.removeItem(TOKEN_KEY); view = 'login'; render(); }
+      if (err.status === 401) act.logout();
       toast(err.message);
       throw err;
     }
@@ -85,20 +108,21 @@
 
   const act = {
     async login(form) {
-      const password = form.password.value;
+      loginError = null;
       try {
-        const res = await api('POST', '/api/auth/login', { password });
+        const res = await api('POST', '/api/auth/login', { password: form.password.value });
         token = res.token;
         localStorage.setItem(TOKEN_KEY, token);
         if (code) openSession(code); else showList();
       } catch (err) {
-        toast(err.message);
+        loginError = err.message;
+        render();
       }
     },
     logout() {
       token = null;
       localStorage.removeItem(TOKEN_KEY);
-      if (socket) { socket.close(); socket = null; }
+      stopPolling();
       view = 'login';
       render();
     },
@@ -146,6 +170,8 @@
     bind();
   }
 
+  const banner = () => (storageNote ? `<div class="notice warn span-all">${esc(storageNote)}</div>` : '');
+
   function renderLogin() {
     return `<div class="login card stack">
       ${window.YFSHLogo.html({ size: 'md' })}
@@ -156,7 +182,8 @@
       </div>
       <form data-form="login">
         <label class="field"><span class="label">Presenter password</span>
-          <input class="input" type="password" name="password" autocomplete="current-password" required autofocus></label>
+          <input class="input" type="password" name="password" id="password" autocomplete="current-password" required autofocus></label>
+        ${loginError ? `<p class="notice danger">${esc(loginError)}</p>` : ''}
         <button class="btn block" type="submit">Sign in</button>
       </form>
     </div>`;
@@ -167,11 +194,12 @@
       <a class="btn ghost small" href="/demo" target="_blank">Snack demo ↗</a>
       <button class="btn ghost small" data-act="logout">Sign out</button></div>
     <div class="grid">
+      ${banner()}
       <div class="card">
         <h3>New session</h3>
         <p class="muted">Make a separate session for rehearsal so the real one starts clean.</p>
         <form data-form="create" class="row">
-          <input class="input" name="name" placeholder="e.g. Rehearsal, or School visit — Oct 10" maxlength="60" style="flex:1 1 220px">
+          <input class="input" name="name" id="session-name" placeholder="e.g. Rehearsal, or School visit — Oct 10" maxlength="60" style="flex:1 1 220px">
           <button class="btn" type="submit">Create</button>
         </form>
       </div>
@@ -194,14 +222,29 @@
     return `<span class="pill status-${status}">${label}</span>`;
   }
 
+  // The one button a presenter most likely needs next on the current slide.
+  function primaryAction(s, slide) {
+    if (s.ended || !slide.activity) return null;
+    const id = slide.activity;
+    const a = s.activities[id];
+    const words = { poll: ['poll', 'results'], feature: ['voting', 'winner'], card: ['form', null] }[id];
+    if (a.status === 'pending') return { id, action: 'open', label: `Open ${words[0]}` };
+    if (a.status === 'open') return { id, action: 'close', label: `Close ${words[0]}` };
+    if (words[1] && !a.revealed) return { id, action: 'reveal', label: `Reveal ${words[1]}` };
+    return null;
+  }
+
   function renderControl() {
     if (!state) return '<div class="card"><p class="muted">Loading session…</p></div>';
     const s = state;
     const slide = config.slides[s.slide - 1];
-    const poll = s.activities.poll, feature = s.activities.feature, card = s.activities.card;
+    const poll_ = s.activities.poll, feature = s.activities.feature, card = s.activities.card;
     const A = config.activities;
     const connPill = connStatus === 'live' ? '<span class="pill live">Live</span>' : '<span class="pill warn">Reconnecting…</span>';
     const shortUrl = joinUrl.replace(/^https?:\/\//, '').replace(/\/a\//, '/');
+    const slash = shortUrl.indexOf('/');
+    const shortUrlHtml = slash < 0 ? esc(shortUrl) : `${esc(shortUrl.slice(0, slash))}<wbr>${esc(shortUrl.slice(slash))}`;
+    const primary = primaryAction(s, slide);
 
     return `
     <div class="top">
@@ -216,11 +259,12 @@
     </div>
 
     <div class="grid">
+      ${banner()}
       <div class="card">
         <div class="row" style="align-items:flex-start">
           <img class="qr" src="/api/sessions/${s.code}/qr.svg" alt="QR code to join">
-          <div class="stack" style="flex:1 1 180px">
-            <div><div class="stat-label">Short join link</div><div class="join-url">${esc(shortUrl)}</div></div>
+          <div class="stack" style="flex:1 1 180px;min-width:0">
+            <div><div class="stat-label">Short join link</div><div class="join-url">${shortUrlHtml}</div></div>
             <div class="row">
               <button class="btn small" data-copy="${esc(joinUrl)}">Copy link</button>
               <button class="btn ghost small" data-copy="${esc(s.code)}">Copy code</button>
@@ -228,8 +272,7 @@
           </div>
         </div>
         <div class="row" style="margin-top:14px">
-          <div><div class="stat">${s.participantCount}</div><div class="stat-label">joined</div></div>
-          <div><div class="stat">${s.connected ?? 0}</div><div class="stat-label">online now</div></div>
+          <div><div class="stat">${s.participantCount}</div><div class="stat-label">phones joined</div></div>
         </div>
       </div>
 
@@ -244,10 +287,10 @@
         <p class="faint" style="margin-top:10px">Use the activity-only projector beside an external slide deck. Arrow keys change slides on the projector only while you’re signed in there.</p>
       </div>
 
-      <div class="card span-all">
+      <div class="card span-all" id="slides">
         <div class="row">
           <button class="btn ghost" data-delta="-1" ${s.slide <= 1 ? 'disabled' : ''}>◀ Previous</button>
-          <div style="flex:1 1 200px">
+          <div style="flex:1 1 200px;min-width:0">
             <div class="stat-label">Slide ${s.slide} of ${s.slideCount}</div>
             <div class="current-slide">${esc(slide.title)}</div>
             <div class="muted">${esc(slide.hint || '')}</div>
@@ -262,22 +305,22 @@
         </div>
       </div>
 
-      <div class="card activity">
-        <h3>1 · ${esc(A.poll.title)} ${statusPill(poll.status)}</h3>
+      <div class="card activity" id="activity-poll">
+        <h3>1 · ${esc(A.poll.title)} ${statusPill(poll_.status)}</h3>
         <p class="muted">${esc(A.poll.question)}</p>
         <div class="row">
-          ${poll.status === 'open'
+          ${poll_.status === 'open'
             ? '<button class="btn" data-activity="poll" data-action="close">Close poll</button>'
-            : `<button class="btn" data-activity="poll" data-action="open" ${s.ended ? 'disabled' : ''}>${poll.status === 'closed' ? 'Reopen' : 'Open'} poll</button>`}
-          ${poll.revealed
+            : `<button class="btn" data-activity="poll" data-action="open" ${s.ended ? 'disabled' : ''}>${poll_.status === 'closed' ? 'Reopen' : 'Open'} poll</button>`}
+          ${poll_.revealed
             ? '<button class="btn ghost" data-activity="poll" data-action="hide">Hide results</button>'
             : '<button class="btn ghost" data-activity="poll" data-action="reveal">Reveal results</button>'}
         </div>
-        <p class="stat-label" style="margin-top:14px">${poll.total} response${poll.total === 1 ? '' : 's'} · ${poll.revealed ? 'showing on projector' : 'hidden from projector'}</p>
-        ${barChart(A.poll.choices, poll.counts, poll.total)}
+        <p class="stat-label" style="margin-top:14px">${poll_.total} response${poll_.total === 1 ? '' : 's'} · ${poll_.revealed ? 'showing on projector' : 'hidden from projector'}</p>
+        ${barChart(A.poll.choices, poll_.counts, poll_.total)}
       </div>
 
-      <div class="card activity">
+      <div class="card activity" id="activity-feature">
         <h3>2 · ${esc(A.feature.title)} ${statusPill(feature.status)}</h3>
         <p class="muted">${esc(A.feature.question)}</p>
         <div class="row">
@@ -293,7 +336,7 @@
         ${renderWinner(feature, A.feature)}
       </div>
 
-      <div class="card activity">
+      <div class="card activity" id="activity-card">
         <h3>3 · ${esc(A.card.title)} ${statusPill(card.status)}</h3>
         <p class="muted">${esc(A.card.prompt)}</p>
         <div class="row">
@@ -318,6 +361,13 @@
           <button class="btn danger small" data-act="remove">Delete session…</button>
         </div>
       </div>
+    </div>
+
+    <div class="quickbar" aria-label="Quick controls">
+      <button class="btn ghost small" data-delta="-1" ${s.slide <= 1 ? 'disabled' : ''} aria-label="Previous slide">◀</button>
+      <div class="qb-title"><span class="stat-label">Slide ${s.slide} of ${s.slideCount}</span><strong>${esc(slide.title)}</strong></div>
+      <button class="btn small" data-delta="1" ${s.slide >= s.slideCount ? 'disabled' : ''} aria-label="Next slide">▶</button>
+      ${primary ? `<button class="btn small qb-action" data-activity="${primary.id}" data-action="${primary.action}">${esc(primary.label)}</button>` : ''}
     </div>`;
   }
 

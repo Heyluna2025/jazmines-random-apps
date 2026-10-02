@@ -1,8 +1,8 @@
 (() => {
   'use strict';
-  const { api, connect, esc, barChart } = window.YFSH;
+  const { api, poll, codeFromLocation, esc, barChart } = window.YFSH;
 
-  const code = (location.pathname.split('/')[2] || '').toUpperCase();
+  const code = codeFromLocation();
   const params = new URLSearchParams(location.search);
   const activityMode = params.get('mode') === 'activity';
   const showFooterQr = params.get('qr') !== '0';
@@ -26,11 +26,12 @@
       return;
     }
     render();
-    connect({
-      code,
-      role: 'projector',
+    poll({
+      url: `/api/sessions/${code}/state`,
+      interval: 1500,
+      initial: state,
       onState: (s) => { state = s; render(); },
-      onStatus: (s) => { connStatus = s; render(); },
+      onStatus: (s) => { if (s !== connStatus) { connStatus = s; render(); } },
     });
   }
 
@@ -47,7 +48,7 @@
     const slide = config.slides[state.slide - 1];
     const panel = renderPanel(slide);
     stage.innerHTML = `
-      <div class="brand-bar">${window.YFSHLogo.html({ size: 'inherit' })}<span>AI and the Future of Work</span><span class="spacer"></span>
+      <div class="brand-bar">${window.YFSHLogo.html({ size: 'inherit' })}<span class="tagline">AI and the Future of Work</span><span class="spacer"></span>
         ${connStatus === 'live' ? '' : '<span class="pill warn">Reconnecting…</span>'}</div>
       <div class="slide ${panel ? '' : 'no-panel'}">
         <div class="slide-text">

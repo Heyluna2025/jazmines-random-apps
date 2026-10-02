@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/presenter", "destination": "/presenter/index.html" },
+    { "source": "/p/:code", "destination": "/presenter/index.html" },
+    { "source": "/x/:code", "destination": "/projector/index.html" },
+    { "source": "/a/:code", "destination": "/audience/index.html" },
+    { "source": "/demo", "destination": "/demo/index.html" },
+    { "source": "/:code([A-HJ-NP-Za-hj-np-z2-9]{4})", "destination": "/audience/index.html" }
+  ],
+  "functions": {
+    "api/index.js": { "includeFiles": "public/**" }
+  }
+}

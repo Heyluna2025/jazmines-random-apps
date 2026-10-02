@@ -1,7 +1,9 @@
-// Small shared helpers: JSON fetch with retries, a reconnecting WebSocket, and
-// HTML escaping. Loaded as a plain script so there is no build step.
+// Small shared helpers: JSON fetch with retries, a state poller, the session
+// code from the URL, and HTML escaping. Plain script, no build step.
 window.YFSH = (() => {
   'use strict';
+
+  const CODE_RE = /^[A-HJ-NP-Z2-9]{4}$/i;
 
   class ApiError extends Error {
     constructor(status, message) {
@@ -11,10 +13,13 @@ window.YFSH = (() => {
   }
 
   async function api(method, url, body, { token } = {}) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = {};
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
     if (token) headers.Authorization = `Bearer ${token}`;
     let res;
     try {
+      // No cache option here: the server's Cache-Control decides (max-age=0 for state,
+      // no-store for presenter data), and request-side no-cache could skip the edge cache.
       res = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
     } catch (err) {
       throw new ApiError(0, 'No connection.');
@@ -41,58 +46,71 @@ window.YFSH = (() => {
     }
   }
 
-  // Reconnecting WebSocket. onStatus gets 'live' | 'reconnecting' | 'gone'.
-  function connect({ code, role, token, onState, onStatus }) {
-    let ws = null;
-    let closed = false;
-    let delay = 1000;
-    let keepAlive = null;
+  // The session code from ?code=, /a/CODE, /x/CODE, /p/CODE or the short /CODE link.
+  function codeFromLocation() {
+    const q = new URLSearchParams(location.search).get('code');
+    if (q && CODE_RE.test(q)) return q.toUpperCase();
+    const parts = location.pathname.split('/').filter(Boolean);
+    for (let i = parts.length - 1; i >= 0; i--) if (CODE_RE.test(parts[i])) return parts[i].toUpperCase();
+    return '';
+  }
 
-    function status(s) { if (onStatus) onStatus(s); }
+  // Polls a state endpoint. onState fires only when the server's version moves
+  // forward; onStatus gets 'live' | 'reconnecting' | 'gone'. Works through any
+  // network that allows plain HTTPS, and the server can cache it at the edge.
+  function poll({ url, token, interval = 2000, initial = null, onState, onStatus }) {
+    let timer = null;
+    let stopped = false;
+    let failures = 0;
+    let version = initial && typeof initial.version === 'number' ? initial.version : -1;
 
-    function open() {
-      if (closed) return;
-      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const params = new URLSearchParams({ code, role });
-      if (token) params.set('token', token);
-      try {
-        ws = new WebSocket(`${proto}//${location.host}/ws?${params}`);
-      } catch {
-        return retry();
+    const status = (s) => { if (onStatus) onStatus(s); };
+    const accept = (state) => {
+      if (!state || typeof state.version !== 'number') return;
+      if (state.version > version) {
+        version = state.version;
+        onState(state);
       }
-      ws.onopen = () => {
-        delay = 1000;
+    };
+
+    async function tick() {
+      if (stopped) return;
+      clearTimeout(timer);
+      try {
+        const data = await api('GET', url, undefined, { token });
+        failures = 0;
         status('live');
-        clearInterval(keepAlive);
-        keepAlive = setInterval(() => { if (ws && ws.readyState === 1) ws.send('ping'); }, 25000);
-      };
-      ws.onmessage = (ev) => {
-        if (ev.data === 'pong') return;
-        let msg;
-        try { msg = JSON.parse(ev.data); } catch { return; }
-        if (msg.type === 'state') onState(msg.state);
-        else if (msg.type === 'gone') { status('gone'); closed = true; ws.close(); }
-      };
-      ws.onclose = () => { clearInterval(keepAlive); if (!closed) retry(); };
-      ws.onerror = () => { /* onclose follows */ };
+        accept(data.state);
+      } catch (err) {
+        if (err.status === 404 || err.status === 401) {
+          stopped = true;
+          status('gone');
+          return;
+        }
+        failures += 1;
+        status('reconnecting');
+      }
+      schedule();
     }
 
-    function retry() {
-      status('reconnecting');
-      setTimeout(open, delay);
-      delay = Math.min(delay * 1.8, 10000);
+    function schedule() {
+      if (stopped) return;
+      clearTimeout(timer);
+      let delay = failures ? Math.min(interval * 2 ** failures, 10000) : interval;
+      if (document.hidden) delay = Math.max(delay, 15000); // easy on the battery while the phone is locked
+      timer = setTimeout(tick, delay);
     }
 
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && !closed && (!ws || ws.readyState > 1)) {
-        delay = 1000;
-        open();
-      }
+      if (!document.hidden && !stopped) tick();
     });
 
-    open();
+    if (initial) { status('live'); schedule(); } else tick();
+
     return {
-      close() { closed = true; clearInterval(keepAlive); if (ws) ws.close(); },
+      refresh: () => tick(),
+      apply: accept,
+      stop() { stopped = true; clearTimeout(timer); },
     };
   }
 
@@ -121,5 +139,5 @@ window.YFSH = (() => {
     }).join('')}</div>`;
   }
 
-  return { api, apiRetry, connect, esc, pct, barChart, ApiError };
+  return { api, apiRetry, poll, codeFromLocation, esc, pct, barChart, ApiError, CODE_RE };
 })();

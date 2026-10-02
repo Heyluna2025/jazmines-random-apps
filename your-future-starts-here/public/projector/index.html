@@ -51,6 +51,26 @@
   body.activity-mode .slide-text { display: none; }
   body.activity-mode .panel .card { padding: 5vmin; }
   @media (max-aspect-ratio: 1/1) { .slide { grid-template-columns: 1fr; } .columns { grid-template-columns: 1fr; } }
+
+  /* Phones and tablets: scroll instead of clip, stack everything */
+  @media (max-width: 760px) {
+    html, body { height: auto; overflow: auto; }
+    body { font-size: 17px; }
+    .stage { height: auto; min-height: 100vh; padding: 16px; gap: 20px; grid-template-rows: auto auto auto; }
+    .brand-bar .tagline { display: none; }
+    .brand-bar .logo { font-size: 1.3em; }
+    .slide { grid-template-columns: 1fr; gap: 20px; align-items: start; }
+    .slide h1 { font-size: 1.9em; }
+    .lines p { font-size: 1.05em; }
+    .lines p:first-child { font-size: 1.2em; }
+    .panel .card { padding: 18px; }
+    .join-big { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .join-big .qr { width: min(60vw, 260px); height: min(60vw, 260px); }
+    .join-big .code { font-size: 2.4em; }
+    .count { font-size: 2.6em; }
+    .footer { flex-wrap: wrap; gap: 10px; }
+    .footer .mini-qr { width: 48px; height: 48px; }
+  }
 </style>
 </head>
 <body>

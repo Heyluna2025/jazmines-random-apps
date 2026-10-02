@@ -1,8 +1,8 @@
 (() => {
   'use strict';
-  const { api, apiRetry, connect, esc } = window.YFSH;
+  const { api, apiRetry, poll, codeFromLocation, esc } = window.YFSH;
 
-  const code = (location.pathname.split('/')[2] || '').toUpperCase();
+  const code = codeFromLocation();
   const app = document.getElementById('app');
   const conn = document.getElementById('conn');
 
@@ -13,6 +13,7 @@
 
   let pid = localStorage.getItem(PID_KEY);
   let config = null;
+  let poller = null;
   let state = null;
   let my = { poll: null, feature: null, cardCompleted: false };
   let card = readJson(CARD_KEY);
@@ -29,7 +30,7 @@
   // ----- boot ---------------------------------------------------------------
 
   async function boot() {
-    if (!/^[A-Z2-9]{4}$/.test(code)) return fatal('That link is missing a session code.', true);
+    if (!code) return fatal('That link is missing a session code.', true);
     try {
       const [cfg, joined] = await Promise.all([
         apiRetry('GET', '/api/config'),
@@ -44,9 +45,10 @@
       return fatal(err.status === 404 ? 'Session not found. Check the code on the big screen.' : 'Could not reach the session. Check your connection and try again.', err.status === 404);
     }
     render();
-    connect({
-      code,
-      role: 'audience',
+    poller = poll({
+      url: `/api/sessions/${code}/state`,
+      interval: 2000,
+      initial: state,
       onState: (s) => { state = s; render(); },
       onStatus: setConn,
     });
@@ -300,6 +302,7 @@
       if (activity === 'poll') { ui.pollEditing = false; ui.pollPick = null; }
       else { ui.featureEditing = false; ui.featurePick = null; }
       ui.notice = null;
+      if (poller && res.state) poller.apply(res.state);
     } catch (err) {
       ui.notice = { text: err.status === 409 ? 'Too late — this one just closed.' : err.message, kind: 'danger' };
     }
@@ -310,9 +313,10 @@
   async function sendCompletion() {
     if (localStorage.getItem(SENT_KEY)) return;
     try {
-      await apiRetry('POST', `/api/sessions/${code}/card-complete`, { pid });
+      const res = await apiRetry('POST', `/api/sessions/${code}/card-complete`, { pid });
       localStorage.setItem(SENT_KEY, '1');
       my.cardCompleted = true;
+      if (poller && res.state) poller.apply(res.state);
     } catch {
       // The card itself is already saved on the phone; the count is a nice-to-have.
     }

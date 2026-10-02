@@ -44,6 +44,20 @@
   .modal { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(16, 8, 44, 0.8); z-index: 20; padding: 16px; }
   .modal .card { max-width: 420px; }
   .change-tag { display: inline-block; background: var(--lavender-300); color: var(--violet-900); font-size: 0.72rem; font-weight: 900; padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .bar { gap: 8px 14px; padding: 8px 12px; font-size: 0.85rem; }
+    .bar .logo-text { display: none; }
+    .wrap { padding: 16px 12px 40px; gap: 14px; }
+    .phone { padding: 16px; border-radius: 20px; }
+    .phone h1 { font-size: 1.4rem; }
+    .snack { gap: 10px; padding: 12px 0; }
+    .snack .emoji { font-size: 1.6rem; }
+    .snack .name { font-size: 1rem; }
+    .stepper button { width: 40px; height: 40px; }
+    .stepper .qty { min-width: 30px; }
+  }
 </style>
 </head>
 <body>

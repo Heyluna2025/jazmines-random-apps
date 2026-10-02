@@ -32,10 +32,12 @@ The control page shows the current slide, a hint for each one, and the three act
 
 Tips:
 
+- On a phone, the bar at the bottom of the control page has Previous/Next and the one action you most likely need next on the current slide (Open poll, Close voting, Reveal winner…).
 - Arrow keys change slides on the control page and on the projector (the projector only responds in a browser where you're signed in — the audience page never does).
 - Going back a slide never deletes answers. Reopening a closed activity lets students change their answer again.
 - *Hide results* / *Hide winner* takes a reveal back if you tapped too early.
-- The "online now" number is phones with a live connection; "joined" is everyone who opened the link. Expect "online" to dip when phones lock — they catch up when unlocked.
+- Phones and the big screen pick up changes within about 2–3 seconds. Give a reveal a beat before you talk about it.
+- "Phones joined" counts everyone who opened the link, including rehearsal devices.
 
 ## The snack demo
 
