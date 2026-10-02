@@ -99,8 +99,10 @@ const ACTIVITIES = {
   poll: {
     id: 'poll',
     title: 'Explore your future',
-    question: 'Which field are you most curious about?',
-    choices: ['Creative work', 'Running a business', 'Technology', 'Helping people', 'Still figuring it out'],
+    question: 'What would you love to become?',
+    hint: 'Pick the one you’re most curious about. 💜 There’s no wrong answer.',
+    choices: ['Creative', 'Business owner', 'Technology', 'Helping people', 'Still figuring it out (okay lang!)'],
+    icons: ['🎨', '💼', '💻', '❤️', '🧭'],
     slide: 1,
   },
   // "Spot the AI's mistake": students open the snack app, which has one
@@ -145,6 +147,87 @@ const ACTIVITIES = {
     slide: 9,
   },
 };
+
+// One path per poll choice (same order as ACTIVITIES.poll.choices): what that
+// future looks like, three first steps, and three beginner business ideas.
+// Each idea's `who`/`what` fill the project card ("I want to help who do what").
+const PATHS = [
+  {
+    name: 'The Creator',
+    emoji: '🎨',
+    tagline: 'You make things people want to look at, read, watch or wear.',
+    steps: [
+      'Pick one thing you love making: art, video, writing, design or music.',
+      'Use AI (ChatGPT, Claude, Canva) to help you make 10 small pieces this week. Speed is practice.',
+      'Show them to 5 people and ask: “Would you pay for this? How much?”',
+    ],
+    ideas: [
+      { title: 'Party invitations & posters', text: 'Design birthday, binyag and debut invitations for families in your barangay.', who: 'families planning parties', what: 'make invitations and posters' },
+      { title: 'Short videos for food sellers', text: 'Turn a small seller’s products into TikTok or Reels clips with AI captions.', who: 'small food sellers', what: 'make short videos for social media' },
+      { title: 'Custom stickers & notebook covers', text: 'Sell personalised designs to classmates for school supplies.', who: 'my classmates', what: 'get custom stickers and designs' },
+    ],
+  },
+  {
+    name: 'The Builder',
+    emoji: '💼',
+    tagline: 'You spot what people need and organise a way to sell it.',
+    steps: [
+      'Find a problem people already pay to solve — around school, home or your barangay.',
+      'Start tiny: a pre-order list or a small sample batch before spending money.',
+      'Use AI for the boring parts: product descriptions, captions, price and profit math.',
+    ],
+    ideas: [
+      { title: 'Pre-order baon & snacks', text: 'Take pre-orders from classmates the day before; deliver at recess.', who: 'busy classmates', what: 'pre-order snacks for recess' },
+      { title: 'Pre-loved clothes reselling', text: 'Sort good ukay finds, write listings with AI, sell online to students.', who: 'students on a budget', what: 'find good pre-loved clothes' },
+      { title: 'Page manager for a local store', text: 'Post updates and promos for a sari-sari store or carinderia each week.', who: 'a local store', what: 'post updates on Facebook' },
+    ],
+  },
+  {
+    name: 'The Maker',
+    emoji: '💻',
+    tagline: 'You build tools that save people time.',
+    steps: [
+      'Build one tiny app with ChatGPT or Claude — one page, one job.',
+      'Put it online for free (GitHub + Vercel, like this app).',
+      'Get 3 real people to use it, then fix what confuses them.',
+    ],
+    ideas: [
+      { title: 'Assignment reminder app', text: 'A simple page where your section lists deadlines and gets reminders.', who: 'my classmates', what: 'remember assignment deadlines' },
+      { title: 'Online menu for a carinderia', text: 'A one-page menu and order form a small eatery can share by QR code.', who: 'a carinderia owner', what: 'take orders online' },
+      { title: 'Reviewer quiz app', text: 'Turn notes for a hard subject into a quiz your classmates can practise with.', who: 'classmates', what: 'review for exams' },
+    ],
+  },
+  {
+    name: 'The Helper',
+    emoji: '❤️',
+    tagline: 'You make life easier for the people around you.',
+    steps: [
+      'Choose a group you care about: younger kids, lolos and lolas, your barangay.',
+      'Ask them what is hard or annoying in their week. Listen more than you talk.',
+      'Use AI to make one simple guide, schedule or tool that fixes one of those things.',
+    ],
+    ideas: [
+      { title: 'Tutoring with AI practice sheets', text: 'Help younger students with reading or math using worksheets you make with AI.', who: 'younger students', what: 'practice reading and math' },
+      { title: 'Medicine reminder for lolo & lola', text: 'A simple printed or phone schedule so they never miss their medicine.', who: 'my lola and lolo', what: 'remember their medicine' },
+      { title: 'Barangay announcement board', text: 'One page for events, lost-and-found and notices that neighbours can check.', who: 'my barangay', what: 'share announcements' },
+    ],
+  },
+  {
+    name: 'The Explorer',
+    emoji: '🧭',
+    tagline: 'Okay lang! Explorers find their thing by trying small things fast.',
+    steps: [
+      'This month, try one tiny project from a different path each week.',
+      'Notice which one you would happily do for free — that’s a clue.',
+      'Talk to one person already doing it. Ask how they started.',
+    ],
+    ideas: [
+      { title: 'Fix one annoying task at home', text: 'Ask your family what task they hate, then use AI to make it easier.', who: 'my family', what: 'finish one task they find annoying' },
+      { title: 'One poster for a school club', text: 'Design a poster with AI for a club’s next event and see how it feels.', who: 'a school club', what: 'promote their events' },
+      { title: 'Three-question interviews', text: 'Ask 3 people what is hard in their day. Their answers are business ideas.', who: 'people around me', what: 'solve a daily problem' },
+    ],
+  },
+];
 
 // The snack-demo page lives at /demo. Each feature-vote choice maps to one
 // prepared branch; the presenter opens the winner from the control page.
@@ -238,7 +321,7 @@ const WELCOME = {
     text: 'I had to start again more than once. Every time, what pulled me through was building something small for someone real. AI makes that easier than it has ever been — so I made this to prove it to you in ten minutes, not someday.',
   },
   roadmap: [
-    { title: 'Explore your future', text: 'Tap what you’re curious about and see what everyone else picked.' },
+    { title: 'Find your path', text: 'Pick what you’d love to become and get your own path and business ideas to start with.' },
     { title: 'Spot the AI’s mistake', text: 'Try an app an AI built, find the bug it hid, and see how many others caught it.' },
     { title: 'Your first small project', text: 'Fill in one card: who you’ll help, with what, and your first step.' },
     { title: 'Launch your own', text: 'The exact steps, tools and AI to turn that card into a real app.' },
@@ -256,4 +339,4 @@ const WELCOME = {
   },
 };
 
-module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, OFFER, SLIDE_COUNT: SLIDES.length };
+module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, OFFER, PATHS, SLIDE_COUNT: SLIDES.length };

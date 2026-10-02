@@ -130,7 +130,7 @@
 
   function progressBar() {
     const i = stepIndex();
-    const labels = ['Start', 'You', 'Poll', 'Results', 'Find it', 'Answer', 'Card', 'Build', 'Follow'];
+    const labels = ['Start', 'You', 'Dream', 'Your path', 'Find it', 'Answer', 'Card', 'Build', 'Follow'];
     return `<div class="progress" aria-label="Step ${i + 1} of ${STEPS.length}">
       ${STEPS.map((s, n) => `<span class="dot ${n < i ? 'done' : ''} ${n === i ? 'now' : ''}" title="${labels[n]}"></span>`).join('')}
       <span class="progress-label">${labels[i]} · ${i + 1}/${STEPS.length}</span>
@@ -197,10 +197,10 @@
     </div>`;
   }
 
-  function choiceList(choices, picked) {
+  function choiceList(choices, picked, icons) {
     return `<div class="choices">${choices.map((c, i) =>
       `<button type="button" class="choice ${picked === i ? 'selected' : ''}" data-pick="${i}" aria-pressed="${picked === i}">
-        <span class="dot"></span><span>${esc(c)}</span></button>`).join('')}</div>`;
+        ${icons && icons[i] ? `<span class="choice-icon" aria-hidden="true">${esc(icons[i])}</span>` : '<span class="dot"></span>'}<span>${esc(c)}</span></button>`).join('')}</div>`;
   }
 
   function closedNote(a) {
@@ -214,23 +214,53 @@
     return `<div class="card">
       <div class="kicker">1 · ${esc(a.title)}</div>
       <div class="question">${esc(a.question)}</div>
+      ${a.hint ? `<p class="muted">${esc(a.hint)}</p>` : ''}
       ${closedNote(st)}
-      ${choiceList(a.choices, picked)}
-      <button class="btn block" data-action="poll-submit" ${picked === null || ui.busy || st.status !== 'open' ? 'disabled' : ''}>${ui.busy ? 'Sending…' : my.poll !== null ? 'Update my answer' : 'Submit'}</button>
-      ${nav('welcome', my.poll !== null ? 'pollResults' : null, 'See results')}
+      ${choiceList(a.choices, picked, a.icons)}
+      <button class="btn block" data-action="poll-submit" ${picked === null || ui.busy || st.status !== 'open' ? 'disabled' : ''}>${ui.busy ? 'Sending…' : my.poll !== null ? 'Show my new path' : 'Show my path'}</button>
+      ${nav('welcome', my.poll !== null ? 'pollResults' : null, 'My path')}
     </div>`;
   }
 
+  // "Your path": the path for the student's pick, three first steps, three
+  // business ideas (one tap saves an idea for the project card), then the room.
   function renderPollResults() {
     const a = config.activities.poll;
     const st = state.activities.poll;
-    return `<div class="card">
-      <div class="kicker">Everyone’s answers · live</div>
-      <h2>${esc(a.question)}</h2>
-      ${my.poll !== null ? `<p class="muted">You picked <strong>${esc(a.choices[my.poll])}</strong>.</p>` : ''}
-      ${st.counts ? barChart(a.choices, st.counts, st.total) : '<p class="muted">Results are hidden right now.</p>'}
-      <p class="faint" style="margin-top:12px">${st.total} answer${st.total === 1 ? '' : 's'} so far. Whatever you picked, there’s a version of you who builds things.</p>
-      ${nav('poll', 'feature')}
+    const path = my.poll !== null && config.paths ? config.paths[my.poll] : null;
+    if (!path) {
+      return `<div class="card"><p class="muted">Pick what you’d love to become first.</p>${nav('poll', null)}</div>`;
+    }
+    const savedIdea = draft.who && draft.what ? `${draft.who}|${draft.what}` : '';
+    return `<div class="stack">
+      <div class="card path-hero">
+        <div class="kicker">Your path</div>
+        <div class="path-emoji" aria-hidden="true">${esc(path.emoji)}</div>
+        <h1>${esc(path.name)}</h1>
+        <p class="muted">${esc(path.tagline)}</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Start here — 3 steps</div>
+        <ol class="roadmap">${path.steps.map((t) => `<li><strong>${esc(t)}</strong></li>`).join('')}</ol>
+      </div>
+      <div class="card">
+        <div class="kicker">Business ideas for you</div>
+        <p class="faint">Small, real, and doable with AI. Tap one to use it for your project card later.</p>
+        <div class="ideas">${path.ideas.map((idea, i) => {
+          const chosen = savedIdea === `${idea.who}|${idea.what}`;
+          return `<div class="idea ${chosen ? 'chosen' : ''}">
+            <strong>${esc(idea.title)}</strong>
+            <span>${esc(idea.text)}</span>
+            <button type="button" class="btn ${chosen ? '' : 'ghost'} small" data-idea="${i}">${chosen ? '✓ Saved for my card' : 'Use this idea'}</button>
+          </div>`;
+        }).join('')}</div>
+      </div>
+      <div class="card">
+        <div class="kicker">How everyone answered · live</div>
+        ${st.counts ? barChart(a.choices, st.counts, st.total) : '<p class="muted">Results are hidden right now.</p>'}
+        <p class="faint" style="margin-top:12px">${st.total} answer${st.total === 1 ? '' : 's'} so far. Every path can become a business.</p>
+        ${nav('poll', 'feature')}
+      </div>
     </div>`;
   }
 
@@ -309,13 +339,22 @@
 
   const projectSentence = (c) => `I want to help ${c.who.trim()} ${c.what.trim()} more easily.`;
 
+  // One-tap starters from the student's path that fill in the card form.
+  function pathIdeaChips() {
+    const path = my.poll !== null && config.paths ? config.paths[my.poll] : null;
+    if (!path) return '';
+    return `<div class="examples"><strong>Ideas from your path (${esc(path.name)})</strong>
+      <div class="chips">${path.ideas.map((idea, i) => `<button type="button" class="chip" data-idea="${i}">${esc(idea.title)}</button>`).join('')}</div>
+      <p class="faint" style="margin:8px 0 0">Tap one to fill in the blanks, then change anything you like.</p></div>`;
+  }
+
   function renderCard() {
     const a = config.activities.card;
     if (card) return renderSavedCard();
     return `<div class="card">
       <div class="kicker">3 · ${esc(a.title)}</div>
       <div class="question">${esc(a.prompt)}</div>
-      <div class="examples"><strong>Examples</strong><ul>${a.examples.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>
+      ${pathIdeaChips() || `<div class="examples"><strong>Examples</strong><ul>${a.examples.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`}
       <form id="card-form" autocomplete="off">
         <label class="field">
           <span class="label">${esc(a.fields.who.label)}</span>
@@ -406,6 +445,17 @@
 
   function bind() {
     app.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => goTo(b.dataset.go)));
+    app.querySelectorAll('[data-idea]').forEach((b) => b.addEventListener('click', () => {
+      const path = config.paths[my.poll];
+      const idea = path && path.ideas[Number(b.dataset.idea)];
+      if (!idea) return;
+      draft.who = idea.who;
+      draft.what = idea.what;
+      writeJson(DRAFT_KEY, draft);
+      const y = window.scrollY;
+      if (step === 'card') { render(); window.scrollTo(0, y); notice('Filled in from your path. Make it your own!', ''); }
+      else { render(); window.scrollTo(0, y); }
+    }));
     app.querySelectorAll('[data-mini]').forEach((b) => b.addEventListener('click', () => {
       const id = b.dataset.mini;
       mini[id] = Math.max(0, Math.min(9, mini[id] + Number(b.dataset.d)));

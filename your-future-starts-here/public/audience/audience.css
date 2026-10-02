@@ -110,6 +110,22 @@
 @keyframes bestie-burst { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .bestie-title { color: var(--violet-800); -webkit-text-fill-color: var(--violet-800); } }
 
+/* Poll choices with icons, and the "Your path" screen */
+.choice-icon { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 1.35rem; background: rgba(255, 255, 255, 0.12); }
+.choice.selected .choice-icon { background: rgba(31, 17, 80, 0.12); }
+.path-hero { text-align: center; background: linear-gradient(135deg, rgba(201, 184, 245, 0.28), rgba(143, 116, 217, 0.18)); }
+.path-hero h1 { font-size: 2rem; margin: 4px 0; }
+.path-emoji { font-size: 3.2rem; line-height: 1; animation: bestie-pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.ideas { display: grid; gap: 10px; margin-top: 10px; }
+.idea { display: grid; gap: 4px; padding: 14px; border-radius: var(--radius-sm); border: 2px solid var(--border); background: var(--surface); }
+.idea strong { font-size: 1.05rem; }
+.idea span { color: var(--text-dim); font-size: 0.95rem; }
+.idea .btn { justify-self: start; margin-top: 6px; }
+.idea.chosen { border-color: var(--lavender-300); background: rgba(201, 184, 245, 0.16); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip { font: inherit; font-weight: 800; font-size: 0.92rem; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--lavender-300); background: transparent; color: var(--lavender-100); cursor: pointer; }
+.chip:active { background: var(--lavender-300); color: var(--violet-900); }
+
 /* The in-step snack app for "Spot the AI's mistake" */
 .mini-app { margin-top: 14px; border-radius: 18px; background: var(--lavender-100); color: var(--violet-800); padding: 14px 16px; box-shadow: var(--shadow); }
 .mini-head { display: flex; justify-content: space-between; align-items: center; font-weight: 900; margin-bottom: 6px; }

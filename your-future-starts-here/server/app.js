@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const express = require('express');
 const QRCode = require('qrcode');
 const S = require('./sessions');
-const { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, OFFER } = require('./slides');
+const { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, WELCOME, REGISTER, OFFER, PATHS } = require('./slides');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const ON_VERCEL = Boolean(process.env.VERCEL);
@@ -184,7 +184,7 @@ function createApp({ store, presenterPassword, presenterPath = null, writeLimit 
 
   app.get('/api/config', (req, res) => {
     res.set('Cache-Control', 'public, max-age=60, s-maxage=3600');
-    res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES, social: SOCIAL, guide: GUIDE, welcome: WELCOME, register: REGISTER, offer: OFFER });
+    res.json({ slides: SLIDES, activities: ACTIVITIES, demoBranches: DEMO_BRANCHES, social: SOCIAL, guide: GUIDE, welcome: WELCOME, register: REGISTER, offer: OFFER, paths: PATHS });
   });
 
   app.get('/api/sessions/:code/state', codeParam, wrap(async (req, res) => {
