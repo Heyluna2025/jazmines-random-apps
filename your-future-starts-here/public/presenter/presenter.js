@@ -220,7 +220,6 @@
 
   function renderList() {
     return `<div class="top">${window.YFSHLogo.html({ size: 'sm' })}<h1>Sessions</h1><span class="spacer"></span>
-      <a class="btn ghost small" href="/demo" target="_blank">Snack demo ↗</a>
       ${authRequired ? '<button class="btn ghost small" data-act="logout">Sign out</button>' : ''}</div>
     <div class="grid">
       ${banner()}
@@ -254,7 +253,7 @@
 
   // The one button a presenter most likely needs next on the current slide.
   function primaryAction(s, slide) {
-    if (s.ended || !slide.activity) return null;
+    if (s.ended || !slide.activity || slide.activity === 'feature') return null; // the mistake game is no longer part of the app
     const id = slide.activity;
     const a = s.activities[id];
     const words = { poll: ['poll', 'results'], feature: ['voting', 'winner'], card: ['form', null] }[id];
@@ -268,7 +267,7 @@
     if (!state) return '<div class="card"><p class="muted">Loading session…</p></div>';
     const s = state;
     const slide = config.slides[s.slide - 1];
-    const poll_ = s.activities.poll, feature = s.activities.feature, card = s.activities.card;
+    const poll_ = s.activities.poll, card = s.activities.card;
     const A = config.activities;
     const connPill = connStatus === 'live' ? '<span class="pill live">Live</span>' : '<span class="pill warn">Reconnecting…</span>';
     const shortUrl = joinUrl.replace(/^https?:\/\//, '').replace(/\/a\//, '/');
@@ -320,7 +319,6 @@
           <a class="btn block" href="/x/${s.code}" target="_blank">Open projector view ↗</a>
           <a class="btn ghost block" href="/x/${s.code}?mode=activity" target="_blank">Projector: activity panel only ↗</a>
           <a class="btn ghost block" href="/a/${s.code}" target="_blank">Preview the audience view ↗</a>
-          <a class="btn ghost block" href="/demo" target="_blank">Snack demo (all branches) ↗</a>
         </div>
         <p class="faint" style="margin-top:10px">Use the activity-only projector beside an external slide deck. Arrow keys change slides on the projector only while you’re signed in there.</p>
       </div>
@@ -358,24 +356,8 @@
         ${barChart(A.poll.choices, poll_.counts, poll_.total)}
       </div>
 
-      <div class="card activity" id="activity-feature">
-        <h3>2 · ${esc(A.feature.title)} ${statusPill(feature.status)}</h3>
-        <p class="muted">${esc(A.feature.question)}</p>
-        <div class="row">
-          ${feature.status === 'open'
-            ? '<button class="btn" data-activity="feature" data-action="close">Close voting</button>'
-            : `<button class="btn" data-activity="feature" data-action="open" ${s.ended ? 'disabled' : ''}>${feature.status === 'closed' ? 'Reopen' : 'Open'} voting</button>`}
-          ${feature.revealed
-            ? '<button class="btn ghost" data-activity="feature" data-action="hide">Hide winner</button>'
-            : '<button class="btn ghost" data-activity="feature" data-action="reveal">Reveal winner</button>'}
-        </div>
-        <p class="stat-label" style="margin-top:14px">${feature.total} vote${feature.total === 1 ? '' : 's'} · ${feature.revealed ? 'winner showing' : 'winner hidden'}</p>
-        ${barChart(A.feature.choices, feature.counts, feature.total)}
-        ${renderWinner(feature, A.feature)}
-      </div>
-
       <div class="card activity" id="activity-card">
-        <h3>3 · ${esc(A.card.title)} ${statusPill(card.status)}</h3>
+        <h3>2 · ${esc(A.card.title)} ${statusPill(card.status)}</h3>
         <p class="muted">${esc(A.card.prompt)}</p>
         <div class="row">
           ${card.status === 'open'
@@ -406,22 +388,6 @@
       <div class="qb-title"><span class="stat-label">Slide ${s.slide} of ${s.slideCount}</span><strong>${esc(slide.title)}</strong></div>
       <button class="btn small" data-delta="1" ${s.slide >= s.slideCount ? 'disabled' : ''} aria-label="Next slide">▶</button>
       ${primary ? `<button class="btn small qb-action" data-activity="${primary.id}" data-action="${primary.action}">${esc(primary.label)}</button>` : ''}
-    </div>`;
-  }
-
-  function renderWinner(feature, def) {
-    if (feature.total === 0) return '<p class="faint" style="margin-top:12px">No votes yet.</p>';
-    if (!feature.tie) {
-      return `<div class="notice" style="margin-top:14px">Leading: <strong>${esc(def.choices[feature.winner])}</strong>
-        ${feature.revealed && config.demoBranches[feature.winner] ? ` · <a href="/demo?branch=${config.demoBranches[feature.winner].key}" target="_blank">open this demo branch ↗</a>` : ''}</div>`;
-    }
-    return `<div class="notice warn" style="margin-top:14px">
-      <strong>It’s a tie.</strong> Pick the winner:
-      <div class="row tie-pick">
-        ${feature.leaders.map((i) => `<button class="btn small ${feature.winnerOverride === i ? '' : 'ghost'}" data-activity="feature" data-action="setWinner" data-choice="${i}">${esc(def.choices[i])}</button>`).join('')}
-        ${feature.winnerOverride !== null ? '<button class="btn ghost small" data-activity="feature" data-action="setWinner" data-choice="null">Clear</button>' : ''}
-      </div>
-      ${feature.winner !== null && feature.revealed && config.demoBranches[feature.winner] ? `<p style="margin:10px 0 0">Showing: <strong>${esc(def.choices[feature.winner])}</strong> · <a href="/demo?branch=${config.demoBranches[feature.winner].key}" target="_blank">open this demo branch ↗</a></p>` : ''}
     </div>`;
   }
 
