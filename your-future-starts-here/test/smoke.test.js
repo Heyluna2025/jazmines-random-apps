@@ -85,7 +85,8 @@ for (const kind of ['memory', 'redis']) {
       const a = await json('POST', `/api/sessions/${code}/join`, {});
       const b = await json('POST', `/api/sessions/${code}/join`, {});
       assert.notEqual(a.data.pid, b.data.pid);
-      assert.equal(a.data.state.focus, 'poll', 'the opening poll is open from the start');
+      assert.equal(a.data.state.activities.poll.status, 'open', 'everything is open from the start');
+      assert.equal(a.data.state.activities.poll.revealed, true);
       const before = await state();
       assert.equal(before.participantCount, 2);
 
@@ -95,7 +96,7 @@ for (const kind of ['memory', 'redis']) {
       await json('POST', `/api/sessions/${code}/activities/poll`, { action: 'open' }, true);
       const sa = await state();
       const sb = await state();
-      assert.equal(sa.focus, 'poll');
+      assert.equal(sa.activities.poll.status, 'open');
       assert.equal(sb.activities.poll.status, 'open');
       assert.ok(sa.version > before.version, 'version moves forward so phones re-render');
 
@@ -112,11 +113,12 @@ for (const kind of ['memory', 'redis']) {
       assert.deepEqual(pres.data.state.activities.poll.counts, [0, 0, 2, 0, 0]);
       assert.equal(pres.data.state.activities.poll.total, 2);
 
-      // Counts stay hidden from the room until revealed
+      // Counts are visible by default; a presenter can hide them for a guided talk
+      assert.deepEqual((await state()).activities.poll.counts, [0, 0, 2, 0, 0]);
+      await json('POST', `/api/sessions/${code}/activities/poll`, { action: 'hide' }, true);
       const hidden = await state();
       assert.equal(hidden.activities.poll.counts, null);
       assert.equal(hidden.activities.poll.total, 2);
-
       await json('POST', `/api/sessions/${code}/activities/poll`, { action: 'reveal' }, true);
       assert.deepEqual((await state()).activities.poll.counts, [0, 0, 2, 0, 0]);
 
@@ -129,7 +131,6 @@ for (const kind of ['memory', 'redis']) {
       assert.equal(again.data.pid, a.data.pid);
       assert.equal(again.data.my.poll, 2);
       assert.equal(again.data.state.participantCount, 2);
-      assert.equal(again.data.state.focus, 'poll');
     });
 
     test('public state is edge-cacheable for a second; presenter data is never cached', async () => {
@@ -144,12 +145,12 @@ for (const kind of ['memory', 'redis']) {
     test('feature vote: tie needs a presenter pick, winner shows after reveal', async () => {
       const a = await json('POST', `/api/sessions/${code}/join`, {});
       const b = await json('POST', `/api/sessions/${code}/join`, {});
+      // Guided-talk shape for the big screen: close the card so focus follows the vote
+      await json('POST', `/api/sessions/${code}/activities/card`, { action: 'close' }, true);
       await json('POST', `/api/sessions/${code}/slide`, { slide: 6 }, true);
-      await json('POST', `/api/sessions/${code}/activities/feature`, { action: 'open' }, true);
       await json('POST', `/api/sessions/${code}/vote/feature`, { pid: a.data.pid, choice: 0 });
       await json('POST', `/api/sessions/${code}/vote/feature`, { pid: b.data.pid, choice: 1 });
       await json('POST', `/api/sessions/${code}/activities/feature`, { action: 'close' }, true);
-      await json('POST', `/api/sessions/${code}/activities/feature`, { action: 'reveal' }, true);
 
       let pub = await state();
       assert.equal(pub.focus, 'feature');
@@ -309,7 +310,10 @@ test.describe('open mode (no PRESENTER_PASSWORD)', () => {
     const list = await (await fetch(`${base}/api/sessions`)).json();
     assert.equal(list.sessions.length, 1);
     assert.equal(list.live, code);
-    assert.equal((await (await fetch(`${base}/api/sessions/${code}/state`)).json()).state.focus, 'poll', 'poll open on arrival');
+    const arrival = (await (await fetch(`${base}/api/sessions/${code}/state`)).json()).state;
+    assert.equal(arrival.activities.poll.status, 'open', 'poll open on arrival');
+    assert.equal(arrival.activities.feature.status, 'open');
+    assert.equal(arrival.activities.card.status, 'open');
     const close = await fetch(`${base}/api/sessions/${code}/activities/poll`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'close' }),
     });

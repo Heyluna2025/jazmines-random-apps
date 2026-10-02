@@ -153,4 +153,42 @@ const SOCIAL = {
   ],
 };
 
-module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, SLIDE_COUNT: SLIDES.length };
+// The "build your own" guide students read on their phones after the card.
+const GUIDE = {
+  title: 'Build and launch your own',
+  intro: 'This app was built with AI help in a day. Here is how, so you can do the same.',
+  sections: [
+    {
+      title: 'What this app is made of',
+      items: [
+        'A web page (HTML, CSS, JavaScript) that works on any phone — no app store needed.',
+        'A small server (Node.js + Express) that counts the votes.',
+        'A database (Redis on Upstash, free plan) so everyone sees the same results.',
+        'Hosting on Vercel (free plan) and code on GitHub (free).',
+      ],
+    },
+    {
+      title: 'Which AI to use',
+      items: [
+        'ChatGPT or Claude — both can write a whole app like this. Pick the one you already have.',
+        'Tell it who the app is for and the one thing it must do. Ask for the simplest version first.',
+        'Ask for everything in one file (index.html) so it is easy to upload.',
+        'When something breaks, paste the error message back. Ask it to explain what it changed.',
+      ],
+    },
+    {
+      title: 'Launch it in 5 steps',
+      items: [
+        'Ask ChatGPT or Claude: "Build a one-page web app, in a single index.html file, that ______."',
+        'Open it on your phone and test it. Fix it with the AI until it does the one thing well.',
+        'Make a free GitHub account, create a repository, upload index.html.',
+        'Go to vercel.com, sign in with GitHub, import that repository, press Deploy.',
+        'Share the link (or a QR code) with the people you built it for.',
+      ],
+    },
+  ],
+  prompt: 'Build a one-page web app in a single index.html file. It is for [who you want to help]. It must let them [the task] more easily. Keep it simple, make it work well on a phone, and explain how to test it.',
+  rules: ['Ask clearly.', 'Check carefully.', 'Finish something useful.'],
+};
+
+module.exports = { SLIDES, ACTIVITIES, DEMO_BRANCHES, SOCIAL, GUIDE, SLIDE_COUNT: SLIDES.length };

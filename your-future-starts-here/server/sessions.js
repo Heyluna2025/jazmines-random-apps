@@ -41,19 +41,20 @@ const cleanName = (name) => String(name || '').trim().slice(0, 60) || 'Untitled 
 // A session is described by flat fields. "poll:status" style keys map onto
 // activities.poll.status in a snapshot and are hash fields in Redis, so both
 // stores apply exactly the same patches.
-// The opening poll starts open, so phones that scan early can answer at once
-// without the presenter pressing anything.
+// Self-paced: every activity is open and its results visible from the start,
+// so a phone can go through the whole thing without anyone pressing buttons.
+// The presenter page can still close or hide things for a guided talk.
 const RESET_PATCH = {
   slide: 1,
   ended: false,
   endedAt: null,
   'poll:status': 'open',
-  'poll:revealed': false,
+  'poll:revealed': true,
   'poll:winnerOverride': null,
-  'feature:status': 'pending',
-  'feature:revealed': false,
+  'feature:status': 'open',
+  'feature:revealed': true,
   'feature:winnerOverride': null,
-  'card:status': 'pending',
+  'card:status': 'open',
 };
 
 function setField(target, key, value) {

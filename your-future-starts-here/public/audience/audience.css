@@ -61,6 +61,18 @@
 .action-card .ac-footer span { white-space: nowrap; }
 .action-card .ac-footer .logo { color: var(--violet-700); }
 .card-preview { width: 100%; border-radius: 16px; box-shadow: var(--shadow); display: block; }
+/* Self-paced flow */
+.progress { display: flex; align-items: center; gap: 6px; margin: 0 0 14px; }
+.progress .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); }
+.progress .dot.done { background: var(--lavender-400); }
+.progress .dot.now { background: var(--lavender-200); box-shadow: 0 0 0 4px rgba(201, 184, 245, 0.25); }
+.progress-label { margin-left: auto; font-size: 0.8rem; font-weight: 800; color: var(--text-dim); letter-spacing: 0.04em; }
+.nav { margin-top: 18px; }
+.guide-h { font-size: 1.1rem; margin: 18px 0 6px; color: var(--lavender-200); }
+.guide-list { margin: 0; padding-left: 22px; }
+.guide-list li { margin: 6px 0; color: var(--lavender-100); }
+.prompt-box { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95rem; line-height: 1.5; padding: 14px; border-radius: var(--radius-sm); background: rgba(0, 0, 0, 0.25); border: 1px dashed var(--border); margin: 8px 0 10px; user-select: all; }
+.rules { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .follow h2 { font-size: 1.25rem; margin-bottom: 14px; }
 .follow .btn { justify-content: space-between; }
 .follow .btn::after { content: "↗"; opacity: 0.6; }
