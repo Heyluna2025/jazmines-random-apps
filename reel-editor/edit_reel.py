@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 W, H = 1080, 1920
 VIOLET = (91, 33, 182)
 VIOLET_LIGHT = (124, 58, 237)
-YELLOW = (255, 214, 10)
+YELLOW = (230, 172, 0)
 INK = (34, 10, 78)
 WHITE = (255, 255, 255)
 FONT_DIR = "/usr/share/fonts/opentype/inter/"
