@@ -1,0 +1,18 @@
+{
+  "hook": {
+    "tag": "AI Secret #1.1",
+    "title": ["TOOL LANG DAW", "ANG AI?"],
+    "highlight": ["AI?"],
+    "chip": "Tool lang daw ang AI?",
+    "start": 0.0,
+    "collapse_at": 3.6
+  },
+  "cards": [
+    {"start": 12.0, "end": 16.0, "side": "right", "y": 1060,
+     "title": "Key point", "body": "Short supporting line for this point."},
+    {"start": 24.0, "end": 28.0, "side": "left", "y": 1060,
+     "title": "Second point", "body": "Cards alternate sides to keep motion going."}
+  ],
+  "subtitle_y": 1596,
+  "subtitles": "captions.srt"
+}
