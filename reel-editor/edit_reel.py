@@ -17,8 +17,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H = 1080, 1920
-VIOLET = (124, 58, 237)
-VIOLET_LIGHT = (167, 139, 250)
+VIOLET = (91, 33, 182)
+VIOLET_LIGHT = (124, 58, 237)
 YELLOW = (255, 214, 10)
 INK = (34, 10, 78)
 WHITE = (255, 255, 255)
@@ -124,7 +124,7 @@ def glass_card(frame, box, radius, t, tint=VIOLET, alpha=1.0, shine_period=4.0):
     # milky violet tint + vertical sheen
     arr = np.asarray(blurred.convert("RGB")).astype(np.float32)
     grad = np.linspace(1.0, 0.0, h, dtype=np.float32)[:, None, None]
-    arr = arr * 0.62 + np.array(tint, np.float32) * 0.20 + 255 * (0.10 + 0.10 * grad)
+    arr = arr * 0.60 + np.array(tint, np.float32) * 0.30 + 255 * (0.05 + 0.08 * grad)
 
     # moving specular streak — the "liquid" shine
     ph = ((t % shine_period) / shine_period) * 2.6 - 0.8
