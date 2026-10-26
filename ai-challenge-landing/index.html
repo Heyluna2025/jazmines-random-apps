@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Income Challenge</title>
+<meta name="description" content="Free 5-day live challenge registration page template.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0d12; --bg-2:#12151d; --card:#161a24; --line:#262b38;
+    --text:#f4f6fb; --muted:#aab2c5; --accent:#ffb800; --accent-2:#22c55e; --danger:#ef4444;
+    --radius:16px; --max:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+  img,video{max-width:100%;display:block}
+  a{color:inherit}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 16px}
+  .narrow{max-width:820px}
+  section{padding:64px 0}
+  h1,h2,h3{line-height:1.12;letter-spacing:-.02em;font-weight:800}
+  h1{font-size:clamp(30px,5.4vw,58px)}
+  h2{font-size:clamp(26px,3.8vw,40px);text-align:center;margin-bottom:12px}
+  .sub{color:var(--muted);text-align:center;max-width:720px;margin:0 auto 36px;font-size:clamp(16px,1.6vw,19px)}
+  .hl{color:var(--accent)}
+  .u{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:6px;text-decoration-thickness:4px}
+
+  /* announcement bar */
+  .bar{background:var(--accent);color:#111;font-weight:700;text-align:center;padding:10px 16px;font-size:14px}
+  .bar b{font-weight:900}
+
+  /* hero */
+  .hero{padding:48px 0 56px;text-align:center;background:
+    radial-gradient(900px 420px at 50% -10%, rgba(255,184,0,.14), transparent 60%), var(--bg)}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,184,0,.12);border:1px solid rgba(255,184,0,.4);color:var(--accent);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
+  .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 0 rgba(239,68,68,.7);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.7)}70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+  .hero h1{max-width:900px;margin:0 auto 18px}
+  .hero p.lead{color:var(--muted);font-size:clamp(17px,2vw,21px);max-width:760px;margin:0 auto 28px}
+  .when{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;margin:0 auto 28px;font-weight:600;font-size:15px;color:var(--text)}
+  .when span{display:inline-flex;align-items:center;gap:8px}
+  .when svg{width:18px;height:18px;stroke:var(--accent)}
+
+  .vsl{position:relative;aspect-ratio:16/9;background:#000;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);max-width:860px;margin:0 auto 28px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .vsl .ph{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,#1a1f2c,#0b0d12)}
+  .vsl .play{width:84px;height:84px;border-radius:50%;background:var(--accent);display:grid;place-items:center;cursor:pointer;transition:transform .15s}
+  .vsl .play:hover{transform:scale(1.06)}
+  .vsl .play svg{width:34px;height:34px;fill:#111;margin-left:5px}
+  .vsl .cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:var(--muted);font-size:13px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:#111;font-weight:900;font-size:18px;padding:18px 34px;border-radius:12px;border:0;cursor:pointer;text-decoration:none;box-shadow:0 10px 30px rgba(255,184,0,.3);transition:transform .12s, box-shadow .12s;width:100%;max-width:520px;text-transform:uppercase;letter-spacing:.02em}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(255,184,0,.4)}
+  .btn svg{width:22px;height:22px;stroke:#111}
+  .btn.big{font-size:20px;padding:22px 40px}
+  .trust{color:var(--muted);font-size:13px;margin-top:12px}
+  .trust b{color:var(--text)}
+
+  /* countdown */
+  .count{display:flex;justify-content:center;gap:12px;margin:28px auto 8px}
+  .count div{background:var(--card);border:1px solid var(--line);border-radius:12px;min-width:74px;padding:12px 8px}
+  .count b{display:block;font-size:30px;font-weight:900;line-height:1}
+  .count small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-top:6px}
+
+  /* logo strip */
+  .logos{padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-2)}
+  .logos p{text-align:center;color:var(--muted);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px}
+  .logos ul{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 36px;list-style:none;opacity:.7}
+  .logos li{font-weight:800;font-size:18px;letter-spacing:.02em}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:32px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;text-align:center}
+  .stat b{display:block;font-size:36px;font-weight:900;color:var(--accent)}
+  .stat span{color:var(--muted);font-size:14px}
+
+  /* days */
+  .days{display:grid;gap:14px}
+  .day{display:grid;grid-template-columns:72px 1fr;gap:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .day .n{background:rgba(255,184,0,.12);color:var(--accent);border:1px solid rgba(255,184,0,.35);border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:13px;text-align:center;line-height:1.1;padding:6px}
+  .day .n b{font-size:26px;display:block}
+  .day h3{font-size:19px;margin-bottom:6px}
+  .day p{color:var(--muted);font-size:15px}
+
+  /* hosts */
+  .hosts{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .host{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:start}
+  .host .avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#2b3140,#161a24);border:3px solid var(--accent);display:grid;place-items:center;font-weight:900;font-size:36px;color:var(--accent)}
+  .host .role{color:var(--accent);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+  .host h3{font-size:22px;margin-bottom:8px}
+  .host p{color:var(--muted);font-size:15px}
+  .host ul{margin:10px 0 0 18px;color:var(--muted);font-size:14px}
+
+  /* checklist */
+  .check{list-style:none;display:grid;gap:12px;max-width:760px;margin:0 auto}
+  .check li{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:16px}
+  .check svg{flex:0 0 22px;width:22px;height:22px;stroke:var(--accent-2);margin-top:2px}
+
+  /* testimonials */
+  .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .t{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .t .stars{color:var(--accent);letter-spacing:2px;margin-bottom:10px}
+  .t p{font-size:15px;color:var(--text);margin-bottom:14px}
+  .t .who{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+  .t .who i{width:34px;height:34px;border-radius:50%;background:#2b3140;display:grid;place-items:center;font-style:normal;font-weight:800;color:var(--accent);font-size:13px}
+
+  /* faq */
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 20px;margin-bottom:10px}
+  summary{cursor:pointer;padding:18px 0;font-weight:700;font-size:16px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--accent);font-size:22px;font-weight:400}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--muted);padding:0 0 18px;font-size:15px}
+
+  /* final cta */
+  .final{background:linear-gradient(180deg,var(--bg-2),var(--bg));text-align:center;border-top:1px solid var(--line)}
+
+  /* footer */
+  footer{padding:36px 0 56px;border-top:1px solid var(--line);color:#7d8699;font-size:12px;line-height:1.6}
+  footer p{margin-bottom:12px}
+  footer nav{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:18px}
+  footer nav a{color:var(--muted)}
+
+  /* sticky mobile cta */
+  .sticky{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(11,13,18,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:none;z-index:50}
+  .sticky .btn{max-width:none;font-size:16px;padding:14px 20px}
+  .sticky.show{display:block}
+
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:16px;z-index:100}
+  .modal.open{display:grid}
+  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;width:100%;max-width:460px;position:relative}
+  .modal h3{font-size:22px;margin-bottom:6px}
+  .modal .hint{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .modal .x{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--muted);font-size:26px;cursor:pointer}
+  .field{margin-bottom:12px}
+  .field input{width:100%;padding:14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:16px;font-family:inherit}
+  .field input:focus{outline:2px solid var(--accent);border-color:transparent}
+  .consent{font-size:12px;color:var(--muted);margin:10px 0 16px}
+  .success{text-align:center;padding:12px 0}
+  .success .big{font-size:48px;margin-bottom:8px}
+
+  @media (max-width:760px){
+    section{padding:48px 0}
+    .hosts{grid-template-columns:1fr}
+    .host{grid-template-columns:88px 1fr}
+    .host .avatar{width:88px;height:88px;font-size:28px}
+    .day{grid-template-columns:60px 1fr;gap:12px;padding:18px}
+    .count div{min-width:64px}
+    .count b{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar" id="bar">🔥 <b>Doors close soon</b> — the free challenge starts <b data-bind="startDateShort"></b>. Grab your spot before registration closes.</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> Free 5-day live challenge</div>
+    <h1>Build Your First <span class="hl">AI Side Hustle</span> In 5 Days — Even If You Have Zero Tech Skills</h1>
+    <p class="lead">Join thousands of complete beginners learning the exact system to spin up a simple AI-powered income stream, live, step by step, with a special guest who built an audience of 18M+ people.</p>
+
+    <div class="when">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><b data-bind="dateRange"></b></span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><b data-bind="time"></b></span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 10l4.55-2.28A1 1 0 0 1 21 8.62v6.76a1 1 0 0 1-1.45.9L15 14"/><rect x="3" y="6" width="12" height="12" rx="2"/></svg><b>Online · Live on Zoom</b></span>
+    </div>
+
+    <div class="vsl" id="vsl">
+      <!-- Replace this placeholder with an <iframe> or <video> embed -->
+      <div class="ph">
+        <div class="play" role="button" aria-label="Play video"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="cap">Watch: what you'll build in 5 days (2 min)</div>
+      </div>
+    </div>
+
+    <a class="btn big" href="#register" data-open>Yes! Save My Free Spot
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <p class="trust">🔒 100% free · No credit card · <b data-bind="seatsLine"></b></p>
+
+    <div class="count" id="countdown" aria-label="Countdown to challenge start">
+      <div><b data-cd="d">00</b><small>Days</small></div>
+      <div><b data-cd="h">00</b><small>Hours</small></div>
+      <div><b data-cd="m">00</b><small>Mins</small></div>
+      <div><b data-cd="s">00</b><small>Secs</small></div>
+    </div>
+  </div>
+</header>
+
+<!-- LOGO STRIP -->
+<div class="logos">
+  <div class="wrap">
+    <p>As featured in</p>
+    <ul><li>PUBLICATION ONE</li><li>MEDIA TWO</li><li>OUTLET THREE</li><li>NETWORK FOUR</li><li>PODCAST FIVE</li></ul>
+  </div>
+</div>
+
+<!-- STATS -->
+<section>
+  <div class="wrap">
+    <h2>Our Past Challenges Have Produced <span class="hl">Real Results</span></h2>
+    <p class="sub">These are placeholder figures. Replace them with your own tracked numbers and keep the disclaimer below honest.</p>
+    <div class="stats">
+      <div class="stat"><b>$155M+</b><span>Tracked student earnings (placeholder)</span></div>
+      <div class="stat"><b>120,000+</b><span>Beginners who have joined a challenge</span></div>
+      <div class="stat"><b>$373/day</b><span>The target income we build toward</span></div>
+      <div class="stat"><b>5 Days</b><span>Start to finish, 60 minutes a day</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU'LL LEARN -->
+<section style="background:var(--bg-2)">
+  <div class="wrap narrow">
+    <h2>What You'll Build, <span class="u">Day by Day</span></h2>
+    <p class="sub">Each session is live. Show up, follow along, and leave every day with something finished.</p>
+    <div class="days">
+      <div class="day"><div class="n"><b>1</b>Day</div><div><h3>Pick your AI income model</h3><p>We walk through the three beginner-friendly models that work right now and help you choose the one that fits your time and skills.</p></div></div>
+      <div class="day"><div class="n"><b>2</b>Day</div><div><h3>Set up your tools in under an hour</h3><p>The exact (mostly free) AI stack we use. No coding. You'll have everything installed and working before the session ends.</p></div></div>
+      <div class="day"><div class="n"><b>3</b>Day</div><div><h3>Create your first sellable asset</h3><p>Build the thing you'll actually get paid for, live, using the templates and prompts we give you.</p></div></div>
+      <div class="day"><div class="n"><b>4</b>Day</div><div><h3>Find your first customers</h3><p>Where beginners find paying clients without ads or an audience, plus the outreach scripts that get replies.</p></div></div>
+      <div class="day"><div class="n"><b>5</b>Day</div><div><h3>Scale to $373/day</h3><p>How to turn one sale into a repeatable system, and the one mistake that keeps most people stuck at zero.</p></div></div>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a class="btn" href="#register" data-open>Register Free Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOSTS -->
+<section>
+  <div class="wrap">
+    <h2>Meet Your <span class="hl">Hosts</span></h2>
+    <p class="sub">Two people who have done this at scale, teaching it to you live.</p>
+    <div class="hosts">
+      <div class="host">
+        <div class="avatar">H</div>
+        <div>
+          <div class="role">Your host</div>
+          <h3>[Host Name]</h3>
+          <p>Founder of [Company]. Has run multiple free challenges for complete beginners and built the system taught in this event from scratch.</p>
+          <ul><li>Built and sold [X] online businesses</li><li>Taught [X] students across [X] countries</li><li>Featured in [publications]</li></ul>
+        </div>
+      </div>
+      <div class="host">
+        <div class="avatar">G</div>
+        <div>
+          <div class="role">Special guest co-host</div>
+          <h3>[Guest Name]</h3>
+          <p>Entrepreneur and investor with 40 years building businesses across multiple industries, and an audience of 18M+ followers.</p>
+          <ul><li>Self-made, started with nothing</li><li>Teaches money and business to millions</li><li>Joining live for all 5 days</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section style="background:var(--bg-2)">
+  <div class="wrap">
+    <h2>This Challenge Is For You If…</h2>
+    <p class="sub">You don't need experience, an audience, or money to start. You need five hours and a laptop.</p>
+    <ul class="check">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>You want an extra income stream but don't know where to start with AI</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>You've watched the videos but never actually built anything</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>You have a job and limited time, and need something that fits around it</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>You'd rather follow a proven, step-by-step process than figure it out alone</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>You're willing to show up live for 60 minutes a day for 5 days</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="wrap">
+    <h2>What Past Participants <span class="hl">Are Saying</span></h2>
+    <p class="sub">Placeholder testimonials. Swap in real, permissioned quotes with first name and location.</p>
+    <div class="tgrid">
+      <div class="t"><div class="stars">★★★★★</div><p>"I had never used any AI tool before day one. By day three I had something I could actually sell. Landed my first client the following week."</p><div class="who"><i>JM</i> Jordan M. · Texas</div></div>
+      <div class="t"><div class="stars">★★★★★</div><p>"The live format made the difference. I'd bought courses before and never finished them. This time I built it alongside everyone else."</p><div class="who"><i>PS</i> Priya S. · London</div></div>
+      <div class="t"><div class="stars">★★★★★</div><p>"Clear, practical, no fluff. The outreach scripts on day four alone were worth showing up for."</p><div class="who"><i>DK</i> Daniel K. · Sydney</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--bg-2)">
+  <div class="wrap narrow">
+    <h2>Frequently Asked Questions</h2>
+    <p class="sub">Everything you need to know before you register.</p>
+    <details><summary>Is it really free?</summary><p>Yes. The 5-day challenge is completely free to attend. There's no credit card required to register. At the end of the challenge we'll share an optional paid program for those who want more support.</p></details>
+    <details><summary>When are the live sessions?</summary><p>Every day at <span data-bind="time"></span>, starting <span data-bind="startDateLong"></span>. Each session runs roughly 60 minutes.</p></details>
+    <details><summary>What if I can't make it live?</summary><p>Replays are available for 24 hours after each session. We strongly recommend attending live, because that's where the questions get answered.</p></details>
+    <details><summary>Do I need technical skills or money to start?</summary><p>No. Everything is beginner-friendly and the tools we use are free or have free tiers. If you can use email, you can do this.</p></details>
+    <details><summary>Is this a get-rich-quick scheme?</summary><p>No. Building any income stream takes work. We teach a method; your results depend on your effort and circumstances. Please read the earnings disclaimer in the footer.</p></details>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap narrow">
+    <h2>Registration Closes <span class="hl" data-bind="startDateShort"></span></h2>
+    <p class="sub">Seats are limited by our Zoom capacity. Save your free spot now and we'll send the login details straight to your inbox.</p>
+    <a class="btn big" href="#register" data-open>Save My Free Spot Now</a>
+    <p class="trust">🔒 100% free · No credit card · Unsubscribe anytime</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap narrow" style="text-align:center">
+    <nav><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Earnings Disclaimer</a><a href="#">Contact</a></nav>
+    <p><b>Earnings disclaimer:</b> Any income figures shown on this page are placeholders and, when replaced, must reflect genuine, documented results. They are not a promise or guarantee of your own earnings. Your results will vary and depend on many factors including your background, experience, and work ethic. All business entails risk and requires consistent effort.</p>
+    <p>This site is not a part of the Facebook website or Facebook Inc. Additionally, this site is NOT endorsed by Facebook in any way. FACEBOOK is a trademark of FACEBOOK, Inc.</p>
+    <p>© <span id="year"></span> [Company Name]. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky"><a class="btn" href="#register" data-open>Save My Free Spot</a></div>
+
+<!-- REGISTRATION MODAL -->
+<div class="modal" id="register" role="dialog" aria-modal="true" aria-labelledby="regTitle">
+  <div class="box">
+    <button class="x" aria-label="Close" data-close>×</button>
+    <div id="formWrap">
+      <h3 id="regTitle">Save your free spot</h3>
+      <p class="hint">Enter your details and we'll email your Zoom link instantly.</p>
+      <form id="regForm" novalidate>
+        <div class="field"><input name="first_name" type="text" placeholder="First name" required autocomplete="given-name"></div>
+        <div class="field"><input name="email" type="email" placeholder="Best email address" required autocomplete="email"></div>
+        <div class="field"><input name="phone" type="tel" placeholder="Mobile number (for reminders)" autocomplete="tel"></div>
+        <p class="consent">By registering you agree to receive emails and SMS about this event. Unsubscribe anytime.</p>
+        <button class="btn" type="submit" style="max-width:none">Register Free →</button>
+      </form>
+    </div>
+    <div class="success" id="success" hidden>
+      <div class="big">🎉</div>
+      <h3>You're in!</h3>
+      <p class="hint">Check your inbox for the Zoom link. Add it to your calendar so you don't miss day one.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- CONFIG: edit these ----
+  const CONFIG = {
+    start: "2026-11-10T19:00:00",     // first session, local time
+    end:   "2026-11-14",
+    timeLabel: "7:00 PM ET / 4:00 PM PT",
+    seatsLine: "Limited to 5,000 live seats",
+    submitUrl: ""                     // POST endpoint for the form; empty = demo mode
+  };
+
+  // ---- bindings ----
+  const start = new Date(CONFIG.start), end = new Date(CONFIG.end + "T00:00:00");
+  const fmt = (d, o) => d.toLocaleDateString("en-US", o);
+  const bind = {
+    startDateShort: fmt(start, {month:"short", day:"numeric"}),
+    startDateLong:  fmt(start, {weekday:"long", month:"long", day:"numeric"}),
+    dateRange: `${fmt(start,{month:"long",day:"numeric"})} – ${fmt(end,{month:"long",day:"numeric"})}`,
+    time: CONFIG.timeLabel,
+    seatsLine: CONFIG.seatsLine
+  };
+  document.querySelectorAll("[data-bind]").forEach(el => el.textContent = bind[el.dataset.bind] ?? "");
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ---- countdown ----
+  const cd = {};
+  document.querySelectorAll("[data-cd]").forEach(el => cd[el.dataset.cd] = el);
+  function tick(){
+    let diff = Math.max(0, start - Date.now());
+    const d = Math.floor(diff/864e5); diff -= d*864e5;
+    const h = Math.floor(diff/36e5);  diff -= h*36e5;
+    const m = Math.floor(diff/6e4);   diff -= m*6e4;
+    const s = Math.floor(diff/1e3);
+    cd.d.textContent = String(d).padStart(2,"0"); cd.h.textContent = String(h).padStart(2,"0");
+    cd.m.textContent = String(m).padStart(2,"0"); cd.s.textContent = String(s).padStart(2,"0");
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ---- modal ----
+  const modal = document.getElementById("register");
+  const open = e => { e && e.preventDefault(); modal.classList.add("open"); modal.querySelector("input")?.focus(); track("InitiateCheckout"); };
+  const close = () => modal.classList.remove("open");
+  document.querySelectorAll("[data-open]").forEach(a => a.addEventListener("click", open));
+  document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", close));
+  modal.addEventListener("click", e => { if (e.target === modal) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+  if (location.hash === "#register") open();
+
+  // ---- sticky mobile CTA after scrolling past hero ----
+  const sticky = document.getElementById("sticky"), hero = document.querySelector(".hero");
+  new IntersectionObserver(([en]) => sticky.classList.toggle("show", !en.isIntersecting && innerWidth < 760), {threshold:0}).observe(hero);
+
+  // ---- form: carry UTMs + click ids through, then POST ----
+  const params = new URLSearchParams(location.search);
+  const passthrough = {};
+  for (const [k, v] of params) if (/^(utm_|fbclid|fbc_id|h_ad_id|medium_id|campaign\.id|ltk_|country)/.test(k)) passthrough[k] = v;
+  try { localStorage.setItem("lp_attrib", JSON.stringify(passthrough)); } catch {}
+
+  document.getElementById("regForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const f = e.target;
+    if (!f.first_name.value.trim() || !/^\S+@\S+\.\S+$/.test(f.email.value)) { f.reportValidity(); return; }
+    const payload = { first_name: f.first_name.value.trim(), email: f.email.value.trim(), phone: f.phone.value.trim(), ...passthrough, page: location.pathname, ts: new Date().toISOString() };
+    const btn = f.querySelector("button"); btn.disabled = true; btn.textContent = "Saving your spot…";
+    try {
+      if (CONFIG.submitUrl) await fetch(CONFIG.submitUrl, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });
+      else console.log("DEMO submit", payload);
+      document.getElementById("formWrap").hidden = true; document.getElementById("success").hidden = false;
+      track("Lead");
+    } catch (err) {
+      btn.disabled = false; btn.textContent = "Register Free →"; alert("Something went wrong. Please try again.");
+    }
+  });
+
+  // ---- pixel hook (wire your Meta Pixel here) ----
+  function track(ev){ if (window.fbq) fbq("track", ev); }
+</script>
+</body>
+</html>
