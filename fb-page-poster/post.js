@@ -13,7 +13,19 @@
 
 const fs = require('fs');
 const path = require('path');
+const { spawnSync } = require('child_process');
 const { createClient } = require('./lib/facebook');
+
+// Node's fetch ignores HTTPS_PROXY unless NODE_USE_ENV_PROXY is set at
+// startup, so behind a proxy (e.g. a Claude cloud environment) restart once
+// with it on.
+if ((process.env.HTTPS_PROXY || process.env.https_proxy) && !process.env.NODE_USE_ENV_PROXY) {
+  const child = spawnSync(process.execPath, ['--no-warnings', ...process.argv.slice(1)], {
+    stdio: 'inherit',
+    env: { ...process.env, NODE_USE_ENV_PROXY: '1' },
+  });
+  process.exit(child.status ?? 1);
+}
 
 const envFile = path.join(__dirname, '.env');
 if (fs.existsSync(envFile)) process.loadEnvFile(envFile);
