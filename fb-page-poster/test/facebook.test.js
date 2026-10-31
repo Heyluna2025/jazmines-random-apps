@@ -82,6 +82,18 @@ test('whoAmI tells whether the token is the Page token', async () => {
   assert.match(calls[0].url, /\/me\?access_token=tok&fields=id%2Cname$/);
 });
 
+test('show reads a post and delete removes it', async () => {
+  const { fetch, calls } = fakeFetch({ id: '123_9', success: true, is_published: false });
+  const fb = createClient({ pageId: '123', token: 'tok', fetch });
+  const post = await fb.show('123_9');
+  assert.equal(post.is_published, false);
+  assert.match(calls[0].url, /\/123_9\?access_token=tok&fields=message%2Cis_published/);
+  assert.equal(await fb.remove('123_9'), true);
+  assert.equal(calls[1].method, 'DELETE');
+  assert.match(calls[1].url, /\/123_9$/);
+  assert.equal(calls[1].form.access_token, 'tok');
+});
+
 test('schedule times need a timezone and 10 minutes of lead', () => {
   assert.equal(scheduleTime(undefined, NOW), undefined);
   assert.throws(() => scheduleTime('2026-11-03T10:00', NOW), /no timezone/);

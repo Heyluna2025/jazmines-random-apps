@@ -22,6 +22,14 @@ node post.js "Workshop photos" --image ./photo.jpg --at 2026-11-03T10:00-05:00
 node post.js queue posts.json
 ```
 
+```bash
+node post.js show POST_ID
+```
+
+```bash
+node post.js delete POST_ID
+```
+
 | Flag | What it does |
 | --- | --- |
 | `--link URL` | Adds a link (shows a preview card on text posts; added to the caption on photo posts) |
@@ -29,11 +37,25 @@ node post.js queue posts.json
 | `--at TIME` | Schedules the post. Must include a timezone (`-05:00`, `+08:00` or `Z`) and be at least 10 minutes away |
 | `--dry-run` | Shows what would be sent without calling Facebook |
 
-`check` confirms the token works and belongs to the Page, not to your personal profile.
+`check` confirms the token works and belongs to the Page, not to your personal profile. `show` reports whether a post is live or scheduled and its link; `delete` removes it.
+
+Behind a proxy (such as a Claude cloud environment, where `HTTPS_PROXY` is set) the script restarts itself once with `NODE_USE_ENV_PROXY=1`, because Node's built-in fetch ignores the proxy otherwise.
+
+## Graphics
+
+```bash
+node make-graphic.js --tag "New this week" --title "Plan a month of content in *20 minutes*" --subtitle "A free walkthrough" --theme dark --out graphics/post.png
+```
+
+Renders a 1080×1080 PNG in the club's purple style. `*word*` colours a word with the accent, `\n` breaks a line, and `--theme` is `dark` or `light`. Needs Playwright with Chromium (preinstalled in Claude cloud environments).
+
+## Claude skill
+
+`.claude/skills/facebook-post/` at the repo root teaches Claude Code the whole routine: draft, make the graphic, show a preview, wait for approval, post or schedule, confirm, and commit the queue. In a Claude Code session on this repo, just ask, e.g. *"schedule this week's posts from our content plan"*.
 
 ## Queue file
 
-Copy `posts.example.json` to `posts.json` (git-ignored) and fill it in. Each entry takes `text`, and optionally `link`, `image` and `at`. Running `node post.js queue posts.json` sends every entry that hasn't gone out yet and writes the Facebook post id back into the file as `facebook_id`, so running it twice never double-posts. Entries with `at` land in the Page's scheduled posts in Meta Business Suite, where you can still edit or delete them.
+Copy `posts.example.json` to `posts.json` and fill it in. Commit `posts.json` and `graphics/` after sending, so the next session knows what has already gone out. Each entry takes `text`, and optionally `link`, `image` and `at`. Running `node post.js queue posts.json` sends every entry that hasn't gone out yet and writes the Facebook post id back into the file as `facebook_id`, so running it twice never double-posts. Entries with `at` land in the Page's scheduled posts in Meta Business Suite, where you can still edit or delete them.
 
 ## Settings
 

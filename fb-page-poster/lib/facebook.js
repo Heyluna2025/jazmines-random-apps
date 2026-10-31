@@ -81,7 +81,16 @@ function createClient({ pageId, token, version = DEFAULT_VERSION, fetch = global
     return { id: data.post_id || data.id, scheduledFor: when };
   }
 
-  return { whoAmI, publish };
+  async function show(postId) {
+    return call('GET', postId, { fields: 'message,is_published,scheduled_publish_time,created_time,permalink_url' });
+  }
+
+  async function remove(postId) {
+    const data = await call('DELETE', postId);
+    return data.success === true;
+  }
+
+  return { whoAmI, publish, show, remove };
 }
 
 function normalize(post) {
