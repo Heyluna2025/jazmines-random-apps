@@ -1,0 +1,15 @@
+{
+  "name": "fb-page-poster",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Post or schedule posts to a Facebook Page from the command line or a JSON queue.",
+  "main": "post.js",
+  "scripts": {
+    "check": "node post.js check",
+    "queue": "node post.js queue posts.json",
+    "test": "node --test test/facebook.test.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  }
+}
