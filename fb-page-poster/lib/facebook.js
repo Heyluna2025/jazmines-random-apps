@@ -119,6 +119,7 @@ function scheduleTime(at, now = Date.now()) {
 // Plain-language hints for the errors people actually hit.
 function explain(err) {
   if (!err.message) return '';
+  if (/does not exist/i.test(err.message)) return `That post doesn't exist (already deleted, or the ID is wrong).`;
   if (err.code === 190) return `The access token is expired or invalid. Make a new Page token (see README). (${err.message})`;
   if (err.code === 200 || err.code === 10) return `The token is missing the pages_manage_posts permission, or you are not an admin of this Page. (${err.message})`;
   if (err.code === 100) return `Facebook rejected a field: ${err.message}`;
