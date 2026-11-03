@@ -33,7 +33,7 @@ node post.js delete POST_ID
 | Flag | What it does |
 | --- | --- |
 | `--link URL` | Adds a link (shows a preview card on text posts; added to the caption on photo posts) |
-| `--image FILE\|URL` | Posts a photo from a local file or a public URL |
+| `--image FILE\|URL` | Posts a photo from a local file or a public URL. Repeat it for a multi-photo (carousel) post; photos keep their order |
 | `--at TIME` | Schedules the post. Must include a timezone (`-05:00`, `+08:00` or `Z`) and be at least 10 minutes away |
 | `--dry-run` | Shows what would be sent without calling Facebook |
 
@@ -55,7 +55,7 @@ Renders a 1080×1080 PNG in the club's purple style. `*word*` colours a word wit
 
 ## Queue file
 
-Copy `posts.example.json` to `posts.json` and fill it in. Commit `posts.json` and `graphics/` after sending, so the next session knows what has already gone out. Each entry takes `text`, and optionally `link`, `image` and `at`. Running `node post.js queue posts.json` sends every entry that hasn't gone out yet and writes the Facebook post id back into the file as `facebook_id`, so running it twice never double-posts. Entries with `at` land in the Page's scheduled posts in Meta Business Suite, where you can still edit or delete them.
+Copy `posts.example.json` to `posts.json` and fill it in. Commit `posts.json` and `graphics/` after sending, so the next session knows what has already gone out. Each entry takes `text`, and optionally `link`, `image` (or `images`, a list, for a carousel) and `at`. Running `node post.js queue posts.json` sends every entry that hasn't gone out yet and writes the Facebook post id back into the file as `facebook_id`, so running it twice never double-posts. Entries with `at` land in the Page's scheduled posts in Meta Business Suite, where you can still edit or delete them.
 
 ## Settings
 

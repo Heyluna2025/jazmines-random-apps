@@ -47,11 +47,11 @@ Show the preview, get the yes, then:
 node fb-page-poster/post.js "Caption text" --image fb-page-poster/graphics/FILE.png --at 2026-11-03T10:00+08:00
 ```
 
-Drop `--at` to publish immediately. `--link URL` adds a link (put it in the caption for photo posts; the tool does this automatically).
+For a carousel, repeat `--image` once per slide, in order (on Facebook these show as a multi-photo post: a grid in the feed that swipes when opened). Drop `--at` to publish immediately. `--link URL` adds a link (put it in the caption for photo posts; the tool does this automatically).
 
 ## 4b. A content plan
 
-1. Turn the plan into `fb-page-poster/posts.json`, appending to what's already there. Each entry: `text`, optional `image` (a URL, or a path relative to `fb-page-poster/`, e.g. `graphics/2026-11-03-content-plan.png`), optional `link`, and `at`. Don't touch entries that already have `facebook_id`.
+1. Turn the plan into `fb-page-poster/posts.json`, appending to what's already there. Each entry: `text`, optional `image` or, for a carousel, `images` (a list; each a URL or a path relative to `fb-page-poster/`, e.g. `graphics/2026-11-10-abc-intro-1.png`), optional `link`, and `at`. Don't touch entries that already have `facebook_id`.
 2. Make the graphics.
 3. Show the person a review table (date and time in PH, caption, graphic) and get approval. Edit and re-show until they approve.
 4. Preview, then send:
