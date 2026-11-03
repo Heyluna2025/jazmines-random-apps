@@ -67,6 +67,34 @@ test('local image is uploaded as a file', async () => {
   assert.equal(calls[0].form.caption, 'Local');
 });
 
+test('several images become one multi-photo post, in order', async () => {
+  const calls = [];
+  let n = 0;
+  const fetch = async (url, init) => {
+    calls.push({ url: String(url), form: Object.fromEntries(init.body.entries()) });
+    const isPhoto = String(url).endsWith('/photos');
+    return { ok: true, status: 200, json: async () => (isPhoto ? { id: `p${++n}` } : { id: '123_77' }) };
+  };
+  const fb = createClient({ pageId: '123', token: 'tok', fetch });
+  const out = await fb.publish(
+    { text: 'Meet the leaders', images: ['https://x/1.png', 'https://x/2.png', 'https://x/3.png'], at: '2026-11-03T10:00-05:00' },
+    { now: NOW },
+  );
+  assert.equal(out.id, '123_77');
+  assert.equal(out.photos, 3);
+  assert.deepEqual(calls.slice(0, 3).map((c) => [c.form.url, c.form.published, c.form.temporary]), [
+    ['https://x/1.png', 'false', 'true'],
+    ['https://x/2.png', 'false', 'true'],
+    ['https://x/3.png', 'false', 'true'],
+  ]);
+  const feed = calls[3];
+  assert.match(feed.url, /\/123\/feed$/);
+  assert.equal(feed.form.message, 'Meet the leaders');
+  assert.equal(feed.form.published, 'false');
+  assert.equal(feed.form['attached_media[0]'], '{"media_fbid":"p1"}');
+  assert.equal(feed.form['attached_media[2]'], '{"media_fbid":"p3"}');
+});
+
 test('Facebook errors come back in plain language', async () => {
   const { fetch } = fakeFetch({ error: { message: 'Session has expired', code: 190 } }, 400);
   const fb = createClient({ pageId: '123', token: 'tok', fetch });

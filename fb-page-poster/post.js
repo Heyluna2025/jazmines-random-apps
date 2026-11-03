@@ -4,7 +4,9 @@
 // Posts to a Facebook Page from the command line.
 //
 //   node post.js check
-//   node post.js "Hello from AI Empowered Club" [--link URL] [--image FILE|URL] [--at 2026-11-03T10:00-05:00] [--dry-run]
+//   node post.js "Hello from AI Empowered Club" [--link URL] [--image FILE|URL ...] [--at 2026-11-03T10:00-05:00] [--dry-run]
+//
+// Repeat --image for a multi-photo (carousel) post; photos keep their order.
 //   node post.js queue posts.json [--dry-run]
 //   node post.js show POST_ID
 //   node post.js delete POST_ID
@@ -37,7 +39,8 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--dry-run') opts.dryRun = true;
-    else if (['--link', '--image', '--at'].includes(a)) opts[a.slice(2)] = argv[++i];
+    else if (a === '--image') (opts.images = opts.images || []).push(argv[++i]);
+    else if (['--link', '--at'].includes(a)) opts[a.slice(2)] = argv[++i];
     else opts._.push(a);
   }
   return opts;
@@ -47,7 +50,9 @@ function describe(post) {
   const bits = [];
   if (post.text) bits.push(JSON.stringify(post.text.length > 60 ? post.text.slice(0, 57) + '...' : post.text));
   if (post.link) bits.push(`link ${post.link}`);
-  if (post.image) bits.push(`image ${post.image}`);
+  const images = [].concat(post.images || [], post.image || []);
+  if (images.length === 1) bits.push(`image ${images[0]}`);
+  else if (images.length) bits.push(`${images.length}-photo carousel`);
   bits.push(post.at ? `scheduled for ${post.at}` : 'now');
   return bits.join(', ');
 }
@@ -56,7 +61,7 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const [command, ...rest] = opts._;
   if (!command) {
-    console.error('Usage:\n  node post.js check\n  node post.js "text" [--link URL] [--image FILE|URL] [--at ISO-TIME] [--dry-run]\n  node post.js queue posts.json [--dry-run]\n  node post.js show POST_ID\n  node post.js delete POST_ID');
+    console.error('Usage:\n  node post.js check\n  node post.js "text" [--link URL] [--image FILE|URL ...] [--at ISO-TIME] [--dry-run]\n  node post.js queue posts.json [--dry-run]\n  node post.js show POST_ID\n  node post.js delete POST_ID');
     process.exit(1);
   }
 
@@ -99,8 +104,9 @@ async function main() {
       if (post.facebook_id) continue;
       if (opts.dryRun) { console.log(`would send: ${describe(post)}`); continue; }
       // Local image paths in the file are relative to the file itself.
-      const image = post.image && !/^https?:\/\//i.test(post.image) ? path.resolve(path.dirname(file), post.image) : post.image;
-      const result = await fb.publish({ ...post, image });
+      const local = (p) => (/^https?:\/\//i.test(p) ? p : path.resolve(path.dirname(file), p));
+      const images = [].concat(post.images || [], post.image || []).map(local);
+      const result = await fb.publish({ ...post, image: undefined, images });
       post.facebook_id = result.id;
       post.sent_at = new Date().toISOString();
       // Save after each post so a failure halfway never double-posts on retry.
@@ -112,7 +118,7 @@ async function main() {
     return;
   }
 
-  const post = { text: command, link: opts.link, image: opts.image, at: opts.at };
+  const post = { text: command, link: opts.link, images: opts.images, at: opts.at };
   if (opts.dryRun) { console.log(`would send: ${describe(post)}`); return; }
   const result = await fb.publish(post);
   console.log(`${result.scheduledFor ? 'Scheduled' : 'Posted'}: ${result.id}`);

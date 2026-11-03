@@ -55,30 +55,45 @@ function createClient({ pageId, token, version = DEFAULT_VERSION, fetch = global
     return { ...me, matchesPage: me.id === String(pageId) };
   }
 
+  // One photo upload to /photos, from a public URL or a local file.
+  function photoBody(image, fields) {
+    if (/^https?:\/\//i.test(image)) return { url: image, ...fields };
+    const body = new FormData();
+    const file = path.resolve(image);
+    body.set('source', new Blob([fs.readFileSync(file)]), path.basename(file));
+    for (const [k, v] of Object.entries(fields)) if (v !== undefined) body.set(k, String(v));
+    return body;
+  }
+
   async function publish(post, { now = Date.now() } = {}) {
-    const { text, link, image } = normalize(post);
+    const { text, link, images } = normalize(post);
     const when = scheduleTime(post.at, now);
     const timing = when ? { published: 'false', scheduled_publish_time: when } : {};
 
-    if (!image) {
+    if (!images.length) {
       const data = await call('POST', `${pageId}/feed`, { message: text, link, ...timing });
       return { id: data.id, scheduledFor: when };
     }
 
     // Photo posts can't carry a link preview, so the link goes in the caption.
     const caption = link ? [text, link].filter(Boolean).join('\n\n') : text;
-    let body;
-    if (/^https?:\/\//i.test(image)) {
-      body = { url: image, caption, ...timing };
-    } else {
-      body = new FormData();
-      const file = path.resolve(image);
-      body.set('source', new Blob([fs.readFileSync(file)]), path.basename(file));
-      if (caption) body.set('caption', caption);
-      for (const [k, v] of Object.entries(timing)) body.set(k, String(v));
+
+    if (images.length === 1) {
+      const data = await call('POST', `${pageId}/photos`, photoBody(images[0], { caption, ...timing }));
+      return { id: data.post_id || data.id, scheduledFor: when };
     }
-    const data = await call('POST', `${pageId}/photos`, body);
-    return { id: data.post_id || data.id, scheduledFor: when };
+
+    // Multi-photo post: upload each photo unpublished, then attach them all to
+    // one feed post in order. Scheduled posts need temporary uploads.
+    const ids = [];
+    for (const image of images) {
+      const data = await call('POST', `${pageId}/photos`, photoBody(image, { published: 'false', temporary: when ? 'true' : undefined }));
+      ids.push(data.id);
+    }
+    const body = { message: caption, ...timing };
+    ids.forEach((id, i) => { body[`attached_media[${i}]`] = JSON.stringify({ media_fbid: id }); });
+    const data = await call('POST', `${pageId}/feed`, body);
+    return { id: data.id, scheduledFor: when, photos: ids.length };
   }
 
   async function show(postId) {
@@ -96,9 +111,9 @@ function createClient({ pageId, token, version = DEFAULT_VERSION, fetch = global
 function normalize(post) {
   const text = (post.text || '').trim();
   const link = (post.link || '').trim() || undefined;
-  const image = (post.image || '').trim() || undefined;
-  if (!text && !link && !image) throw new Error('A post needs text, a link or an image.');
-  return { text: text || undefined, link, image };
+  const images = [].concat(post.images || [], post.image || []).map((s) => String(s).trim()).filter(Boolean);
+  if (!text && !link && !images.length) throw new Error('A post needs text, a link or an image.');
+  return { text: text || undefined, link, images };
 }
 
 // Returns Unix seconds, or undefined to post right away. Times must carry a
