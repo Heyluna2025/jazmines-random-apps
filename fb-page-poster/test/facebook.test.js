@@ -95,6 +95,73 @@ test('several images become one multi-photo post, in order', async () => {
   assert.equal(feed.form['attached_media[2]'], '{"media_fbid":"p3"}');
 });
 
+// Fake Graph API for Instagram flows: routes by endpoint and records calls.
+function fakeGraph(routes) {
+  const calls = [];
+  const fetch = async (url, init) => {
+    const u = new URL(String(url));
+    const form = init.body ? Object.fromEntries(init.body.entries()) : Object.fromEntries(u.searchParams);
+    calls.push({ method: init.method, path: u.pathname.replace(/^\/v[\d.]+\//, ''), form });
+    const reply = routes(init.method, u.pathname.replace(/^\/v[\d.]+\//, ''), form, calls);
+    return { ok: true, status: 200, json: async () => reply };
+  };
+  return { fetch, calls };
+}
+
+test('Instagram single image: find the account, create, wait, publish', async () => {
+  let polls = 0;
+  const { fetch, calls } = fakeGraph((method, p, form) => {
+    if (p === '123') return { instagram_business_account: { id: '900', username: 'aiempowered' } };
+    if (p === '900/media') return { id: 'c1' };
+    if (p === 'c1') return { status_code: ++polls < 2 ? 'IN_PROGRESS' : 'FINISHED' };
+    if (p === '900/media_publish') return { id: 'm1' };
+    throw new Error(`unexpected ${method} ${p}`);
+  });
+  const fb = createClient({ pageId: '123', token: 'tok', fetch, sleep: async () => {} });
+  const out = await fb.publishInstagram({ text: 'Hi', link: 'https://x.io', image: 'https://cdn.example/a.jpg' });
+  assert.equal(out.id, 'm1');
+  const create = calls.find((c) => c.path === '900/media');
+  assert.equal(create.form.image_url, 'https://cdn.example/a.jpg');
+  assert.equal(create.form.caption, 'Hi\n\nhttps://x.io');
+  assert.equal(calls.filter((c) => c.path === 'c1').length, 2);
+  assert.equal(calls.at(-1).form.creation_id, 'c1');
+});
+
+test('Instagram carousel hosts local files through the Page and keeps order', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'igpost-'));
+  const files = ['1.png', '2.png'].map((f) => { const p = path.join(dir, f); fs.writeFileSync(p, Buffer.from([1])); return p; });
+  let photo = 0;
+  let child = 0;
+  const { fetch, calls } = fakeGraph((method, p, form) => {
+    if (p === '123/photos') return { id: `ph${++photo}` };
+    if (/^ph\d$/.test(p)) return { images: [{ width: 320, source: `https://fbcdn/${p}-small.jpg` }, { width: 1080, source: `https://fbcdn/${p}.jpg` }] };
+    if (p === '900/media' && form.is_carousel_item) return { id: `k${++child}` };
+    if (p === '900/media') return { id: 'car' };
+    if (/^(k\d|car)$/.test(p)) return { status_code: 'FINISHED' };
+    if (p === '900/media_publish') return { id: 'm9' };
+    throw new Error(`unexpected ${method} ${p}`);
+  });
+  const fb = createClient({ pageId: '123', token: 'tok', igUserId: '900', fetch, sleep: async () => {} });
+  const out = await fb.publishInstagram({ text: 'Leaders', images: files });
+  assert.equal(out.id, 'm9');
+  assert.equal(out.photos, 2);
+  const uploads = calls.filter((c) => c.path === '123/photos');
+  assert.deepEqual(uploads.map((c) => [c.form.source.name, c.form.published]), [['1.png', 'false'], ['2.png', 'false']]);
+  const items = calls.filter((c) => c.path === '900/media' && c.form.is_carousel_item);
+  assert.deepEqual(items.map((c) => c.form.image_url), ['https://fbcdn/ph1.jpg', 'https://fbcdn/ph2.jpg']);
+  const parent = calls.find((c) => c.path === '900/media' && c.form.media_type === 'CAROUSEL');
+  assert.equal(parent.form.children, 'k1,k2');
+  assert.equal(parent.form.caption, 'Leaders');
+});
+
+test('Instagram refuses text-only posts and gives up on failed processing', async () => {
+  const fb = createClient({ pageId: '123', token: 'tok', igUserId: '900', fetch: fakeGraph(() => ({})).fetch });
+  await assert.rejects(fb.publishInstagram({ text: 'no picture' }), /at least one image/);
+  const { fetch } = fakeGraph((method, p) => (p === '900/media' ? { id: 'c1' } : { status_code: 'ERROR' }));
+  const fb2 = createClient({ pageId: '123', token: 'tok', igUserId: '900', fetch, sleep: async () => {} });
+  await assert.rejects(fb2.publishInstagram({ image: 'https://x/a.jpg' }), /couldn't process/);
+});
+
 test('Facebook errors come back in plain language', async () => {
   const { fetch } = fakeFetch({ error: { message: 'Session has expired', code: 190 } }, 400);
   const fb = createClient({ pageId: '123', token: 'tok', fetch });

@@ -1,9 +1,10 @@
 'use strict';
 
-// Thin client for the three Graph API calls this app needs: who the token
-// belongs to, a text/link post (/feed), and a photo post (/photos). Uses the
-// global fetch, FormData and Blob from Node 18+, so there are no dependencies.
-// Pass { fetch } to swap in a fake for tests.
+// Thin Graph API client for a Facebook Page and the Instagram professional
+// account linked to it: text, link, photo and multi-photo posts on the Page
+// (scheduled or immediate), and photo and carousel posts on Instagram. Uses
+// the global fetch, FormData and Blob from Node 18+, so there are no
+// dependencies. Pass { fetch, sleep } to swap in fakes for tests.
 
 const fs = require('fs');
 const path = require('path');
@@ -20,7 +21,14 @@ class FacebookError extends Error {
   }
 }
 
-function createClient({ pageId, token, version = DEFAULT_VERSION, fetch = globalThis.fetch } = {}) {
+function createClient({
+  pageId,
+  token,
+  version = DEFAULT_VERSION,
+  igUserId,
+  fetch = globalThis.fetch,
+  sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+} = {}) {
   if (!pageId) throw new Error('FB_PAGE_ID is not set.');
   if (!token) throw new Error('FB_PAGE_ACCESS_TOKEN is not set.');
   const base = `https://graph.facebook.com/${version}`;
@@ -105,7 +113,76 @@ function createClient({ pageId, token, version = DEFAULT_VERSION, fetch = global
     return data.success === true;
   }
 
-  return { whoAmI, publish, show, remove };
+  // ---- Instagram (the professional account linked to the Page) ----
+
+  let igAccount;
+  async function instagramAccount() {
+    if (igAccount) return igAccount;
+    if (igUserId) return (igAccount = { id: String(igUserId) });
+    const data = await call('GET', String(pageId), { fields: 'instagram_business_account{id,username}' });
+    if (!data.instagram_business_account) {
+      throw new Error('No Instagram professional account is linked to this Page, or the token lacks instagram_basic. Link it in Meta Business Suite → Settings → Instagram account, then make a token with instagram_basic and instagram_content_publish.');
+    }
+    return (igAccount = data.instagram_business_account);
+  }
+
+  // Instagram fetches images itself from a public URL and only accepts JPEG.
+  // Uploading a local file to the Page as an unpublished photo covers both:
+  // Facebook re-encodes it and serves it from its CDN. Unpublished photos
+  // don't appear on the Page.
+  async function hostImage(image) {
+    if (/^https?:\/\//i.test(image)) return image;
+    const photo = await call('POST', `${pageId}/photos`, photoBody(image, { published: 'false' }));
+    const data = await call('GET', photo.id, { fields: 'images' });
+    const largest = (data.images || []).sort((a, b) => b.width - a.width)[0];
+    if (!largest) throw new Error(`Facebook returned no hosted copy of ${image}.`);
+    return largest.source;
+  }
+
+  async function waitUntilReady(containerId, { tries = 20, delayMs = 3000 } = {}) {
+    for (let i = 0; i < tries; i++) {
+      const { status_code: status } = await call('GET', containerId, { fields: 'status_code' });
+      if (status === 'FINISHED') return;
+      if (status === 'ERROR' || status === 'EXPIRED') throw new Error(`Instagram couldn't process the media (${status}).`);
+      await sleep(delayMs);
+    }
+    throw new Error('Instagram is still processing the media. Try again in a few minutes.');
+  }
+
+  // Instagram's API publishes immediately; it has no scheduler. Scheduled
+  // Instagram posts wait in the queue until they are due (see post.js).
+  async function publishInstagram(post) {
+    const { text, link, images } = normalize(post);
+    if (!images.length) throw new Error('Instagram posts need at least one image.');
+    if (images.length > 10) throw new Error('Instagram carousels take at most 10 images.');
+    const ig = await instagramAccount();
+    // Links in captions aren't clickable on Instagram, but keep them visible.
+    const caption = link ? [text, link].filter(Boolean).join('\n\n') : text;
+
+    const urls = [];
+    for (const image of images) urls.push(await hostImage(image));
+
+    let containerId;
+    if (urls.length === 1) {
+      containerId = (await call('POST', `${ig.id}/media`, { image_url: urls[0], caption })).id;
+    } else {
+      const children = [];
+      for (const url of urls) {
+        children.push((await call('POST', `${ig.id}/media`, { image_url: url, is_carousel_item: 'true' })).id);
+      }
+      for (const child of children) await waitUntilReady(child);
+      containerId = (await call('POST', `${ig.id}/media`, { media_type: 'CAROUSEL', children: children.join(','), caption })).id;
+    }
+    await waitUntilReady(containerId);
+    const data = await call('POST', `${ig.id}/media_publish`, { creation_id: containerId });
+    return { id: data.id, photos: urls.length };
+  }
+
+  async function showInstagram(mediaId) {
+    return call('GET', mediaId, { fields: 'caption,timestamp,permalink,media_type' });
+  }
+
+  return { whoAmI, publish, show, remove, instagramAccount, publishInstagram, showInstagram };
 }
 
 function normalize(post) {
@@ -120,15 +197,21 @@ function normalize(post) {
 // timezone so "10:00" never silently means 10:00 UTC.
 function scheduleTime(at, now = Date.now()) {
   if (!at) return undefined;
-  if (!/(Z|[+-]\d{2}:?\d{2})$/i.test(String(at).trim())) {
-    throw new Error(`"${at}" has no timezone. Write it like 2026-11-03T10:00-05:00 (or end with Z for UTC).`);
-  }
-  const ms = Date.parse(at);
-  if (Number.isNaN(ms)) throw new Error(`"${at}" is not a date Facebook can use.`);
+  const ms = parseTime(at);
   if (ms - now < MIN_SCHEDULE_MS) {
     throw new Error(`"${at}" is less than 10 minutes away. Facebook only schedules posts at least 10 minutes ahead; leave the time off to post now.`);
   }
   return Math.floor(ms / 1000);
+}
+
+// Milliseconds for an ISO time that names its timezone.
+function parseTime(at) {
+  if (!/(Z|[+-]\d{2}:?\d{2})$/i.test(String(at).trim())) {
+    throw new Error(`"${at}" has no timezone. Write it like 2026-11-03T10:00+08:00 (or end with Z for UTC).`);
+  }
+  const ms = Date.parse(at);
+  if (Number.isNaN(ms)) throw new Error(`"${at}" is not a date Facebook can use.`);
+  return ms;
 }
 
 // Plain-language hints for the errors people actually hit.
@@ -141,4 +224,4 @@ function explain(err) {
   return err.message;
 }
 
-module.exports = { createClient, scheduleTime, FacebookError, DEFAULT_VERSION };
+module.exports = { createClient, scheduleTime, parseTime, FacebookError, DEFAULT_VERSION };

@@ -1,11 +1,11 @@
 ---
 name: facebook-post
-description: Draft, design, schedule and publish organic posts to the AI Empowered Club Facebook Page, one at a time or a whole content plan. Use when someone asks to post, schedule or queue something on Facebook or "the Page", turn a content plan into Facebook posts, make a post graphic, check what is scheduled, or delete a Page post.
+description: Draft, design, schedule and publish organic posts to the AI Empowered Club Facebook Page and its linked Instagram account, one at a time or a whole content plan. Use when someone asks to post, schedule or queue something on Facebook, Instagram or "the Page", turn a content plan into Facebook posts, make a post graphic, check what is scheduled, or delete a Page post.
 ---
 
 # Facebook Page posting
 
-Posts go to the **AI Empowered Club** Page (ID `1231207646740791`) through `fb-page-poster/` in this repo. These are organic posts, not ads. Read `fb-page-poster/README.md` for every command and flag.
+Posts go to the **AI Empowered Club** Page (ID `1231207646740791`) and, when asked, its linked Instagram account, through `fb-page-poster/` in this repo. These are organic posts, not ads. Read `fb-page-poster/README.md` for every command and flag.
 
 ## Ground rules
 
@@ -24,6 +24,8 @@ node fb-page-poster/post.js check
 - `FB_PAGE_ACCESS_TOKEN is not set` → the person adds it to the cloud environment's settings (environment menu → Edit → environment variables) and starts a new session. The README has the token steps.
 - `fetch failed` / `ENOTFOUND` → `graph.facebook.com` is missing from the environment's Network access → Allowed domains.
 - `expired or invalid` → the token was revoked; make a new one (README).
+
+**Instagram:** `check` also reports whether Instagram is ready. If not, the Instagram account must be a Professional account linked to the Page, and the token must include `instagram_basic` and `instagram_content_publish`. Instagram needs an image on every post and has no scheduler: scheduled Instagram posts go through the queue (`"platforms": ["facebook", "instagram"]`) and publish on the first queue run at or after their time, so make sure a queue run is scheduled around each Instagram time (an hourly scheduled task, or ask the person to run it). Links in Instagram captions aren't clickable; say "link in bio" instead when that applies.
 
 ## 2. Draft the post
 
@@ -47,11 +49,11 @@ Show the preview, get the yes, then:
 node fb-page-poster/post.js "Caption text" --image fb-page-poster/graphics/FILE.png --at 2026-11-03T10:00+08:00
 ```
 
-For a carousel, repeat `--image` once per slide, in order (on Facebook these show as a multi-photo post: a grid in the feed that swipes when opened). Drop `--at` to publish immediately. `--link URL` adds a link (put it in the caption for photo posts; the tool does this automatically).
+For a carousel, repeat `--image` once per slide, in order (on Facebook these show as a multi-photo post: a grid in the feed that swipes when opened). Drop `--at` to publish immediately. Add `--platform facebook,instagram` to post to both now (Instagram can't take `--at`; use the queue for scheduled Instagram posts). `--link URL` adds a link (put it in the caption for photo posts; the tool does this automatically).
 
 ## 4b. A content plan
 
-1. Turn the plan into `fb-page-poster/posts.json`, appending to what's already there. Each entry: `text`, optional `image` or, for a carousel, `images` (a list; each a URL or a path relative to `fb-page-poster/`, e.g. `graphics/2026-11-10-abc-intro-1.png`), optional `link`, and `at`. Don't touch entries that already have `facebook_id`.
+1. Turn the plan into `fb-page-poster/posts.json`, appending to what's already there. Each entry: `text`, optional `image` or, for a carousel, `images` (a list; each a URL or a path relative to `fb-page-poster/`, e.g. `graphics/2026-11-10-abc-intro-1.png`), optional `link`, `at`, and `platforms` (`["facebook"]` by default; `["facebook", "instagram"]` for both). Don't touch entries that already have `facebook_id` / `instagram_id`.
 2. Make the graphics.
 3. Show the person a review table (date and time in PH, caption, graphic) and get approval. Edit and re-show until they approve.
 4. Preview, then send:
@@ -61,11 +63,11 @@ For a carousel, repeat `--image` once per slide, in order (on Facebook these sho
    ```bash
    node fb-page-poster/post.js queue fb-page-poster/posts.json
    ```
-   Entries already carrying `facebook_id` are skipped, so re-running is safe.
+   Platforms already carrying an id (`facebook_id`, `instagram_id`) are skipped, so re-running is safe. Instagram copies whose time hasn't come are reported as waiting.
 
 ## 5. Confirm and save
 
-- Verify each post with `node fb-page-poster/post.js show POST_ID` and report the date and time in PH and the permalink.
+- Verify each post with `node fb-page-poster/post.js show POST_ID` (add `--platform instagram` for Instagram ids) and report the date and time in PH and the permalink.
 - Commit `fb-page-poster/posts.json` and new files in `fb-page-poster/graphics/`, then push, so the next session knows what has gone out. Cloud sessions start from a fresh clone; anything uncommitted is lost.
 
 ## Fixing mistakes

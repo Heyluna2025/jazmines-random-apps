@@ -1,6 +1,6 @@
 # FB Page Poster
 
-Posts to the **AI Empowered Club** Facebook Page (or any Page you admin) from the command line, either right away or scheduled. Scheduled posts are handed to Facebook's own scheduler, so nothing has to stay running. A JSON queue file lets you line up a whole content plan and send it in one go.
+Posts to the **AI Empowered Club** Facebook Page (or any Page you admin), and to the Instagram professional account linked to it, from the command line, either right away or scheduled. Scheduled posts are handed to Facebook's own scheduler, so nothing has to stay running. A JSON queue file lets you line up a whole content plan and send it in one go.
 
 No dependencies: Node 20.12 or newer.
 
@@ -35,11 +35,23 @@ node post.js delete POST_ID
 | `--link URL` | Adds a link (shows a preview card on text posts; added to the caption on photo posts) |
 | `--image FILE\|URL` | Posts a photo from a local file or a public URL. Repeat it for a multi-photo (carousel) post; photos keep their order |
 | `--at TIME` | Schedules the post. Must include a timezone (`-05:00`, `+08:00` or `Z`) and be at least 10 minutes away |
+| `--platform LIST` | `facebook` (default), `instagram`, or `facebook,instagram` |
 | `--dry-run` | Shows what would be sent without calling Facebook |
 
 `check` confirms the token works and belongs to the Page, not to your personal profile. `show` reports whether a post is live or scheduled and its link; `delete` removes it.
 
 Behind a proxy (such as a Claude cloud environment, where `HTTPS_PROXY` is set) the script restarts itself once with `NODE_USE_ENV_PROXY=1`, because Node's built-in fetch ignores the proxy otherwise.
+
+## Instagram
+
+Instagram posts need at least one image (up to 10 for a carousel); links in captions aren't clickable there. Instagram's API publishes immediately and has **no scheduler**, so:
+
+- From the command line, `--platform instagram` posts now (with `--at` it refuses).
+- In the queue, give the entry `"platforms": ["facebook", "instagram"]` and an `at` time. Facebook gets it scheduled straight away; the Instagram copy waits in the queue and is published by the first `queue` run at or after its time. Run the queue on a schedule (for example an hourly scheduled task) for hands-off Instagram posting.
+
+Instagram fetches images from a public URL and only accepts JPEG, so local files are first uploaded to the Page as unpublished photos (they don't appear on the Page) and Instagram is given Facebook's hosted JPEG. `show POST_ID --platform instagram` shows a published Instagram post; delete Instagram posts in the Instagram app.
+
+Requirements: the Instagram account is a Professional (Business or Creator) account linked to the Page, and the token includes `instagram_basic` and `instagram_content_publish`. `check` reports whether Instagram is ready.
 
 ## Graphics
 
@@ -65,6 +77,7 @@ Copy `.env.example` to `.env`, or set these as environment variables (in a Claud
 | --- | --- |
 | `FB_PAGE_ID` | `1231207646740791` (AI Empowered Club) |
 | `FB_PAGE_ACCESS_TOKEN` | A Page access token with `pages_manage_posts` (see below) |
+| `IG_USER_ID` | Optional. The linked Instagram account is found automatically from the Page |
 | `FB_GRAPH_VERSION` | Optional, defaults to `v23.0` |
 
 In a Claude cloud environment, also add `graph.facebook.com` under **Network access → Allowed domains**, or every call fails with `fetch failed`.
@@ -74,9 +87,9 @@ In a Claude cloud environment, also add `graph.facebook.com` under **Network acc
 You need to be an admin of the Page. About 10 minutes.
 
 1. Go to [developers.facebook.com/apps](https://developers.facebook.com/apps) → **Create app**. Pick the use case **Manage everything on your Page** (or *Other → Business*). The app can stay in Development mode; it only posts to Pages you admin.
-2. Open the [Graph API Explorer](https://developers.facebook.com/tools/explorer/). Choose your app top right, then **Get User Access Token** and tick `pages_show_list`, `pages_read_engagement` and `pages_manage_posts`. Click **Generate Access Token** and allow access to AI Empowered Club.
+2. Open the [Graph API Explorer](https://developers.facebook.com/tools/explorer/). Choose your app top right, then **Get User Access Token** and tick `pages_show_list`, `pages_read_engagement` and `pages_manage_posts`, plus `instagram_basic` and `instagram_content_publish` for Instagram. If a permission is missing from the list, add the **Manage everything on your Page** (and, for Instagram, **Manage messaging & content on Instagram**) use case to the app first. Click **Generate Access Token** and allow access to AI Empowered Club.
 3. Copy that token into the [Access Token Debugger](https://developers.facebook.com/tools/debug/accesstoken/) and click **Extend Access Token** at the bottom. Copy the long-lived token it gives you.
-4. Back in the Graph API Explorer, paste the long-lived token into the token box and run `me/accounts`. Copy the `access_token` next to **AI Empowered Club**. A Page token made from a long-lived user token does not expire.
+4. Back in the Graph API Explorer, paste the long-lived token into the token box and run `me/accounts`. Copy the `access_token` next to **AI Empowered Club**. A Page token made from a long-lived user token does not expire: paste it into the Access Token Debugger and check that **Expires** says **Never**. If it shows a time, it was made from the short-lived token; repeat with the extended one.
 5. Save it as `FB_PAGE_ACCESS_TOKEN` and run `node post.js check`.
 
 Treat the token like a password: it can post as the Page. Keep it out of the repo and out of chat. If it leaks, change your Facebook password or remove the app, which revokes it.
