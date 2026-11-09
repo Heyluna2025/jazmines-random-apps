@@ -1068,7 +1068,9 @@ function wallPanel(id,w,h,x,y,z,onX,draw){
   if(onX){ box(.1,h+.24,w+.24,WOOD_D,x+.06,y,z,ROOT,false); m.position.set(x+.13,y,z); m.rotation.y = Math.PI/2; } else { box(w+.24,h+.24,.1,WOOD_D,x,y,z+.06,ROOT,false); m.position.set(x,y,z+.13); }
   ROOT.add(m); WALLS[id] = {g:c.getContext('2d'), t, draw}; drawWall(id);
 }
-function drawWall(id){ const w = WALLS[id]; if(!w) return; const g = w.g; g.fillStyle = '#FFFDF6'; g.fillRect(0,0,512,256); if(isLive() && id !== 'kpi' && id !== 'people'){ wallHead(g, ({score:'Scoreboard: revenue vs target', targets:'Targets this month', archive:'Archives and assets'})[id] || 'Wall', '#8A8F9A'); g.fillStyle = '#5A5F6A'; g.font = 'bold 24px Trebuchet MS, sans-serif'; g.textAlign = 'center'; g.fillText('Not connected yet', 256, 140); w.t.needsUpdate = true; return; } w.draw(g); g.fillStyle = '#9A8F80'; g.font = '13px Trebuchet MS, sans-serif'; g.textAlign = 'right'; g.fillText(isLive() ? 'Live' : 'Sample numbers', 500, 249); w.t.needsUpdate = true; }
+function targetsHTML(){ const t = LV.rev && LV.rev.targets; if(!isLive() || !t || !t.length) return ''; return '<h3>Your targets</h3>'+t.map(x => { const sofar = x.so_far; const pct = sofar != null ? Math.min(1, sofar/x.target) : 0; return barRow(x.label+(x.period === 'month' ? ' · this month' : x.period === 'event' ? ' · the event' : ''), pct, (sofar != null ? sofar.toLocaleString()+' of ' : 'target ')+x.target.toLocaleString()+' '+x.unit+(x.floor ? ' at least' : ''), 'var(--move)'); }).join('')+'<p class="sub">Members are counted from Circle. Revenue and seats: Lawrence reports them against these targets in his daily note.</p>'; }
+function drawTargetsWall(g){ const t = LV.rev && LV.rev.targets; wallHead(g, 'Targets this month', '#8A8F9A'); if(!t || !t.length){ g.fillStyle = '#5A5F6A'; g.font = 'bold 24px Trebuchet MS, sans-serif'; g.textAlign = 'center'; g.fillText('No targets yet', 256, 140); return; } g.textAlign = 'left'; t.slice(0,3).forEach((x, i) => { const y = 92 + i*52; g.fillStyle = '#2B2233'; g.font = 'bold 19px Trebuchet MS, sans-serif'; g.fillText(x.label.slice(0, 34), 24, y); g.fillStyle = '#5A5F6A'; g.font = '16px Trebuchet MS, sans-serif'; g.fillText((x.so_far != null ? x.so_far.toLocaleString()+' of ' : '')+x.target.toLocaleString()+' '+x.unit+(x.floor ? ' at least' : ''), 24, y+22); const pct = x.so_far != null ? Math.min(1, x.so_far/x.target) : 0; g.fillStyle = '#E4E9FB'; g.fillRect(300, y-14, 188, 14); g.fillStyle = '#3550B0'; g.fillRect(300, y-14, Math.round(188*pct), 14); }); }
+function drawWall(id){ const w = WALLS[id]; if(!w) return; const g = w.g; g.fillStyle = '#FFFDF6'; g.fillRect(0,0,512,256); if(isLive() && id === 'targets'){ drawTargetsWall(g); g.fillStyle = '#9A8F80'; g.font = '13px Trebuchet MS, sans-serif'; g.textAlign = 'right'; g.fillText('Live', 500, 249); w.t.needsUpdate = true; return; } if(isLive() && id !== 'kpi' && id !== 'people'){ wallHead(g, ({score:'Scoreboard: revenue vs target', targets:'Targets this month', archive:'Archives and assets'})[id] || 'Wall', '#8A8F9A'); g.fillStyle = '#5A5F6A'; g.font = 'bold 24px Trebuchet MS, sans-serif'; g.textAlign = 'center'; g.fillText('Not connected yet', 256, 140); w.t.needsUpdate = true; return; } w.draw(g); g.fillStyle = '#9A8F80'; g.font = '13px Trebuchet MS, sans-serif'; g.textAlign = 'right'; g.fillText(isLive() ? 'Live' : 'Sample numbers', 500, 249); w.t.needsUpdate = true; }
 function wallHead(g,t,c){ g.fillStyle = c; g.fillRect(0,0,512,40); g.fillStyle = '#FFFFFF'; g.font = 'bold 23px Trebuchet MS, sans-serif'; g.textAlign = 'left'; g.fillText(t, 16, 28); }
 function wallRow(g,i,name,v,right,color){ const y = 47+i*23.5; g.fillStyle = '#23243B'; g.font = 'bold 14px Trebuchet MS, sans-serif'; g.textAlign = 'left'; g.fillText(name, 14, y+12);
   g.fillStyle = '#ECE6D8'; g.fillRect(196,y,236,14); g.fillStyle = color; g.fillRect(196,y,236*Math.min(v,1),14); g.fillStyle = '#23243B'; g.textAlign = 'right'; g.fillText(right, 500, y+12); }
@@ -2192,7 +2194,7 @@ function revRange(){ const t = phDay(), ym = t.slice(0,7), days = (LV.rev && LV.
   if(revPreset === 'all') return [days.reduce((m, d) => d[3] < m ? d[3] : m, t), t];
   return [monAdd(ym, -5)+'-01', t]; }
 function loadRev(force){ if(!isLive() || !LV.key || revBusy) return; const now = Date.now(); if(!force && LV.rev && now - revAt < 120000) return; revBusy = true; if(navView === 'revenue') renderView();
-  api('ao-state?view=revenue').then(r => { if(r && Array.isArray(r.rows)){ LV.rev = r; LV.revErr = false; revAt = Date.now(); } else LV.revErr = true; })
+  api('ao-state?view=revenue').then(r => { if(r && Array.isArray(r.rows)){ LV.rev = r; LV.revErr = false; revAt = Date.now(); try{ drawWall('targets'); }catch(e){} } else LV.revErr = true; })
   .catch(e => { if(e.message !== '401') LV.revErr = true; }).then(() => { revBusy = false; if(!$('roster').hidden && navView === 'revenue') renderView(); }); }
 function revChart(cur, months, vals, a, b){
   const n = months.length, bw = n > 14 ? 34 : 52, gap = n > 14 ? 10 : 18, W = Math.max(300, n*(bw+gap)+gap), H = 170, base = 132, top = 24, max = Math.max.apply(null, vals.concat([1]));
@@ -2234,7 +2236,8 @@ function socialHTML(){
 }
 $('rosterList').addEventListener('change', e => { if(e.target && e.target.id === 'socAcc') socSet('account', e.target.value); });
 $('rosterList').addEventListener('click', e => { const b = e.target.closest && e.target.closest('button[data-range]'); if(b) socSet('range', b.getAttribute('data-range')); });
-function revenueHTML(){
+function revenueHTML(){ return targetsHTML() + revenueHTML0(); }
+function revenueHTML0(){
   if(!isLive()) return '<p class="empty">The revenue report only shows in Live mode.</p>';
   const R = revRange(), a = R[0], b = R[1];
   const bar = '<div class="revbar"><label for="revBiz"><b>Show</b></label> <select id="revBiz"><option value="all">All businesses</option>'+REV_BIZ.map(x => '<option'+(x === revBiz ? ' selected' : '')+'>'+x+'</option>').join('')+'</select>'+
@@ -2283,7 +2286,7 @@ function act(body){ return api('ao-action', body).then(j => { setTimeout(poll, 5
 function liveStart(){
   try{ LV.key = localStorage.getItem('office-key') || ''; }catch(e){}
   inbox.length = 0; AG.forEach(a => { a.done = 0; a.log = []; a.learned = []; a.liveQ = []; if(!a.staff){ a.cur = 'Connecting…'; a.prog = 0; } }); DEPTS.forEach(d => { d.delivered = 0; });
-  poll(); setInterval(poll, 5000); loadCards(true);
+  poll(); setInterval(poll, 5000); loadCards(true); setTimeout(() => loadRev(), 1500);
 }
 function applyState(st){
   const first = !LV.state; LV.state = st; LV.ok = true; LV.err = '';
