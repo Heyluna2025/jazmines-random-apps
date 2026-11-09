@@ -497,7 +497,7 @@ const AG = [
    tasks:['Write the Camp launch emails','Update the AEC welcome emails','Schedule reminder emails'], steps:['Writing email 2','Checking names and links','Scheduling sends']},
   {id:'lk', name:'Hazel', role:'List keeper', dept:'mkt', kind:'shiba', fur:'#C96A3E', dark:'#8E4424', shirt:'#B8436C', to:['you','cos'],
    tasks:['Collect new leads from every sign-up form','Add new leads to the master list','Remove duplicates and bounced emails','Mark who unsubscribed','Give Rebecca and Anita the right group for each send'], steps:['Collecting new sign-ups','Checking for duplicates','Tagging where each lead came from','Updating the master list','Preparing the send list']},
-  {id:'so', name:'Alicia', role:'Post scheduler', dept:'smm', kind:'dog', fur:'#F0D3A2', dark:'#A9682A', shirt:'#E06A93', to:['you'],
+  {id:'so', name:'Alicia', role:'Social Media Manager for JDL', dept:'smm', kind:'dog', fur:'#F0D3A2', dark:'#A9682A', shirt:'#E06A93', to:['you'],
    tasks:['Queue tomorrow’s posts','Schedule this week’s reels','Check the posting calendar'], steps:['Scheduling posts','Checking the calendar','Picking posting times'], need:'3 posts for tomorrow are ready. Approve?'},
   {id:'ga', name:'Iris', role:'Graphic artist', dept:'smm', kind:'cat', fur:'#8CCB7A', dark:'#4E9A63', shirt:'#F6EBD8', to:['smm','you'],
    tasks:['Design today’s static post','Make a carousel from this week’s lesson','Design a quote card in your brand style','Make the announcement graphic for the next event','Resize one design for every platform'], steps:['Reading the brief','Sketching the layout','Setting the headline','Applying your brand colors','Exporting each size']},
@@ -589,7 +589,7 @@ if(!isLive()){
     lk:['List keeper','Keeps the guest list tidy so every invitation reaches the right friend.','New friends added this week',['Add this week’s new sign-ups','Tidy up doubled names','Sort the list by favourite topic'],['Collecting sign-ups','Checking for doubles','Sorting the list']],
     em:['Email writer','Writes welcome notes and reminders that sound like a friend.','Emails written this week',['Write a warm welcome note','Draft the “we miss you” email','Polish the launch countdown'],['Drafting','Adding a personal touch','Checking the links']],
     ga:['Graphic artist','Turns ideas into pretty pictures people want to share.','Graphics made this week',['Design a cheerful quote card','Make a five-slide picture story','Pick this week’s colors'],['Sketching','Choosing colors','Adding the finishing touches']],
-    so:['Post scheduler','Lines up posts so something fun goes out every day.','Posts lined up this week',['Line up this week’s posts','Pick the best time to post','Queue the weekend surprise'],['Checking the calendar','Picking time slots','Queueing posts']],
+    so:['Social media manager','Makes sure something meaningful goes out every day.','Posts lined up this week',['Line up this week’s posts','Pick the best time to post','Queue the weekend surprise'],['Checking the calendar','Picking time slots','Queueing posts']],
     cap:['Caption writer','Writes captions people actually stop to read.','Captions written this week',['Write five scroll-stopping captions','Find the perfect emoji','Punch up the hook line'],['Writing captions','Testing hooks','Choosing hashtags']],
     ce:['Video editor','Turns long recordings into tidy, watchable videos.','Videos edited this week',['Trim the workshop recording','Cut the bloopers (and save them)','Add the big-moment zooms'],['Trimming pauses','Adding zooms','Exporting the final cut']],
     re:['Clip editor','Cuts short, punchy clips from long videos.','Clips delivered this week',['Cut three 30-second clips','Find the funniest moment','Add bouncy captions'],['Finding the best moments','Cutting clips','Adding captions']],
@@ -1567,7 +1567,7 @@ function wallHTML(id){
   if(id === 'archive') return STORE.map(o => barRow(o.name, o.v, pct(o.v)+' used', o.v > .85 ? '#C8553D' : '#3D9A9A')).join('')+barRow('Files sorted today', 0, String(filed));
   return GOALS.map(o => barRow(o.name, o.v, pct(o.v))).join('');
 }
-function calHTML(){ if(isLive()) return '<p class="empty">No posts scheduled yet. Alicia needs your Blotato key before she can schedule.</p>'; return CAL.map(c => '<div class="item"><div class="row-main"><b>'+esc(c.title)+'</b><span class="sub">'+esc(c.d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'}))+' · '+esc(c.time)+' · '+esc(c.plat)+'</span></div><span class="pill '+(c.st === 'Scheduled' ? 'ok' : c.st === 'Needs video' ? 'need' : '')+'">'+esc(c.st)+'</span></div>').join(''); }
+function calHTML(){ if(isLive()) return '<p class="empty">No posts scheduled yet. Alicia plans the next 3 days every morning at 10; approve her plan in My agents and they appear here and in Blotato.</p>'; return CAL.map(c => '<div class="item"><div class="row-main"><b>'+esc(c.title)+'</b><span class="sub">'+esc(c.d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'}))+' · '+esc(c.time)+' · '+esc(c.plat)+'</span></div><span class="pill '+(c.st === 'Scheduled' ? 'ok' : c.st === 'Needs video' ? 'need' : '')+'">'+esc(c.st)+'</span></div>').join(''); }
 const kv = a => isLive() ? ((a.live && a.live.kpi && a.live.kpi.goal) ? Math.min(1, (a.live.kpi.value || 0)/a.live.kpi.goal) : 0) : Math.min(1, a.kpi0 + a.done*.015);
 function kpiText(a){ if(isLive()){ const k = a.live && a.live.kpi; return (!k || k.goal == null) ? 'No goal yet' : k.value == null ? 'No number yet' : k.value+(k.unit || '')+' of '+k.goal+(k.unit || ''); } const v = Math.round(a.kpi[1]*kv(a)); return a.kpi[2] === '%' ? v+'% (goal '+a.kpi[1]+'%)' : v+' of '+a.kpi[1]; }
 const PLAYBOOK = {
@@ -1581,7 +1581,7 @@ function uniq(arr){ return arr.filter((x,i) => arr.indexOf(x) === i); }
 const ACC_KIND = {key:'API key', signin:'Sign-in', mac:'Your Mac', app:'Your own app', answer:'Your answer'};
 const DEMO_ACCESS = [
   {name:'AI brain', kind:'key', what:'What the agents think and write with.', status:'connected', agents:['cos','tr','cap','nl']},
-  {name:'Social scheduler', kind:'key', what:'Queues approved posts for the right time.', status:'saved', agents:['so'], how:'The key is saved. The wiring that uses it comes next.'},
+  {name:'Social scheduler (Blotato)', kind:'key', what:'Schedules approved posts, reads what is already on your accounts, and collects views and likes.', status:'connected', agents:['so']},
   {name:'Email, read-only', kind:'signin', what:'Lets Admin sort the inbox and pass invoices to Finance.', status:'missing', agents:['adm','rc'], how:'One sign-in connects it.'},
   {name:'Calendar, read-only', kind:'signin', what:'Lets the team plan around the day.', status:'missing', agents:['adm','cs'], how:'One sign-in connects it.'},
   {name:'Payments, read-only', kind:'key', what:'Lets Finance total the sales without touching the money.', status:'missing', agents:['rv','of'], how:'A read-only key connects it.'},
