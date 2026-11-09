@@ -302,7 +302,15 @@ button.pill{cursor:pointer}
 .rkpi .meter{margin-top:0}
 .rnum{font-size:12.5px}
 .rdone{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-@media (max-width:900px){ .rrow{grid-template-columns:30px minmax(0,1fr) auto} .rjob,.rkpi{grid-column:2/-1} .rdone{display:none} .rrow .pill{grid-row:1;grid-column:3} }
+@media (max-width:900px){ .rrow{grid-template-columns:30px minmax(0,1fr) auto} .rjob,.rkpi{grid-column:2/-1} .rdone{display:none} .rrow .pill{grid-row:1;grid-column:3}
+.call .call-head{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.call .call-log{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;padding:4px 0;min-height:80px}
+.call .call-log p{margin:0;padding:8px 12px;border-radius:14px;max-width:88%;font-size:14px;line-height:1.35}
+.call .call-log p.you{align-self:flex-end;background:var(--move-bg);color:var(--move)}
+.call .call-log p.mimi{align-self:flex-start;background:var(--accent-bg);color:var(--ink)}
+.call .call-log p.sys{align-self:center;color:var(--muted);font-size:12px;background:none}
+.call .talk{min-width:150px;min-height:52px;font-size:16px;touch-action:none;-webkit-user-select:none;user-select:none}
+.call .talk[aria-pressed="true"]{background:var(--need);color:#fff} }
 @media (max-width:1100px){
   .app{flex-direction:column;gap:8px}
   .side{width:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:8px 10px;gap:4px}
@@ -381,6 +389,7 @@ button.pill{cursor:pointer}
     <div class="tools">
       <span class="pill" id="count"></span>
       <button class="pill" id="needBtn" type="button"></button>
+      <button class="btn" id="callBtn" type="button">Call Mimi</button>
       <button class="btn" id="muteBtn" type="button" aria-pressed="false">Mute</button>
       <button class="btn" id="homeBtn" type="button">Whole office</button>
     </div>
@@ -433,6 +442,7 @@ button.pill{cursor:pointer}
 </div>
 
 <dialog id="keyDlg" class="dlg"><form id="keyForm" novalidate><h2>Open your live office</h2><p class="sub">Live mode shows your real business activity. Enter your office key to unlock it on this device. Anyone without the key only sees Demo mode.</p><label for="keyIn">Office key</label><input id="keyIn" type="password" autocomplete="off"><p class="err" id="keyErr" hidden></p><div class="dlg-row"><button class="btn" type="button" id="keyCancel">Stay in Demo</button><button class="btn primary" type="submit">Unlock Live</button></div></form></dialog>
+<dialog id="callDlg" class="dlg call"><div class="call-head"><b>On a call with Mimi</b><span class="sub" id="callStatus">Hold the button and talk. Let go when you are done.</span></div><div class="call-log" id="callLog"></div><div class="dlg-row"><button class="btn" type="button" id="callEnd">Hang up</button><button class="btn primary talk" type="button" id="talkBtn">Hold to talk</button></div></dialog>
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="music min" id="music" aria-label="Office music"><div class="music-head"><b>Office music</b><span><button class="btn sm" type="button" id="musicPlay">Pause</button> <button class="btn sm" type="button" id="musicHide">Hide</button></span></div>
 <div class="music-src"><label><input type="radio" name="msrc" value="radio" checked> Office theme (no ads, starts by itself)</label><label><input type="radio" name="msrc" value="yt"> YouTube track (shows ads unless you have Premium)</label></div><div id="musicFrame"></div></div>
@@ -2040,6 +2050,45 @@ function api(path, body){
   return fetch(LIVE_URL+path, {method: body ? 'POST' : 'GET', headers:h, body: body ? JSON.stringify(body) : undefined}).then(r => { if(r.status === 401){ lockLive('That office key did not work. Try again.'); throw new Error('401'); }
     return r.json().catch(() => ({})).then(j => { if(!r.ok || j.ok === false) throw new Error(j.error || 'The office could not do that just now.'); return j; }); });
 }
+// ---- Call Mimi: hold to talk, she answers in her own voice (ao-voice).
+const CALL = {id:'', rec:null, chunks:[], stream:null, busy:false, offered:false, audio:null, mime:''};
+function callLog(kind, text){ const p = document.createElement('p'); p.className = kind; p.textContent = text; $('callLog').appendChild(p); $('callLog').scrollTop = 1e9; return p; }
+function callStatus(t){ setText($('callStatus'), t); }
+function unlockAudio(){ try{ if(!CALL.audio){ CALL.audio = new Audio(); CALL.audio.setAttribute('playsinline',''); } CALL.audio.src = 'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA'; CALL.audio.play().catch(() => {}); }catch(e){} }
+async function callOpen(){
+  if(!isLive()){ askKey('Switch to Live first: calls reach your real office.'); return; }
+  unlockAudio();
+  CALL.id = 'c' + Date.now().toString(36); CALL.offered = false; $('callLog').textContent = '';
+  const d = $('callDlg'); if(!d.open){ if(d.showModal) d.showModal(); else d.setAttribute('open',''); }
+  if(!navigator.mediaDevices || !window.MediaRecorder){ callLog('sys', 'This browser cannot record. Open the office in Safari or Chrome.'); return; }
+  try{ CALL.stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ callLog('sys', 'The microphone was not allowed. Allow it for this site and try again.'); return; }
+  CALL.mime = ['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+  api('ao-voice').then(r => { if(r && r.voice === false) callLog('sys', 'Mimi will answer in text only: her ElevenLabs voice key is not saved in the office yet.'); }).catch(() => {});
+  callLog('sys', 'Connected. Hold the button, ask your question, let go.');
+}
+function callClose(){ const d = $('callDlg'); if(d.open){ if(d.close) d.close(); else d.removeAttribute('open'); } if(CALL.stream){ CALL.stream.getTracks().forEach(t => t.stop()); CALL.stream = null; } if(CALL.audio){ CALL.audio.pause(); } }
+function talkStart(e){ if(e) e.preventDefault(); if(CALL.busy || !CALL.stream || (CALL.rec && CALL.rec.state === 'recording')) return; CALL.chunks = []; try{ CALL.rec = new MediaRecorder(CALL.stream, CALL.mime ? {mimeType:CALL.mime} : undefined); }catch(err){ CALL.rec = new MediaRecorder(CALL.stream); } CALL.rec.ondataavailable = ev => { if(ev.data && ev.data.size) CALL.chunks.push(ev.data); }; CALL.rec.onstop = talkSend; CALL.rec.start(); $('talkBtn').setAttribute('aria-pressed','true'); setText($('talkBtn'), 'Listening…'); callStatus('Listening. Let go when you are done.'); if(CALL.audio) CALL.audio.pause(); }
+function talkStop(e){ if(e) e.preventDefault(); if(CALL.rec && CALL.rec.state === 'recording') CALL.rec.stop(); $('talkBtn').setAttribute('aria-pressed','false'); setText($('talkBtn'), 'Hold to talk'); }
+async function talkSend(){
+  const blob = new Blob(CALL.chunks, {type: CALL.rec.mimeType || CALL.mime || 'audio/webm'}); if(blob.size < 1500){ callStatus('That was too short. Hold the button while you speak.'); return; }
+  CALL.busy = true; callStatus('Mimi is thinking…'); const you = callLog('you', '…');
+  try{
+    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
+    const r = await api('ao-voice', {call_id: CALL.id, audio: b64, mime: blob.type, offered: CALL.offered});
+    you.textContent = r.heard || '(nothing heard)'; callLog('mimi', r.said || '…');
+    if(/bandwidth|marinig|want to hear/i.test(r.said || '')) CALL.offered = true;
+    if(r.audio && CALL.audio){ CALL.audio.src = 'data:audio/mpeg;base64,' + r.audio; CALL.audio.play().catch(() => callStatus('Tap the reply to hear it.')); callStatus('Hold the button to reply.'); }
+    else { callStatus(r.voice_problem ? 'Text only: ' + r.voice_problem : 'Hold the button to reply.'); }
+  }catch(e){ you.remove(); callLog('sys', e.message || 'That did not go through. Try again.'); callStatus('Hold the button to try again.'); }
+  CALL.busy = false;
+}
+$('callBtn').addEventListener('click', callOpen);
+$('callEnd').addEventListener('click', callClose);
+$('callDlg').addEventListener('close', callClose);
+['pointerdown','touchstart'].forEach(ev => $('talkBtn').addEventListener(ev, talkStart, {passive:false}));
+['pointerup','pointercancel','pointerleave','touchend','touchcancel'].forEach(ev => $('talkBtn').addEventListener(ev, talkStop, {passive:false}));
+$('callLog').addEventListener('click', e => { if(e.target.classList.contains('mimi') && CALL.audio && CALL.audio.src) CALL.audio.play().catch(() => {}); });
 const CAL_COLORS = [['#6D28D9','#EDE9FE'],['#0B7A55','#D9F5EA'],['#C2500F','#FDE7D6'],['#1D4ED8','#DBE7FE'],['#B4235A','#FCE1EC']];
 const CAL_DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MONTH_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 let gcCalMonth = '', gcCalDay = '', gcCalOff = {}, gcCalBusy = false, gcCalErr = '';
