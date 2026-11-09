@@ -1,0 +1,1 @@
+{"headers": [{"source": "/models/(.*)", "headers": [{"key": "Cache-Control", "value": "public, max-age=86400"}]}], "rewrites": [{"source": "/office", "destination": "/index.html"}, {"source": "/office/", "destination": "/index.html"}, {"source": "/office/:path*", "destination": "/:path*"}]}
