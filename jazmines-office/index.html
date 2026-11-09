@@ -303,6 +303,20 @@ button.pill{cursor:pointer}
 .rnum{font-size:12.5px}
 .rdone{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 @media (max-width:900px){ .rrow{grid-template-columns:30px minmax(0,1fr) auto} .rjob,.rkpi{grid-column:2/-1} .rdone{display:none} .rrow .pill{grid-row:1;grid-column:3}
+.soc-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+.soc-bar select{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+.soc-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.soc-tabs button{font:inherit;font-size:13px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.soc-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:6px 0 14px}
+.tile{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.tile b{display:block;font-size:22px;font-family:var(--font-display);font-weight:600;line-height:1.1}
+.tile span{font-size:12px;color:var(--muted)}
+.soc-days{display:flex;align-items:flex-end;gap:3px;height:70px;margin:4px 0 14px;border-bottom:1px solid var(--line);padding-bottom:2px}
+.soc-days i{flex:1;background:var(--move);border-radius:3px 3px 0 0;min-height:2px;opacity:.85}
+.soc-post .when{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;white-space:nowrap}
+.soc-post .txt{flex:1;min-width:0;font-size:13px}
+.soc-post .nums{font-size:12px;color:var(--muted);white-space:nowrap}
 .call .call-head{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
 .call .call-log{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;padding:4px 0;min-height:80px}
 .call .call-log p{margin:0;padding:8px 12px;border-radius:14px;max-width:88%;font-size:14px;line-height:1.35}
@@ -374,7 +388,8 @@ button.pill{cursor:pointer}
     <button class="nav" type="button" data-view="health">App health<b id="navHealth" hidden></b></button>
     <button class="nav" type="button" data-view="access">Accesses</button>
     <span class="navgroup" id="navFin" hidden>Financials</span>
-    <button class="nav" type="button" data-view="revenue" id="navRev" hidden>Revenue report</button>
+    <button class="nav" type="button" data-view="social" id="navSoc" hidden>Social Media</button>
+<button class="nav" type="button" data-view="revenue" id="navRev" hidden>Revenue report</button>
     <span class="grow"></span>
     <button class="nav" type="button" id="musicBtn" aria-pressed="false">Music</button>
     <button class="nav" type="button" data-view="settings">Settings</button>
@@ -1717,13 +1732,13 @@ function healthHTML(){
 }
 const VIEWS = {agents:['My agents', () => AG.length+' agents. Click one to see '+(isLive() ? 'the job description, what they need, and when they work.' : 'what they do. Demo mode shows made-up tasks and sample numbers.')], flows:['Workflows', () => isLive() ? 'How work moves between your agents and you.' : 'Made-up examples, just for fun. Your real workflows only appear in Live mode.'],
   inbox:['Your inbox', () => 'Updates and finished work from your agents. Open one to read it, act on it, or move it to your To Do List.'], reports:['Reports', () => isLive() ? 'Real numbers from your office.' : 'Sample numbers. This is Demo mode.'], health:['App health', () => 'IT checks this office app and tracks what it costs to run.'], cal:['Your calendar', () => isLive() ? 'Your Google calendars together, read-only. Each account has its own color.' : 'Sample events. This is Demo mode.'], todo:['Jazmine’s To Do List', () => isLive() ? 'Your own list. Tick things off as you finish them.' : 'Sample list. This is Demo mode, so nothing here is saved.'], revenue:['Revenue report', () => 'Live numbers from Stripe, your event sites and the camp payment tracker. Pick a business and the dates.'], access:['Accesses', () => isLive() ? 'The accounts and keys your agents need, and which ones are connected.' : 'Sample list. This is Demo mode.'], settings:['Settings', () => 'How your office looks and behaves.']};
-function renderView(force){ if(navView === 'office' || navView === 'settings') return; if(navView === 'todo' && !force && document.activeElement && (document.activeElement.id === 'todoIn' || document.activeElement.id === 'todoPri')) return; if(navView === 'inbox' && !force && document.activeElement && (document.activeElement.id === 'mailReply' || document.activeElement.id === 'mailPri')) return; if(force && navView === 'todo' && document.activeElement && $('rosterList').contains(document.activeElement)) document.activeElement.blur(); setHTML($('rosterList'), navView === 'todo' ? todoHTML() : navView === 'cal' ? gcCalHTML() : navView === 'agents' ? rosterHTML() : navView === 'flows' ? flowsHTML() : navView === 'inbox' ? mailHTML() : navView === 'health' ? healthHTML() : navView === 'access' ? accessHTML() : navView === 'revenue' ? revenueHTML() : reportsHTML()); }
+function renderView(force){ if(navView === 'office' || navView === 'settings') return; if(navView === 'todo' && !force && document.activeElement && (document.activeElement.id === 'todoIn' || document.activeElement.id === 'todoPri')) return; if(navView === 'inbox' && !force && document.activeElement && (document.activeElement.id === 'mailReply' || document.activeElement.id === 'mailPri')) return; if(force && navView === 'todo' && document.activeElement && $('rosterList').contains(document.activeElement)) document.activeElement.blur(); setHTML($('rosterList'), navView === 'todo' ? todoHTML() : navView === 'cal' ? gcCalHTML() : navView === 'agents' ? rosterHTML() : navView === 'flows' ? flowsHTML() : navView === 'inbox' ? mailHTML() : navView === 'health' ? healthHTML() : navView === 'access' ? accessHTML() : navView === 'revenue' ? revenueHTML() : navView === 'social' ? socialHTML() : reportsHTML()); }
 function showView(v){
   navView = v; document.querySelectorAll('.nav').forEach(b => { if(b.dataset.view === v) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   $('roster').hidden = v === 'office'; if(v === 'office') return;
-  setText($('viewTitle'), VIEWS[v][0]); setText($('rosterSub'), VIEWS[v][1]()); $('rosterTools').hidden = v !== 'agents'; $('rosterList').hidden = v === 'settings'; $('settingsView').hidden = v !== 'settings'; $('rosterList').scrollTop = 0; renderView(); if(v === 'agents' || v === 'access') loadCards(); if(v === 'revenue') loadRev(); if(v === 'todo') loadTodos(); if(v === 'cal') gcLoadCal();
+  setText($('viewTitle'), VIEWS[v][0]); setText($('rosterSub'), VIEWS[v][1]()); $('rosterTools').hidden = v !== 'agents'; $('rosterList').hidden = v === 'settings'; $('settingsView').hidden = v !== 'settings'; $('rosterList').scrollTop = 0; renderView(); if(v === 'agents' || v === 'access') loadCards(); if(v === 'revenue') loadRev(); if(v === 'social') loadSocial(); if(v === 'todo') loadTodos(); if(v === 'cal') gcLoadCal();
 }
-if(isLive()){ $('navFin').hidden = false; $('navRev').hidden = false; }
+if(isLive()){ $('navFin').hidden = false; $('navRev').hidden = false; $('navSoc').hidden = false; }
 setTimeout(() => loadTodos(), 1500);
 $('rosterList').addEventListener('input', e => { if(e.target && e.target.id === 'todoIn') todoDraft = e.target.value; else if(e.target && e.target.id === 'mailReply'){ mailDraft = e.target.value; mailDraftFor = mailOpen; } });
 $('rosterList').addEventListener('keydown', e => { if(e.key === 'Enter' && e.target && e.target.id === 'todoIn'){ e.preventDefault(); todoAdd(); } });
@@ -2189,6 +2204,36 @@ function revChart(cur, months, vals, a, b){
       '<text x="'+(x+bw/2)+'" y="'+(base+30)+'" text-anchor="middle" font-size="10" fill="var(--muted)">'+(i === 0 || m.slice(5) === '01' ? m.slice(0,4) : '')+'</text></g>'; }).join('');
   return '<div class="revchart"><svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="Month by month"><line x1="0" x2="'+W+'" y1="'+base+'" y2="'+base+'" stroke="var(--line)"/>'+bars+'</svg></div>';
 }
+// ---- Social Media screen (live only): accounts, scheduled posts, performance. Read fresh from Blotato through ao-state.
+const SOC = {range:'7d', account:'all', data:null, at:0, busy:false, err:''};
+const SOC_RANGES = [['7d','7 days'],['15d','15 days'],['30d','30 days'],['month','This month'],['year','This year']];
+function loadSocial(force){ if(!isLive() || !LV.key || SOC.busy) return; const now = Date.now(); if(!force && SOC.data && SOC.data.range === SOC.range && SOC.data.account === SOC.account && now - SOC.at < 120000) return; SOC.busy = true; SOC.err = ''; if(navView === 'social') renderView(true);
+  api('ao-state?view=social&range='+encodeURIComponent(SOC.range)+'&account='+encodeURIComponent(SOC.account)).then(r => { if(r && r.ok){ SOC.data = r; SOC.at = Date.now(); } else SOC.err = (r && r.error) || 'Blotato did not answer.'; })
+  .catch(e => { if(e.message !== '401') SOC.err = e.message; }).then(() => { SOC.busy = false; if(!$('roster').hidden && navView === 'social') renderView(true); }); }
+function socSet(k, v){ SOC[k] = v; if(k === 'account') SOC.data = null; loadSocial(true); }
+const socN = v => v == null ? '—' : v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e4 ? Math.round(v/1e3)+'K' : v >= 1e3 ? (v/1e3).toFixed(1)+'K' : String(v);
+const socWhen = iso => { const d = new Date(iso); return d.toLocaleDateString('en-PH', {timeZone:'Asia/Manila', weekday:'short', month:'short', day:'numeric'})+' · '+d.toLocaleTimeString('en-PH', {timeZone:'Asia/Manila', hour:'numeric', minute:'2-digit'}); };
+const socPlat = p => ({tiktok:'TikTok', youtube:'YouTube', instagram:'Instagram', facebook:'Facebook', threads:'Threads', twitter:'X', linkedin:'LinkedIn', bluesky:'Bluesky', pinterest:'Pinterest'})[p] || p;
+function socPost(p){ const nums = p.status === 'published' ? [['views',p.views],['likes',p.likes],['comments',p.comments],['shares',p.shares]].filter(x => x[1] != null).map(x => socN(x[1])+' '+x[0]).join(' · ') : '';
+  return '<div class="item soc-post"><span class="when">'+esc(socWhen(p.at))+'</span><span class="txt"><b>'+esc(socPlat(p.platform))+'</b>'+(SOC.account === 'all' ? ' <span class="sub">'+esc(p.account)+'</span>' : '')+'<br>'+esc((p.text || '').split('\n')[0].slice(0, 110))+(p.url ? ' <a href="'+esc(p.url)+'" target="_blank" rel="noopener">open</a>' : '')+(p.error ? '<br><span class="sub" style="color:var(--need)">'+esc(p.error)+'</span>' : '')+'</span>'+
+    (p.status === 'scheduled' ? '<span class="pill move">Scheduled</span>' : p.status === 'failed' ? '<span class="pill need">Failed</span>' : '<span class="nums">'+(nums || 'no numbers yet')+'</span>')+'</div>'; }
+function socialHTML(){
+  if(!isLive()) return '<p class="empty">Social Media is a live-only screen. Switch to Live to see your accounts.</p>';
+  const d = SOC.data; if(!d && SOC.busy) return '<p class="empty">Reading your accounts from Blotato…</p>'; if(!d) { loadSocial(); return SOC.err ? '<p class="empty">'+esc(SOC.err)+'</p>' : '<p class="empty">Reading your accounts from Blotato…</p>'; }
+  const acc = '<select id="socAcc" aria-label="Account"><option value="all"'+(SOC.account === 'all' ? ' selected' : '')+'>All accounts</option>'+d.accounts.map(a => '<option value="'+esc(a.id)+'"'+(SOC.account === a.id ? ' selected' : '')+'>'+esc(a.label)+'</option>').join('')+'</select>';
+  const tabs = '<div class="soc-tabs" role="tablist">'+SOC_RANGES.map(r => '<button type="button" data-range="'+r[0]+'" aria-pressed="'+(SOC.range === r[0])+'">'+r[1]+'</button>').join('')+'</div>';
+  const t = d.totals, tiles = [['Published', t.posts], ['Views', t.views], ['Likes', t.likes], ['Comments', t.comments], ['Shares', t.shares], ['Scheduled', t.scheduled]].concat(t.failed ? [['Failed', t.failed]] : [])
+    .map(x => '<div class="tile"><b>'+esc(socN(x[1]))+'</b><span>'+esc(x[0])+'</span></div>').join('');
+  const max = Math.max.apply(null, d.by_day.map(x => x.views).concat([1])), anyViews = d.by_day.some(x => x.views > 0);
+  const days = d.by_day.length > 1 ? '<h3>'+(anyViews ? 'Views by day' : 'Posts by day')+'</h3><div class="soc-days">'+d.by_day.map(x => { const v = anyViews ? x.views : x.posts, m = anyViews ? max : Math.max.apply(null, d.by_day.map(y => y.posts).concat([1])); return '<i style="height:'+Math.max(2, Math.round(v/m*66))+'px" title="'+esc(x.day+': '+x.posts+' posts, '+socN(x.views)+' views')+'"></i>'; }).join('')+'</div>' : '';
+  const top = d.top.length ? '<h3>Top posts</h3>'+d.top.map(socPost).join('') : '';
+  const sched = '<h3>Scheduled ('+d.scheduled.length+')</h3>'+(d.scheduled.length ? d.scheduled.map(socPost).join('') : '<p class="empty">Nothing scheduled yet. Approve a plan from Alicia or Didi and it shows here.</p>');
+  const recent = '<h3>Went out in this range ('+d.recent.length+')</h3>'+(d.recent.length ? d.recent.map(socPost).join('') : '<p class="empty">Nothing went out in this range.</p>');
+  const notes = (d.notes || []).map(n => '<p class="sub">'+esc(n)+'</p>').join('');
+  return '<div class="soc-bar">'+acc+tabs+'</div>'+(SOC.err ? '<p class="sub" style="color:var(--need)">'+esc(SOC.err)+'</p>' : '')+'<div class="tiles">'+tiles+'</div>'+days+notes+top+sched+recent+'<p class="sub" style="margin-top:14px">Read from Blotato '+esc(new Date(d.at).toLocaleTimeString('en-PH', {timeZone:'Asia/Manila', hour:'numeric', minute:'2-digit'}))+'. Numbers are Blotato’s latest snapshot for each post, not live counts.</p>';
+}
+$('rosterList').addEventListener('change', e => { if(e.target && e.target.id === 'socAcc') socSet('account', e.target.value); });
+$('rosterList').addEventListener('click', e => { const b = e.target.closest && e.target.closest('button[data-range]'); if(b) socSet('range', b.getAttribute('data-range')); });
 function revenueHTML(){
   if(!isLive()) return '<p class="empty">The revenue report only shows in Live mode.</p>';
   const R = revRange(), a = R[0], b = R[1];
