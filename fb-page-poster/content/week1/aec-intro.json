@@ -98,12 +98,14 @@
         {
           "name": "Coach Jazmine",
           "role": "Co-founder, AI Empowered Club",
-          "detail": "[[One line on what Coach Jazmine teaches]]"
+          "detail": "[[One line on what Coach Jazmine teaches]]",
+          "photo": "brand/people/coach-jazmine.jpg"
         },
         {
           "name": "Coach Lloyd",
           "role": "Co-founder, AI Empowered Club",
-          "detail": "[[One line on what Coach Lloyd teaches]]"
+          "detail": "[[One line on what Coach Lloyd teaches]]",
+          "photo": "brand/people/coach-lloyd.jpg"
         }
       ]
     },

@@ -132,12 +132,21 @@ function hub(s) {
   </div>`;
 }
 
+// Photos are paths relative to this folder (e.g. brand/people/coach-jazmine.jpg)
+// or URLs; local files are embedded so the page needs no file access.
+function photoSrc(photo) {
+  if (/^(https?:|data:)/.test(photo)) return photo;
+  const file = path.resolve(__dirname, photo);
+  const type = /\.png$/i.test(file) ? 'png' : 'jpeg';
+  return `data:image/${type};base64,${fs.readFileSync(file).toString('base64')}`;
+}
+
 function people(s) {
   return `<div class="block">
     ${s.kicker ? `<div class="kicker">${rich(s.kicker)}</div>` : ''}
     <h1>${rich(s.title)}</h1>
     <div class="people n${s.people.length}">${s.people.map((p) => `<div class="person">
-      <div class="photo">${p.photo ? `<img src="${p.photo}">` : `<span class="initial">${escape(p.name.replace(/^Coach\s+/i, '').charAt(0))}</span>`}</div>
+      <div class="photo">${p.photo ? `<img src="${photoSrc(p.photo)}">` : `<span class="initial">${escape(p.name.replace(/^Coach\s+/i, '').charAt(0))}</span>`}</div>
       <div><h3>${rich(p.name)}</h3><div class="role">${rich(p.role || '')}</div><p>${rich(p.detail || '')}</p></div>
     </div>`).join('')}</div>
   </div>`;

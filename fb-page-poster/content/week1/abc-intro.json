@@ -94,12 +94,14 @@
         {
           "name": "Coach Jazmine",
           "role": "Co-founder, AI Empowered Club",
-          "detail": ""
+          "detail": "",
+          "photo": "brand/people/coach-jazmine.jpg"
         },
         {
           "name": "Coach Lloyd",
           "role": "Co-founder, AI Empowered Club",
-          "detail": ""
+          "detail": "",
+          "photo": "brand/people/coach-lloyd.jpg"
         }
       ]
     },
