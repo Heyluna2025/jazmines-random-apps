@@ -536,6 +536,8 @@ const AG = [
    tasks:['Draft this week’s newsletter','Test subject lines','Tidy the subscriber list'], steps:['Drafting the intro','Testing subject lines','Checking links']},
   {id:'em', name:'Rebecca', role:'Email writer', dept:'mkt', kind:'duck', fur:'#FBFAF5', dark:'#E8E4DA', shirt:'#C2456E', to:['you','cos'],
    tasks:['Write the Camp launch emails','Update the AEC welcome emails','Schedule reminder emails'], steps:['Writing email 2','Checking names and links','Scheduling sends']},
+  {id:'ads', name:'Gabriel', role:'Ads specialist', dept:'mkt', kind:'rat', fur:'#BDB5B3', dark:'#8E8688', shirt:'#2B3A55', coat:'#2B3A55', pants:['#D9D2C5','#4A4440'], loafers:'#5A3A22', specs:true, curls:'#3A2A22', to:['you','mkt'],
+   tasks:['Plan this week’s Meta ads','Write 5 hooks for the camp ad','Read yesterday’s ad results'], steps:['Picking the audience','Writing the angle','Drafting the copy','Checking the numbers'], need:'The camp ad set is ready. Approve the budget?'},
   {id:'lk', name:'Hazel', role:'List keeper', dept:'mkt', kind:'shiba', fur:'#C96A3E', dark:'#8E4424', shirt:'#B8436C', to:['you','cos'],
    tasks:['Collect new leads from every sign-up form','Add new leads to the master list','Remove duplicates and bounced emails','Mark who unsubscribed','Give Rebecca and Anita the right group for each send'], steps:['Collecting new sign-ups','Checking for duplicates','Tagging where each lead came from','Updating the master list','Preparing the send list']},
   {id:'so', name:'Alicia', role:'Social Media Manager for JDL', dept:'smm', kind:'dog', fur:'#F0D3A2', dark:'#A9682A', shirt:'#E06A93', to:['you'],
@@ -604,7 +606,7 @@ const AG = [
    tasks:['Keep every team on deadline','Send deadline reminders','Check who is falling behind','Review the performance wall'], steps:['Checking who is behind','Sending deadline reminders','Reviewing today’s numbers','Updating the performance wall']}
 ];
 const JOBS = {
-  nl:['Writes and sends your weekly newsletter.','Newsletter open rate',45,'%'], em:['Writes launch, welcome, and reminder emails.','Emails written this week',10,''], lk:['Keeps one master list of every lead and tells Marketing who to email.','New leads added this week',50,''],
+  nl:['Writes and sends your weekly newsletter.','Newsletter open rate',45,'%'], ads:['Plans and writes the paid ads on Meta, TikTok and YouTube, and reads the results.','Ad plans ready before the launch window',100,'%'], em:['Writes launch, welcome, and reminder emails.','Emails written this week',10,''], lk:['Keeps one master list of every lead and tells Marketing who to email.','New leads added this week',50,''],
   so:['Schedules posts on your accounts at the right times.','Posts scheduled this week',14,''], ga:['Designs your static posts: carousels, quote cards, and announcement graphics in your brand style.','Graphics designed this week',10,''], cap:['Writes captions and picks hashtags for every post.','Captions written this week',14,''],
   ce:['Edits your AEC and ABC class recordings into your house format, following your AEC Class Editor playbook.','Class videos edited this week',2,''], re:['Cuts reels from your classes in your JDL Reel house style, with your name logo, headlines, and captions.','Reels delivered this week',7,''],
   sam:['Writes scripts the way you talk, with no AI-sounding filler.','Scripts approved this week',7,''], cp:['Watches competitor ads, offers, and pricing.','Competitor reports this week',2,''],
@@ -628,7 +630,7 @@ if(!isLive()){
     cos:['Chief of Staff','Keeps the whole office purring and brings you one tidy report a day.','Wrap-ups delivered on time',['Round up everyone’s good news','Plan tomorrow’s to-do list','Write the daily wrap-up'],['Collecting updates','Sorting the highlights','Writing the wrap-up']],
     nl:['Newsletter writer','Writes a friendly letter to your fans every week.','Letters opened',['Write the Monday pep-talk letter','Pick this week’s feel-good story','Test three subject lines'],['Brainstorming openers','Writing the letter','Proofreading twice']],
     lk:['List keeper','Keeps the guest list tidy so every invitation reaches the right friend.','New friends added this week',['Add this week’s new sign-ups','Tidy up doubled names','Sort the list by favourite topic'],['Collecting sign-ups','Checking for doubles','Sorting the list']],
-    em:['Email writer','Writes welcome notes and reminders that sound like a friend.','Emails written this week',['Write a warm welcome note','Draft the “we miss you” email','Polish the launch countdown'],['Drafting','Adding a personal touch','Checking the links']],
+    ads:['Ads specialist','Turns offers into ads people actually click.','Ad plans ready before launch',['Plan this week’s ads','Write five hooks','Read the results'],['Picking the audience','Writing the angle','Checking the numbers']], em:['Email writer','Writes welcome notes and reminders that sound like a friend.','Emails written this week',['Write a warm welcome note','Draft the “we miss you” email','Polish the launch countdown'],['Drafting','Adding a personal touch','Checking the links']],
     ga:['Graphic artist','Turns ideas into pretty pictures people want to share.','Graphics made this week',['Design a cheerful quote card','Make a five-slide picture story','Pick this week’s colors'],['Sketching','Choosing colors','Adding the finishing touches']],
     so:['Social media manager','Makes sure something meaningful goes out every day.','Posts lined up this week',['Line up this week’s posts','Pick the best time to post','Queue the weekend surprise'],['Checking the calendar','Picking time slots','Queueing posts']],
     cap:['Social media manager','Makes sure something meaningful goes out for the club every day.','Captions written this week',['Write five scroll-stopping captions','Find the perfect emoji','Punch up the hook line'],['Writing captions','Testing hooks','Choosing hashtags']],
@@ -1143,7 +1145,7 @@ function olc(m){ const o = new T.Mesh(m.geometry, OUTLINE); o.position.copy(m.po
 function buildCritter(a){
   const g = new T.Group(), rig = new T.Group(); g.add(rig); rig.scale.setScalar(CS);
   const P = {g, rig}, k = a.kind === 'shiba' ? 'fox' : a.kind, fur = a.fur, dk = a.dark, eye = '#2A1F1A', pink = '#F4B6C2', cream = '#FFF6E6';
-  const bird = k === 'duck' || k === 'bird' || k === 'owl', beak = a.beak || '#F29A2E', paw = a.paws || fur, footC = bird ? (a.feet || '#F29A2E') : paw;
+  const bird = k === 'duck' || k === 'bird' || k === 'owl', beak = a.beak || '#F29A2E', paw = a.paws || fur, footC = a.loafers || (bird ? (a.feet || '#F29A2E') : paw);
   P.footL = sph([.13,.09,.18],footC,-.15,.09,.05,rig); P.footR = sph([.13,.09,.18],footC,.15,.09,.05,rig);
   const tail = new T.Group(); tail.position.set(0,.3,-.22); rig.add(tail);
   if(a.fluffy){ tail.rotation.x = -.75; ol(sph([.17,.34,.17],dk,0,.34,0,tail),OT); }
@@ -1151,9 +1153,13 @@ function buildCritter(a){
   else if(k === 'fox'){ tail.rotation.x = -.8; ol(sph([.15,.32,.15],fur,0,.32,0,tail),OT); sph(.115,cream,0,.58,0,tail); }
   else if(k === 'bear'){ ol(sph(.1,dk,0,.04,-.09,tail),OT); }
   else if(k === 'dog'){ tail.rotation.x = -.45; ol(sph([.07,.2,.07],fur,0,.2,0,tail),OT); }
+  else if(k === 'rat'){ tail.rotation.x = -.25; ol(sph([.035,.4,.035],pink,0,.36,0,tail),OT); }
   else if(k === 'duck'){ tail.rotation.x = -.5; ol(sph([.13,.11,.17],a.wing || fur,0,-.02,-.12,tail),OT); }
   else if(bird){ tail.rotation.x = -.9; ol(sph([.15,.05,.24],dk,0,.04,-.16,tail),OT); }
+  if(a.pants){ for(let i = 0; i < 4; i++) for(let j = 0; j < 2; j++) box(.12,.09,.24,a.pants[(i+j)%2],-.18+i*.12,.17+j*.09,0,rig,false); }
+  if(a.loafers){ box(.14,.04,.08,'#2A1A10',-.15,.12,.06,rig,false); box(.14,.04,.08,'#2A1A10',.15,.12,.06,rig,false); }
   ol(sph(a.chubby ? [.36,.36,.32] : [.31,.35,.28],a.shirt,0,.48,0,rig),OT);
+  if(a.coat){ ol(sph([.35,.33,.31],a.coat,0,.44,-.02,rig),OT); [-1,1].forEach(s => box(.1,.26,.03,'#1C2638',s*.12,.56,.3,rig,false)); box(.06,.3,.03,'#F6EBD8',0,.55,.31,rig,false); }
   if(a.tie) box(.09,.24,.04,'#C8372D',0,.53,.265,rig,false);
   if(a.apron) box(.38,.42,.05,a.apron,0,.43,.3,rig,false);
   const armC = bird ? (a.wing || fur) : paw, armS = bird ? [.08,.15,.12] : .105;
@@ -1164,6 +1170,7 @@ function buildCritter(a){
     else if(k === 'fox'){ olc(cone(.18,.4,dk,s*.29,.46,0,head,-s*.22)); cone(.09,.24,cream,s*.28,.43,.085,head,-s*.22); }
     else if(k === 'bear'){ ol(sph(.16,dk,s*.35,.35,0,head),OT); sph(.09,cream,s*.35,.35,.095,head); }
     else if(k === 'dog'){ ol(sph([.11,.27,.16],dk,s*.5,-.03,0,head),OT); }
+    else if(k === 'rat'){ ol(sph(.17,fur,s*.42,.36,-.04,head),OT); sph(.105,pink,s*.42,.36,.07,head); }
     else if(k === 'owl'){ olc(cone(.1,.24,dk,s*.34,.4,0,head,-s*.55)); }
   });
   if(k === 'duck' || k === 'bird'){ ol(sph([.07,.13,.07],fur,0,.5,-.02,head),OT); sph([.05,.09,.05],fur,.09,.46,-.02,head); }
@@ -1173,6 +1180,9 @@ function buildCritter(a){
   if(a.spots){ [[0,.33],[-.13,.31],[.13,.31]].forEach(q => sph([.03,.08,.02],a.spots,q[0],q[1],.318,head)); [[-.3,.2,-.3],[.3,.2,-.3],[0,.3,-.335],[-.2,-.05,-.41],[.2,-.05,-.41],[0,.05,-.45]].forEach(q => sph([.07,.07,.03],a.spots,q[0],q[1],q[2],head)); }
   if(a.hat){ cyl(.25,.23,.26,'#FFFFFF',0,.54,-.03,head); ol(sph([.31,.18,.31],'#FFFFFF',0,.72,-.03,head),OT); }
   if(a.face) sph([.31,.27,.045],a.face,0,-.01,.432,head);
+  if(a.curls){ [[0,.44,.05],[-.17,.42,.08],[.17,.42,.08],[-.3,.34,.02],[.3,.34,.02],[-.08,.46,-.12],[.1,.46,-.12],[-.24,.4,-.14],[.24,.4,-.14]].forEach(q => ol(sph(.12,a.curls,q[0],q[1],q[2],head),OT)); }
+  if(a.specs){ [-1,1].forEach(s => { cyl(.115,.115,.03,'#2A2A2A',s*.17,.045,.44,head).rotation.x = Math.PI/2; sph([.09,.09,.012],'#DDEEF8',s*.17,.045,.455,head); }); box(.1,.025,.025,'#2A2A2A',0,.05,.445,head,false); }
+  if(k === 'rat'){ [-1,1].forEach(s => { box(.26,.012,.012,'#5A5050',s*.22,-.08,.4,head,false).rotation.z = s*.15; box(.26,.012,.012,'#5A5050',s*.22,-.13,.4,head,false).rotation.z = -s*.1; }); }
   const ez = a.face ? .463 : .428, iris = a.eye || eye;
   [-1,1].forEach(s => { sph([.07,.1,.035],iris,s*.17,.04,ez,head); if(a.eye) sph([.042,.062,.02],eye,s*.17,.035,ez+.022,head); sph(.026,'#FFFFFF',s*.17+.022,.085,ez+.03,head); });
   [-1,1].forEach(s => sph([.085,.052,.025],'#F29CB0',s*.31,-.11,.34,head));
