@@ -60,27 +60,27 @@
       "nodes": [
         {
           "icon": "calendar",
-          "label": "Main Session",
+          "label": "Live session",
           "sub": "Saturdays"
         },
         {
           "icon": "flask",
-          "label": "Execution Lab",
+          "label": "Hands-on lab",
           "sub": "Tuesdays"
         },
         {
           "icon": "users",
-          "label": "AI Council",
-          "sub": "Small group"
+          "label": "Group coaching",
+          "sub": "Every week"
         },
         {
           "icon": "mic",
-          "label": "Builders Podcast",
+          "label": "Podcast",
           "sub": "Thursdays"
         },
         {
           "icon": "trophy",
-          "label": "Friday Wins",
+          "label": "Weekly wins",
           "sub": "Share your progress"
         }
       ]

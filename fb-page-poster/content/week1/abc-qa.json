@@ -5,7 +5,7 @@
     "facebook",
     "instagram"
   ],
-  "caption": "Thinking about joining AI Builder's Camp? Here are the questions we get most 👇\n\n🧩 Do I need to be techy? [[beginner requirement]]\n🗓️ How much time does it take? A Saturday main session, a Tuesday Execution Lab, a small-group council meeting, a Thursday podcast and one weekly task.\n▶️ What if I miss a session? Replays are posted in the community.\n🎁 What will I have after 8 weeks? Your Builder's Purpose Blueprint, your own digital product, and the know-how to sell it.\n💳 How much is it? [[approved price and payment options]]\n\nStill have a question? Drop it in the comments or send us a message. We'll help you see if ABC fits.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "caption": "Thinking about joining AI Builder's Camp? Here are the questions we get most 👇\n\n🧩 Do I need to be techy? [[beginner requirement]]\n🗓️ How much time does it take? A Saturday main session, a Tuesday hands-on lab, small-group coaching, a Thursday podcast and one weekly task.\n▶️ What if I miss a session? Replays are posted in the community.\n🎁 What will I have after 8 weeks? Your personal purpose blueprint, your own digital product, and the know-how to sell it.\n💳 How much is it? [[approved price and payment options]]\n\nStill have a question? Drop it in the comments or send us a message. We'll help you see if ABC fits.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "cover",
@@ -18,13 +18,13 @@
       "theme": "light",
       "kicker": "Fit",
       "q": "Do I need to be techy?",
-      "a": "[[Beginner requirement, e.g. no coding needed]] You'll set up Claude and ChatGPT in Week 0 with step-by-step guides."
+      "a": "[[Beginner requirement, e.g. no coding needed]] Before the program starts, you'll set up Claude and ChatGPT with step-by-step guides."
     },
     {
       "layout": "qa",
       "kicker": "Schedule",
       "q": "How much time does it take?",
-      "a": "Each week: a Saturday main session, a Tuesday Execution Lab, a small-group council meeting and a Thursday podcast, plus one weekly task. [[Hours per week]]"
+      "a": "Each week: a Saturday main session, a Tuesday hands-on lab, small-group coaching and a Thursday podcast, plus one weekly task. [[Hours per week]]"
     },
     {
       "layout": "qa",
@@ -37,7 +37,7 @@
       "layout": "qa",
       "kicker": "Outcome",
       "q": "What will I have after 8 weeks?",
-      "a": "Your Builder's Purpose Blueprint, your own digital product, and the know-how to sell it."
+      "a": "Your personal purpose blueprint, your own digital product, and the know-how to sell it."
     },
     {
       "layout": "qa",
