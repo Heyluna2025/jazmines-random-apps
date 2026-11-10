@@ -9,10 +9,12 @@
 //
 // Writes <out>-01.png, <out>-02.png, ... and with --sheet a <out>-sheet.png
 // overview for review. Spec: { "slides": [ { "layout": "...", ... } ] } with
-// layouts cover, statement, bullets, steps, hub, people, qa and cta (see the
+// layouts cover, statement ("logo": true adds the ABC logo), bullets, steps, hub, people, qa and cta (see the
 // render functions below). In any text, *word* gets the accent colour and
 // [[note]] renders a dashed "to confirm" box, so drafts can't be mistaken for
-// approved copy. Add "theme": "light" to a slide for the light version.
+// approved copy. Add "theme": "light" to a slide for the light version, and
+// "brand": "aec" at the top of the spec for an AI Empowered Club post (AEC
+// wordmark and violet backgrounds instead of the ABC logo).
 
 const fs = require('fs');
 const path = require('path');
@@ -63,7 +65,9 @@ const rich = (s = '') =>
 
 function cover(s) {
   return `<div class="cover">
-    <img class="biglogo" src="${logoUri}" alt="AI Builder's Camp">
+    ${s.brand === 'aec'
+      ? `<div class="wordmark"><span class="wm-icon">${icon('spark', 92)}</span><span>AI Empowered<br>Club</span></div>`
+      : `<img class="biglogo" src="${logoUri}" alt="AI Builder's Camp">`}
     ${s.tag ? `<div class="tag">${rich(s.tag)}</div>` : ''}
     <h1 class="xl">${rich(s.title)}</h1>
     ${s.subtitle ? `<p class="lead">${rich(s.subtitle)}</p>` : ''}
@@ -72,6 +76,7 @@ function cover(s) {
 
 function statement(s) {
   return `<div class="block">
+    ${s.logo ? `<img class="inlogo" src="${logoUri}" alt="AI Builder's Camp">` : ''}
     ${s.kicker ? `<div class="kicker">${rich(s.kicker)}</div>` : ''}
     <h1>${rich(s.title)}</h1>
     ${s.body ? `<p class="body">${rich(s.body)}</p>` : ''}
@@ -154,7 +159,9 @@ function cta(s) {
 
 const LAYOUTS = { cover, statement, bullets, steps, hub, people, qa, cta };
 
-function page(slide, index, total) {
+function page(slide, index, total, brand = 'abc') {
+  slide = { ...slide, brand };
+  const aec = brand === 'aec';
   const render = LAYOUTS[slide.layout];
   if (!render) throw new Error(`Slide ${index + 1}: unknown layout "${slide.layout}". Use ${Object.keys(LAYOUTS).join(', ')}.`);
   const light = slide.theme === 'light';
@@ -168,7 +175,7 @@ html,body{margin:0}
 body{width:1080px;height:1350px;overflow:hidden;position:relative;background:${c.bg};color:${c.fg};font-family:'Inter',sans-serif}
 .bg{position:absolute;inset:0;background:
   radial-gradient(circle at 85% 8%,${c.glow} 0,transparent 42%),
-  radial-gradient(circle at 5% 95%,${light ? 'rgba(239,168,49,.12)' : 'rgba(112,52,171,.45)'} 0,transparent 45%)${light ? '' : `,linear-gradient(160deg,${BRAND.plum} 0%,${BRAND.night} 60%)`}}
+  radial-gradient(circle at 5% 95%,${light ? 'rgba(239,168,49,.12)' : 'rgba(112,52,171,.45)'} 0,transparent 45%)${light ? '' : aec ? `,linear-gradient(160deg,#3B23B5 0%,#1E1260 45%,${BRAND.night} 100%)` : `,linear-gradient(160deg,${BRAND.plum} 0%,${BRAND.night} 60%)`}}
 .dots{position:absolute;inset:0;background-image:radial-gradient(${c.line} 1.2px,transparent 1.4px);background-size:36px 36px;opacity:.35;-webkit-mask-image:linear-gradient(180deg,#000 0,transparent 30%,transparent 75%,#000 100%)}
 .top{position:absolute;top:56px;left:72px;right:72px;display:flex;align-items:center;gap:22px}
 .mark{height:46px;width:92px;background:${c.fg};-webkit-mask:url(${logoUri}) center/contain no-repeat}
@@ -188,6 +195,11 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .body{font-size:40px;line-height:1.42;color:${c.sub};margin:0}
 .note{font-size:26px;color:${c.sub};margin:34px 0 0;opacity:.85}
 .cover{text-align:center;display:flex;flex-direction:column;align-items:center}
+.wordmark{display:flex;align-items:center;gap:30px;margin-bottom:60px;font-family:'Inter Display';font-weight:900;font-size:76px;line-height:.98;letter-spacing:-1px;text-align:left;color:${c.fg}}
+.wm-icon{width:150px;height:150px;border-radius:40px;background:${BRAND.violet};color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(112,85,250,.7)}
+.aecmark{width:46px;height:46px;border-radius:13px;background:${BRAND.violet};color:#fff;display:flex;align-items:center;justify-content:center}
+.org.strong{color:${c.fg};font-weight:800}
+.inlogo{display:block;width:320px;margin-bottom:44px;align-self:flex-start;filter:drop-shadow(0 0 30px rgba(112,85,250,.6))}
 .biglogo{width:520px;margin-bottom:60px;filter:drop-shadow(0 0 40px rgba(112,85,250,.6))${light ? ' brightness(0.15)' : ''}}
 .list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:30px}
 .list li{display:flex;gap:26px;align-items:flex-start;font-size:38px;line-height:1.32}
@@ -226,10 +238,12 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .tbc::before{content:'TO CONFIRM: ';font-size:.6em;font-weight:800;letter-spacing:2px;color:${BRAND.gold}}
 </style></head><body>
 <div class="bg"></div><div class="dots"></div>
-<div class="top"><div class="mark"></div><div class="sep"></div><div class="org">AI Empowered Club</div></div>
+<div class="top">${aec
+  ? `<div class="aecmark">${icon('spark', 28)}</div><div class="org strong">AI Empowered Club</div>`
+  : `<div class="mark"></div><div class="sep"></div><div class="org">AI Empowered Club</div>`}</div>
 ${slide.layout === 'hub' ? render(slide) : `<div class="main">${render(slide)}</div>`}
 <div class="foot"><span><b>${String(index + 1).padStart(2, '0')}</b> / ${String(total).padStart(2, '0')}</span>
-${last ? `<span>AI Builder's Camp · a program under AI Empowered Club</span>` : `<span class="swipe">Swipe →</span>`}</div>
+${last ? `<span>${aec ? 'AI Empowered Club · #YourAIBestie' : "AI Builder's Camp · a program under AI Empowered Club"}</span>` : `<span class="swipe">Swipe →</span>`}</div>
 </body></html>`;
 }
 
@@ -242,7 +256,7 @@ async function main() {
     process.exit(1);
   }
   const out = path.resolve(args[outIdx + 1]);
-  const { slides } = JSON.parse(fs.readFileSync(specFile, 'utf8'));
+  const { slides, brand = 'abc' } = JSON.parse(fs.readFileSync(specFile, 'utf8'));
   fs.mkdirSync(path.dirname(out), { recursive: true });
 
   const { chromium } = require('playwright');
@@ -251,7 +265,7 @@ async function main() {
   try {
     const pg = await browser.newPage({ viewport: { width: 1080, height: 1350 } });
     for (let i = 0; i < slides.length; i++) {
-      await pg.setContent(page(slides[i], i, slides.length), { waitUntil: 'load' });
+      await pg.setContent(page(slides[i], i, slides.length, brand), { waitUntil: 'load' });
       await pg.evaluate(() => document.fonts.ready);
       const file = `${out}-${String(i + 1).padStart(2, '0')}.png`;
       await pg.screenshot({ path: file });

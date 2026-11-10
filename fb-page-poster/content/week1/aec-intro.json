@@ -1,0 +1,117 @@
+{
+  "post": "AEC · Meet AI Empowered Club: the community, the courses and ABC",
+  "when": "[[date and time]]",
+  "platforms": [
+    "facebook",
+    "instagram"
+  ],
+  "brand": "aec",
+  "caption": "AI-empowered, not powered by AI. 💜\n\nMeet AI Empowered Club (AEC): a community where you learn AI with friends, not alone.\n\nInside AEC:\n📅 AI Pulse and live events\n✍️ Prompt Challenges\n🏆 Share Wins\n💬 Ask Jazmine\n🎬 Webinar and masterclass replays\n\nPlus courses like the Freedom series, 100 AI Tools and AI Content Factory, and our 8-week program, AI Builder's Camp.\n\nWant to join? Send us a message. [[CTA: join link / keyword]]\n\n#AIEmpoweredClub #YourAIBestie #AIBuildersCamp",
+  "slides": [
+    {
+      "layout": "cover",
+      "tag": "Meet AEC",
+      "title": "AI-empowered,\n*not powered by AI.*",
+      "subtitle": "A community where you learn AI with friends, not alone."
+    },
+    {
+      "layout": "statement",
+      "kicker": "What is AEC?",
+      "title": "One community.\n*Many ways to learn AI.*",
+      "body": "AI Empowered Club is both a community and a course provider for [[who AEC is for]] who want to use AI in real life."
+    },
+    {
+      "layout": "hub",
+      "kicker": "Inside the community",
+      "title": "Where members *learn, share and win*",
+      "center": "Inside AEC",
+      "nodes": [
+        {
+          "icon": "calendar",
+          "label": "AI Pulse + Events",
+          "sub": "What's new in AI"
+        },
+        {
+          "icon": "spark",
+          "label": "Prompt Challenges",
+          "sub": "Practise by doing"
+        },
+        {
+          "icon": "trophy",
+          "label": "Share Wins",
+          "sub": "Celebrate progress"
+        },
+        {
+          "icon": "chat",
+          "label": "Ask Jazmine",
+          "sub": "Get your questions answered"
+        },
+        {
+          "icon": "mic",
+          "label": "Replays",
+          "sub": "Webinars + masterclasses"
+        }
+      ]
+    },
+    {
+      "layout": "steps",
+      "theme": "light",
+      "kicker": "Learn at your pace",
+      "title": "Courses inside *AEC*",
+      "steps": [
+        {
+          "icon": "compass",
+          "title": "The Freedom series",
+          "text": "Mind, Skill, Income and Time Freedom."
+        },
+        {
+          "icon": "box",
+          "title": "100 AI Tools",
+          "text": "Find the right tool for the job."
+        },
+        {
+          "icon": "megaphone",
+          "title": "AI Content Factory",
+          "text": "Create content faster with AI."
+        },
+        {
+          "icon": "rocket",
+          "title": "World of Claude",
+          "text": "Get more out of Claude."
+        }
+      ]
+    },
+    {
+      "layout": "statement",
+      "kicker": "Our flagship program",
+      "title": "Ready to build?\nMeet *AI Builder's Camp.*",
+      "body": "An 8-week program under AEC: discover your purpose, build your own digital product and learn how to sell it, with coaches and a council by your side.",
+      "footnote": "[[Confirm which courses and programs are open to new members]]",
+      "logo": true
+    },
+    {
+      "layout": "people",
+      "theme": "light",
+      "kicker": "The founders",
+      "title": "Built by two *AI besties*",
+      "people": [
+        {
+          "name": "Coach Jazmine",
+          "role": "Co-founder, AI Empowered Club",
+          "detail": "[[One line on what Coach Jazmine teaches]]"
+        },
+        {
+          "name": "Coach Lloyd",
+          "role": "Co-founder, AI Empowered Club",
+          "detail": "[[One line on what Coach Lloyd teaches]]"
+        }
+      ]
+    },
+    {
+      "layout": "cta",
+      "title": "Learn AI\n*with friends.*",
+      "body": "Want to join AI Empowered Club? Send us a message.",
+      "button": "[[Join link or keyword]]"
+    }
+  ]
+}
