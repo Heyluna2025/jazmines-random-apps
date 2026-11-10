@@ -14,7 +14,7 @@
 // [[note]] renders a dashed "to confirm" box, so drafts can't be mistaken for
 // approved copy. Add "theme": "light" to a slide for the light version, and
 // "brand": "aec" at the top of the spec for an AI Empowered Club post (AEC
-// wordmark and violet backgrounds instead of the ABC logo).
+// logo and violet backgrounds instead of the ABC logo). Logos live in brand/.
 
 const fs = require('fs');
 const path = require('path');
@@ -30,7 +30,10 @@ const BRAND = {
   gold: '#EFA831', // accent from the ABC deck
 };
 
-const logoUri = `data:image/png;base64,${fs.readFileSync(path.join(__dirname, 'brand', 'abc-logo-white.png')).toString('base64')}`;
+const asset = (file) => `data:image/png;base64,${fs.readFileSync(path.join(__dirname, 'brand', file)).toString('base64')}`;
+const logoUri = asset('abc-logo-white.png');
+const aecLogoUri = asset('aec-logo-white.png');
+const aecMarkUri = asset('aec-mark-white.png');
 
 // Simple 24px line icons.
 const ICONS = {
@@ -66,7 +69,7 @@ const rich = (s = '') =>
 function cover(s) {
   return `<div class="cover">
     ${s.brand === 'aec'
-      ? `<div class="wordmark"><span class="wm-icon">${icon('spark', 92)}</span><span>AI Empowered<br>Club</span></div>`
+      ? `<img class="aeclogo" src="${aecLogoUri}" alt="AI Empowered Club">`
       : `<img class="biglogo" src="${logoUri}" alt="AI Builder's Camp">`}
     ${s.tag ? `<div class="tag">${rich(s.tag)}</div>` : ''}
     <h1 class="xl">${rich(s.title)}</h1>
@@ -195,9 +198,8 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .body{font-size:40px;line-height:1.42;color:${c.sub};margin:0}
 .note{font-size:26px;color:${c.sub};margin:34px 0 0;opacity:.85}
 .cover{text-align:center;display:flex;flex-direction:column;align-items:center}
-.wordmark{display:flex;align-items:center;gap:30px;margin-bottom:60px;font-family:'Inter Display';font-weight:900;font-size:76px;line-height:.98;letter-spacing:-1px;text-align:left;color:${c.fg}}
-.wm-icon{width:150px;height:150px;border-radius:40px;background:${BRAND.violet};color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(112,85,250,.7)}
-.aecmark{width:46px;height:46px;border-radius:13px;background:${BRAND.violet};color:#fff;display:flex;align-items:center;justify-content:center}
+.aeclogo{width:400px;margin-bottom:56px;filter:drop-shadow(0 0 40px rgba(112,85,250,.7))${light ? ' brightness(0.15)' : ''}}
+.amark{height:40px;width:49px;background:${c.fg};-webkit-mask:url(${aecMarkUri}) center/contain no-repeat}
 .org.strong{color:${c.fg};font-weight:800}
 .inlogo{display:block;width:320px;margin-bottom:44px;align-self:flex-start;filter:drop-shadow(0 0 30px rgba(112,85,250,.6))}
 .biglogo{width:520px;margin-bottom:60px;filter:drop-shadow(0 0 40px rgba(112,85,250,.6))${light ? ' brightness(0.15)' : ''}}
@@ -239,8 +241,8 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 </style></head><body>
 <div class="bg"></div><div class="dots"></div>
 <div class="top">${aec
-  ? `<div class="aecmark">${icon('spark', 28)}</div><div class="org strong">AI Empowered Club</div>`
-  : `<div class="mark"></div><div class="sep"></div><div class="org">AI Empowered Club</div>`}</div>
+  ? `<div class="amark"></div><div class="org strong">AI Empowered Club</div>`
+  : `<div class="mark"></div><div class="sep"></div><div class="amark"></div><div class="org">AI Empowered Club</div>`}</div>
 ${slide.layout === 'hub' ? render(slide) : `<div class="main">${render(slide)}</div>`}
 <div class="foot"><span><b>${String(index + 1).padStart(2, '0')}</b> / ${String(total).padStart(2, '0')}</span>
 ${last ? `<span>${aec ? 'AI Empowered Club · #YourAIBestie' : "AI Builder's Camp · a program under AI Empowered Club"}</span>` : `<span class="swipe">Swipe →</span>`}</div>
