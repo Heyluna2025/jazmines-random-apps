@@ -192,9 +192,9 @@ body{width:1080px;height:1350px;overflow:hidden;position:relative;background:${c
 .top{position:absolute;top:56px;left:72px;right:72px;display:flex;align-items:center;gap:22px}
 .mark{height:46px;width:92px;background:${c.fg};-webkit-mask:url(${logoUri}) center/contain no-repeat}
 .sep{width:2px;height:34px;background:${c.line}}
-.org{font-family:'Inter Display';font-weight:700;font-size:22px;letter-spacing:4px;text-transform:uppercase;color:${c.sub}}
+.org{font-family:'Inter Display';font-weight:700;font-size:24px;letter-spacing:4px;text-transform:uppercase;color:${c.sub}}
 .main{position:absolute;top:150px;left:72px;right:72px;bottom:150px;display:flex;flex-direction:column;justify-content:center}
-.foot{position:absolute;bottom:56px;left:72px;right:72px;display:flex;justify-content:space-between;align-items:center;font-size:24px;color:${c.sub};letter-spacing:1px}
+.foot{position:absolute;bottom:56px;left:72px;right:72px;display:flex;justify-content:space-between;align-items:center;font-size:27px;color:${c.sub};letter-spacing:1px}
 .foot b{color:${c.fg};font-weight:700}
 .swipe{display:flex;align-items:center;gap:12px;font-weight:600;color:${c.accent}}
 h1{font-family:'Inter Display';font-weight:800;font-size:76px;line-height:1.04;letter-spacing:-1.5px;margin:0 0 34px}
@@ -206,7 +206,7 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .lead{font-size:38px;line-height:1.35;color:${c.sub};margin:0}
 .body{font-size:40px;line-height:1.42;color:${c.sub};margin:0}
 .note{font-size:26px;color:${c.sub};margin:34px 0 0;opacity:.85}
-.cover{text-align:center;display:flex;flex-direction:column;align-items:center}
+.cover{text-align:center;display:flex;flex-direction:column;align-items:center;max-width:820px;margin:0 auto}
 .aeclogo{width:400px;margin-bottom:56px;filter:drop-shadow(0 0 40px rgba(112,85,250,.7))${light ? ' brightness(0.15)' : ''}}
 .amark{height:40px;width:49px;background:${c.fg};-webkit-mask:url(${aecMarkUri}) center/contain no-repeat}
 .org.strong{color:${c.fg};font-weight:800}
@@ -217,7 +217,7 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .dot{flex:none;width:62px;height:62px;border-radius:50%;background:${c.soft};border:2px solid ${c.line};display:flex;align-items:center;justify-content:center;color:${c.accent};margin-top:-4px}
 .steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:30px}
 .steps li{display:flex;gap:30px;align-items:center;background:${c.soft};border:1.5px solid ${c.line};border-radius:28px;padding:30px 34px}
-.steps p{margin:0;font-size:30px;line-height:1.35;color:${c.sub}}
+.steps p{margin:0;font-size:32px;line-height:1.35;color:${c.sub}}
 .num{flex:none;width:118px;height:118px;border-radius:50%;background:${light ? BRAND.violet : 'linear-gradient(140deg,' + BRAND.violet + ',' + BRAND.purple + ')'};color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .num b{font-family:'Inter Display';font-size:20px;letter-spacing:2px;opacity:.9}
 .hubwrap{position:absolute;inset:0;display:flex;flex-direction:column}
@@ -226,10 +226,10 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .hub{position:relative;height:840px;margin-top:40px;color:${c.line}}
 .ring{position:absolute;left:0;top:0}
 .center{position:absolute;left:540px;top:420px;transform:translate(-50%,-50%);width:250px;height:250px;border-radius:50%;background:${light ? '#fff' : BRAND.deep};border:3px solid ${BRAND.violet};box-shadow:0 0 70px ${c.glow};display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:'Inter Display';font-weight:800;font-size:36px;line-height:1.1;color:${c.fg}}
-.node{position:absolute;transform:translate(-50%,-50%);width:240px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.node{position:absolute;transform:translate(-50%,-50%);width:270px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .bubble{width:112px;height:112px;border-radius:50%;background:${light ? '#fff' : BRAND.plum};border:3px solid ${c.accent};display:flex;align-items:center;justify-content:center;color:${c.accent};margin-bottom:12px}
-.nlabel{font-family:'Inter Display';font-weight:800;font-size:28px;color:${c.fg};line-height:1.1}
-.nsub{font-size:22px;color:${c.sub};margin-top:4px}
+.nlabel{font-family:'Inter Display';font-weight:800;font-size:32px;color:${c.fg};line-height:1.1}
+.nsub{font-size:28px;color:${c.sub};margin-top:4px}
 .center-note{position:absolute;bottom:150px;left:72px;right:72px;text-align:center}
 .people{display:flex;flex-direction:column;gap:30px}
 .person{display:flex;gap:34px;align-items:center;background:${c.soft};border:1.5px solid ${c.line};border-radius:32px;padding:30px}

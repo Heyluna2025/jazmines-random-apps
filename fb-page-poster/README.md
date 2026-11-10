@@ -61,6 +61,20 @@ node make-graphic.js --tag "New this week" --title "Plan a month of content in *
 
 Renders a 1080×1080 PNG in the club's purple style. `*word*` colours a word with the accent, `\n` breaks a line, and `--theme` is `dark` or `light`. Needs Playwright with Chromium (preinstalled in Claude cloud environments).
 
+## Carousels and platform previews
+
+```bash
+node make-carousel.js content/week1/abc-intro.json --out graphics/week1/2026-11-10-abc-intro --sheet
+```
+
+```bash
+node preview-platforms.js content/week1/abc-intro.json graphics/week1/2026-11-10-abc-intro
+```
+
+`make-carousel.js` renders 1080×1350 (4:5) slides from a JSON spec: the largest portrait size both Facebook and Instagram show in full. `"brand": "aec"` gives AI Empowered Club styling; the default is AI Builder's Camp. Logos and people photos live in `brand/`. `*word*` gets the accent colour and `[[note]]` renders a dashed TO CONFIRM box, so unfinished copy can't be mistaken for approved copy.
+
+`preview-platforms.js` mocks up the Instagram feed (phone size, caption cut at "more") and profile grid (3:4 crop), the Facebook feed collage (approximate; Facebook picks the layout) and the tapped-open view, plus a crop check of every slide against the 3:4 and 1:1 crops. Review these before posting. Design rules that came out of them: keep cover text in the middle ~820px (Facebook's collage and Instagram's grid crop the sides), and keep text at 26px or larger so it stays readable at phone size.
+
 ## Claude skill
 
 `.claude/skills/facebook-post/` at the repo root teaches Claude Code the whole routine: draft, make the graphic, show a preview, wait for approval, post or schedule, confirm, and commit the queue. In a Claude Code session on this repo, just ask, e.g. *"schedule this week's posts from our content plan"*.

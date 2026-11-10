@@ -41,6 +41,8 @@ node fb-page-poster/make-graphic.js --tag "New this week" --title "Plan a month 
 
 `*word*` colours a word with the accent; `\n` breaks a line; `--theme` is `dark` or `light`. Keep titles short (under ~8 words). **Open the PNG and look at it** before showing it: check for overflowing or awkward line breaks and re-render if needed. Name files `YYYY-MM-DD-short-slug.png` in `fb-page-poster/graphics/`.
 
+For a carousel, write a spec in `fb-page-poster/content/` and render it with `node fb-page-poster/make-carousel.js SPEC --out fb-page-poster/graphics/... --sheet` (see the README). Remove every `[[TO CONFIRM]]` before publishing. Then run `node fb-page-poster/preview-platforms.js SPEC PREFIX` and look at the Instagram, Facebook and crop previews; fix anything cut off or too small before showing the person.
+
 ## 4a. One post
 
 Show the preview, get the yes, then:
