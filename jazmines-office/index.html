@@ -317,6 +317,10 @@ button.pill{cursor:pointer}
 .soc-post .when{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;white-space:nowrap}
 .soc-post .txt{flex:1;min-width:0;font-size:13px}
 .soc-post .nums{font-size:12px;color:var(--muted);white-space:nowrap}
+details.rep{border-top:1px solid var(--line);padding:8px 2px}
+details.rep summary{cursor:pointer;display:flex;flex-direction:column;gap:2px;list-style:none}
+details.rep summary::-webkit-details-marker{display:none}
+details.rep .rep-body{font-size:13px;line-height:1.45;padding:8px 0 4px;color:var(--ink)}
 .soc-grid.week{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:6px;overflow-x:auto}
 .soc-col{background:var(--surface-2);border-radius:10px;padding:8px;min-height:90px;font-size:12px}
 .soc-col.today,.soc-mcell.today{outline:2px solid var(--move)}
@@ -1701,7 +1705,21 @@ const DEMO_FLOWS = [
 const FLOWS = isLive() ? REAL_FLOWS : DEMO_FLOWS;
 function flowsHTML(){ return FLOWS.map(f => '<div class="flow"><b>'+esc(f[0])+'</b><div class="chain">'+f[1].map((st,i) => { const a = byId[st[0]];
   return (i ? '<span class="arrow" aria-hidden="true">→</span>' : '')+(a ? '<span class="step">'+faceImg(a,'face')+'<span><b style="display:inline;margin:0">'+esc(a.name)+'</b> '+esc(st[1])+'</span></span>' : '<span class="step you"><span><b style="display:inline;margin:0">You</b> '+esc(st[1])+'</span></span>'); }).join('')+'</div></div>').join(''); }
-function reportsHTML(){ return '<div class="card" style="margin-top:14px"><div><b>Mimi’s daily report</b><span class="sub">'+nextReport()+'</span></div><button class="btn sm" type="button" data-act="report">Preview</button></div>'+
+// Reports is the one place for every report: the written ones from the team, Social Media and Revenue.
+const REP = {tab:'written'};
+function writtenReportsHTML(){
+  if(!isLive()) return '<p class="empty">Written reports come from your live office. Switch to Live to read them.</p>';
+  const items = ((LV.state && LV.state.inbox) || []).filter(x => x.kind === 'delivery' && /report|performance|recap|round-?up|check|sales so far|what sold|went out/i.test(x.title || '')).slice(0, 30);
+  if(!items.length) return '<p class="empty">No written reports yet. Mimi’s daily report, Alicia’s and Didi’s performance checks and the Monday social media reports land here.</p>';
+  return items.map(x => { const a = byId[x.agent_id]; return '<details class="rep"><summary><b>'+esc(x.title || '')+'</b><span class="sub">'+esc((a ? a.name : x.agent_id)+' · '+new Date(x.at).toLocaleString('en-PH', {timeZone:'Asia/Manila', weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}))+'</span></summary><div class="rep-body">'+esc(x.body || '').replace(/\n/g, '<br>')+'</div></details>'; }).join('');
+}
+function reportsHTML(){
+  const tabs = '<div class="soc-tabs" style="margin:4px 0 12px">'+[['written','Written reports'],['social','Social media'],['revenue','Revenue']].map(t => '<button type="button" data-rep="'+t[0]+'" aria-pressed="'+(REP.tab === t[0])+'">'+t[1]+'</button>').join('')+'</div>';
+  if(REP.tab === 'social') return tabs + socialHTML();
+  if(REP.tab === 'revenue') return tabs + revenueHTML();
+  return tabs + '<h3>From the team</h3>' + writtenReportsHTML() + reportsHTML0();
+}
+function reportsHTML0(){ return '<div class="card" style="margin-top:14px"><div><b>Mimi’s daily report</b><span class="sub">'+nextReport()+'</span></div><button class="btn sm" type="button" data-act="report">Preview</button></div>'+
   '<h3>Performance</h3>'+wallHTML('kpi')+'<h3>Scoreboard: revenue against target</h3>'+wallHTML('score')+'<h3>Targets this month</h3>'+wallHTML('targets')+'<h3>Archives and assets</h3>'+wallHTML('archive'); }
 const HEALTH = {runs:[], issues:[], fps:60}; let lastCheckKey = '';
 const CHECKS = [
@@ -1752,7 +1770,7 @@ function showView(v){
   $('roster').hidden = v === 'office'; if(v === 'office') return;
   setText($('viewTitle'), VIEWS[v][0]); setText($('rosterSub'), VIEWS[v][1]()); $('rosterTools').hidden = v !== 'agents'; $('rosterList').hidden = v === 'settings'; $('settingsView').hidden = v !== 'settings'; $('rosterList').scrollTop = 0; renderView(); if(v === 'agents' || v === 'access') loadCards(); if(v === 'revenue') loadRev(); if(v === 'social') loadSocial(); if(v === 'todo') loadTodos(); if(v === 'cal') gcLoadCal();
 }
-if(isLive()){ $('navFin').hidden = false; $('navRev').hidden = false; $('navSoc').hidden = false; }
+if(isLive()){ $('navFin').hidden = false; }
 setTimeout(() => loadTodos(), 1500);
 $('rosterList').addEventListener('input', e => { if(e.target && e.target.id === 'todoIn') todoDraft = e.target.value; else if(e.target && e.target.id === 'mailReply'){ mailDraft = e.target.value; mailDraftFor = mailOpen; } });
 $('rosterList').addEventListener('keydown', e => { if(e.key === 'Enter' && e.target && e.target.id === 'todoIn'){ e.preventDefault(); todoAdd(); } });
@@ -2267,7 +2285,7 @@ function socialHTML(){
   return '<div class="soc-bar">'+acc+tabs+'</div>'+(SOC.err ? '<p class="sub" style="color:var(--need)">'+esc(SOC.err)+'</p>' : '')+'<div class="tiles">'+tiles+'</div>'+days+notes+cal+top+sched+recent+'<p class="sub" style="margin-top:14px">Read from Blotato '+esc(new Date(d.at).toLocaleTimeString('en-PH', {timeZone:'Asia/Manila', hour:'numeric', minute:'2-digit'}))+'. Numbers are Blotato’s latest snapshot for each post, not live counts.</p>';
 }
 $('rosterList').addEventListener('change', e => { if(e.target && e.target.id === 'socAcc') socSet('account', e.target.value); });
-$('rosterList').addEventListener('click', e => { const b = e.target.closest && e.target.closest('button[data-range]'); if(b){ socSet('range', b.getAttribute('data-range')); return; } const c = e.target.closest && e.target.closest('button[data-cal]'); if(c){ SOC.cal = c.getAttribute('data-cal'); SOC.day = 0; renderView(true); return; } const n = e.target.closest && e.target.closest('button[data-calnav]'); if(n){ SOC.day += Number(n.getAttribute('data-calnav')); renderView(true); } });
+$('rosterList').addEventListener('click', e => { const r = e.target.closest && e.target.closest('button[data-rep]'); if(r){ REP.tab = r.getAttribute('data-rep'); if(REP.tab === 'social') loadSocial(); if(REP.tab === 'revenue') loadRev(); renderView(true); return; } const b = e.target.closest && e.target.closest('button[data-range]'); if(b){ socSet('range', b.getAttribute('data-range')); return; } const c = e.target.closest && e.target.closest('button[data-cal]'); if(c){ SOC.cal = c.getAttribute('data-cal'); SOC.day = 0; renderView(true); return; } const n = e.target.closest && e.target.closest('button[data-calnav]'); if(n){ SOC.day += Number(n.getAttribute('data-calnav')); renderView(true); } });
 function revenueHTML(){ return targetsHTML() + revenueHTML0(); }
 function revenueHTML0(){
   if(!isLive()) return '<p class="empty">The revenue report only shows in Live mode.</p>';
