@@ -1,11 +1,11 @@
 {
   "post": "Week 1 · Tue · AEC introduces ABC: who it's for and what it covers",
-  "when": "2026-11-10 (Tue) [[time]]",
+  "when": "2026-11-10 (Tue)",
   "platforms": [
     "facebook",
     "instagram"
   ],
-  "caption": "Tired of watching AI tutorials and still not building anything? 👀\n\nMeet AI Builder's Camp (ABC), a program under AI Empowered Club.\n\nIn 8 weeks, you'll:\n✅ Discover your purpose\n✅ Build your own digital product\n✅ Learn how to sell it\n\n…with Coach Jazmine, Coach Lloyd, your AI Council Leaders and a community that won't let you quit.\n\nYou are the hero. AI is the tool. 💜\n\nCurious if ABC fits you? Send us a message. [[CTA: message keyword / link]]\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "caption": "Tired of watching AI tutorials and still not building anything? 👀\n\nMeet AI Builder's Camp (ABC), a program under AI Empowered Club.\n\nIn 8 weeks, you'll:\n✅ Discover your purpose\n✅ Build your own digital product\n✅ Learn how to sell it\n\n…with Coach Jazmine, Coach Lloyd, your AI Council Leaders and a community that won't let you quit.\n\nYou are the hero. AI is the tool. 💜\n\nCurious if ABC fits you? Send us a message.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "cover",
@@ -27,7 +27,6 @@
       "items": [
         "You've watched AI tutorials but haven't *built* anything yet",
         "You want to turn your experience into a *digital product*",
-        "You're new to AI: [[no coding needed?]]",
         "You want coaches and a community to keep you *moving forward*"
       ]
     },
@@ -95,12 +94,12 @@
         {
           "name": "Coach Jazmine",
           "role": "Co-founder, AI Empowered Club",
-          "detail": "[[One line on what Coach Jazmine teaches]]"
+          "detail": ""
         },
         {
           "name": "Coach Lloyd",
           "role": "Co-founder, AI Empowered Club",
-          "detail": "[[One line on what Coach Lloyd teaches]]"
+          "detail": ""
         }
       ]
     },
@@ -113,7 +112,7 @@
       ],
       "title": "You are the hero.\n*AI is the tool.*",
       "body": "Curious if ABC fits you? Send us a message.",
-      "button": "[[Message us: ABC]]"
+      "button": "Send us a message"
     }
   ]
 }

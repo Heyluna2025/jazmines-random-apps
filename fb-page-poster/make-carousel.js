@@ -137,7 +137,7 @@ function people(s) {
     ${s.kicker ? `<div class="kicker">${rich(s.kicker)}</div>` : ''}
     <h1>${rich(s.title)}</h1>
     <div class="people n${s.people.length}">${s.people.map((p) => `<div class="person">
-      <div class="photo">${p.photo ? `<img src="${p.photo}">` : '<span>Photo</span>'}</div>
+      <div class="photo">${p.photo ? `<img src="${p.photo}">` : `<span class="initial">${escape(p.name.replace(/^Coach\s+/i, '').charAt(0))}</span>`}</div>
       <div><h3>${rich(p.name)}</h3><div class="role">${rich(p.role || '')}</div><p>${rich(p.detail || '')}</p></div>
     </div>`).join('')}</div>
   </div>`;
@@ -225,6 +225,7 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .people{display:flex;flex-direction:column;gap:30px}
 .person{display:flex;gap:34px;align-items:center;background:${c.soft};border:1.5px solid ${c.line};border-radius:32px;padding:30px}
 .photo{flex:none;width:210px;height:210px;border-radius:50%;border:4px solid ${c.accent};overflow:hidden;display:flex;align-items:center;justify-content:center;background:${light ? '#fff' : BRAND.deep};color:${c.sub};font-size:24px;letter-spacing:2px;text-transform:uppercase}
+.initial{font-family:'Inter Display';font-weight:900;font-size:96px;letter-spacing:0;color:${c.accent}}
 .photo img{width:100%;height:100%;object-fit:cover}
 .people.n1 .photo{width:300px;height:300px}
 .role{font-family:'Inter Display';font-weight:700;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:${c.accent};margin-bottom:12px}
