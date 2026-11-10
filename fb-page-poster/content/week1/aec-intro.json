@@ -6,19 +6,19 @@
     "instagram"
   ],
   "brand": "aec",
-  "caption": "AI-empowered, not powered by AI. 💜\n\nMeet AI Empowered Club (AEC): a community where you learn AI with friends, not alone.\n\nInside AEC:\n📅 AI Pulse and live events\n✍️ Prompt Challenges\n🏆 Share Wins\n💬 Ask Jazmine\n🎬 Webinar and masterclass replays\n\nPlus courses like the Freedom series, 100 AI Tools and AI Content Factory, and our 8-week program, AI Builder's Camp.\n\nWant to join? Send us a message. [[CTA: join link / keyword]]\n\n#AIEmpoweredClub #YourAIBestie #AIBuildersCamp",
+  "caption": "AI-empowered, not powered by AI. 💜\n\nMeet AI Empowered Club (AEC): a community where you learn AI with friends, not alone.\n\nInside AEC:\n📅 AI Pulse and live events\n✍️ Prompt Challenges\n🏆 Share Wins\n💬 Ask Jazmine\n🎬 Webinar and masterclass replays\n\nPlus courses like the Freedom series, 100 AI Tools and AI Content Factory, and our 8-week program, AI Builder's Camp.\n\nWant to join? Send us a message.\n\n#AIEmpoweredClub #YourAIBestie #AIBuildersCamp",
   "slides": [
     {
       "layout": "cover",
       "tag": "Meet AEC",
-      "title": "AI-empowered,\n*not powered by AI.*",
+      "title": "AI-empowered,\n*not powered\nby AI.*",
       "subtitle": "A community where you learn AI with friends, not alone."
     },
     {
       "layout": "statement",
       "kicker": "What is AEC?",
       "title": "One community.\n*Many ways to learn AI.*",
-      "body": "AI Empowered Club is both a community and a course provider for [[who AEC is for]] who want to use AI in real life."
+      "body": "AI Empowered Club is both a community and a course provider for people who want to use AI in real life."
     },
     {
       "layout": "hub",
@@ -86,7 +86,6 @@
       "kicker": "Our flagship program",
       "title": "Ready to build?\nMeet *AI Builder's Camp.*",
       "body": "An 8-week program under AEC: discover your purpose, build your own digital product and learn how to sell it, with coaches and a council by your side.",
-      "footnote": "[[Confirm which courses and programs are open to new members]]",
       "logo": true
     },
     {
@@ -98,13 +97,13 @@
         {
           "name": "Coach Jazmine",
           "role": "Co-founder, AI Empowered Club",
-          "detail": "[[One line on what Coach Jazmine teaches]]",
+          "detail": "",
           "photo": "brand/people/coach-jazmine.jpg"
         },
         {
           "name": "Coach Lloyd",
           "role": "Co-founder, AI Empowered Club",
-          "detail": "[[One line on what Coach Lloyd teaches]]",
+          "detail": "",
           "photo": "brand/people/coach-lloyd.jpg"
         }
       ]
@@ -113,7 +112,7 @@
       "layout": "cta",
       "title": "Learn AI\n*with friends.*",
       "body": "Want to join AI Empowered Club? Send us a message.",
-      "button": "[[Join link or keyword]]"
+      "button": "Send us a message"
     }
   ]
 }
