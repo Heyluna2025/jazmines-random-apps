@@ -6,7 +6,7 @@
     "instagram"
   ],
   "brand": "aec",
-  "caption": "AI-empowered, not powered by AI. 💜\n\nMeet AI Empowered Club (AEC): a community where you learn AI with friends, not alone.\n\nInside AEC:\n📅 AI Pulse and live events\n✍️ Prompt Challenges\n🏆 Share Wins\n💬 Ask Jazmine\n🎬 Webinar and masterclass replays\n\nPlus courses like the Freedom series, 100 AI Tools and AI Content Factory, and our 8-week program, AI Builder's Camp.\n\nWant to join? Send us a message.\n\n#AIEmpoweredClub #YourAIBestie #AIBuildersCamp",
+  "caption": "AI-empowered, not powered by AI. 💜\n\nMeet AI Empowered Club (AEC): a community where you learn AI with friends, not alone.\n\nInside AEC:\n📅 AI Pulse and live events\n✍️ Prompt Challenges\n🏆 Share Wins\n💬 Ask Jazmine\n🎬 Webinar and masterclass replays\n\nPlus self-paced courses on AI tools, content creation and growing your skills, and our 8-week program, AI Builder's Camp.\n\nWant to join? Send us a message.\n\n#AIEmpoweredClub #YourAIBestie #AIBuildersCamp",
   "slides": [
     {
       "layout": "cover",
@@ -56,28 +56,28 @@
     {
       "layout": "steps",
       "theme": "light",
-      "kicker": "Learn at your pace",
-      "title": "Courses inside *AEC*",
+      "kicker": "Courses inside AEC",
+      "title": "Learn at *your pace*",
       "steps": [
         {
           "icon": "compass",
-          "title": "The Freedom series",
-          "text": "Mind, Skill, Income and Time Freedom."
+          "title": "Mindset and growth",
+          "text": "Build the mindset and skills for AI freedom."
         },
         {
           "icon": "box",
-          "title": "100 AI Tools",
-          "text": "Find the right tool for the job."
+          "title": "AI tools",
+          "text": "Find and use the right AI tool for the job."
         },
         {
           "icon": "megaphone",
-          "title": "AI Content Factory",
+          "title": "Content creation",
           "text": "Create content faster with AI."
         },
         {
           "icon": "rocket",
-          "title": "World of Claude",
-          "text": "Get more out of Claude."
+          "title": "AI assistants",
+          "text": "Get more out of tools like Claude and ChatGPT."
         }
       ]
     },
