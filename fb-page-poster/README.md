@@ -92,6 +92,10 @@ You need to be an admin of the Page. About 10 minutes.
 4. Back in the Graph API Explorer, paste the long-lived token into the token box and run `me/accounts`. Copy the `access_token` next to **AI Empowered Club**. A Page token made from a long-lived user token does not expire: paste it into the Access Token Debugger and check that **Expires** says **Never**. If it shows a time, it was made from the short-lived token; repeat with the extended one.
 5. Save it as `FB_PAGE_ACCESS_TOKEN` and run `node post.js check`.
 
+Even a never-expiring Page token loses **data access** about 90 days after the user token it came from was authorised (the Access Token Debugger shows the date as *Data Access Expires*). Before that date, repeat these steps to make a fresh token. The current token's data access ends **8 Feb 2027**.
+
+If the login pop-up shows *Invalid Scopes: pages_read_user_content*, add that permission (read-only) to the app's **Manage everything on your Page** use case and try again. Permissions shown in green in the Explorer are requested but not yet granted; they turn black once you click **Generate Access Token** and approve them, including ticking the Instagram account.
+
 Treat the token like a password: it can post as the Page. Keep it out of the repo and out of chat. If it leaks, change your Facebook password or remove the app, which revokes it.
 
 ## Tests
