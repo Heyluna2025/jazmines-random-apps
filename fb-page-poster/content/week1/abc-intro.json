@@ -1,0 +1,119 @@
+{
+  "post": "Week 1 · Tue · AEC introduces ABC: who it's for and what it covers",
+  "when": "2026-11-10 (Tue) [[time]]",
+  "platforms": [
+    "facebook",
+    "instagram"
+  ],
+  "caption": "Tired of watching AI tutorials and still not building anything? 👀\n\nMeet AI Builder's Camp (ABC), a program under AI Empowered Club.\n\nIn 8 weeks, you'll:\n✅ Discover your purpose\n✅ Build your own digital product\n✅ Learn how to sell it\n\n…with Coach Jazmine, Coach Lloyd, your AI Council Leaders and a community that won't let you quit.\n\nYou are the hero. AI is the tool. 💜\n\nCurious if ABC fits you? Send us a message. [[CTA: message keyword / link]]\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "slides": [
+    {
+      "layout": "cover",
+      "tag": "Meet ABC",
+      "title": "Stop watching tutorials.\n*Start building.*",
+      "subtitle": "AI Builder's Camp, a program under AI Empowered Club"
+    },
+    {
+      "layout": "statement",
+      "kicker": "What is ABC?",
+      "title": "8 weeks to turn *who you are* into something you can sell.",
+      "body": "Discover your purpose, build your own digital product, and learn how to sell it, with coaches and a community that won't let you quit."
+    },
+    {
+      "layout": "bullets",
+      "theme": "light",
+      "kicker": "Who it's for",
+      "title": "ABC is for you if…",
+      "items": [
+        "You've watched AI tutorials but haven't *built* anything yet",
+        "You want to turn your experience into a *digital product*",
+        "You're new to AI: [[no coding needed?]]",
+        "You want coaches and a community to keep you *moving forward*"
+      ]
+    },
+    {
+      "layout": "steps",
+      "kicker": "What it covers",
+      "title": "Your journey in 3 moves",
+      "steps": [
+        {
+          "icon": "compass",
+          "title": "Know your purpose",
+          "text": "Find what you're uniquely built to offer, with an AI guide and your coaches."
+        },
+        {
+          "icon": "box",
+          "title": "Build your product",
+          "text": "Shape your offer and create your own digital product with Claude and ChatGPT."
+        },
+        {
+          "icon": "megaphone",
+          "title": "Learn to sell it",
+          "text": "Get it in front of the right people and make your first sale."
+        }
+      ]
+    },
+    {
+      "layout": "hub",
+      "kicker": "How it works",
+      "title": "A weekly rhythm that keeps you *building*",
+      "center": "Your week in ABC",
+      "nodes": [
+        {
+          "icon": "calendar",
+          "label": "Main Session",
+          "sub": "Saturdays"
+        },
+        {
+          "icon": "flask",
+          "label": "Execution Lab",
+          "sub": "Tuesdays"
+        },
+        {
+          "icon": "users",
+          "label": "AI Council",
+          "sub": "Small-group meeting"
+        },
+        {
+          "icon": "mic",
+          "label": "Builders Podcast",
+          "sub": "Thursdays"
+        },
+        {
+          "icon": "trophy",
+          "label": "Friday Wins",
+          "sub": "Share your progress"
+        }
+      ]
+    },
+    {
+      "layout": "people",
+      "theme": "light",
+      "kicker": "Who guides you",
+      "title": "You won't build alone",
+      "people": [
+        {
+          "name": "Coach Jazmine",
+          "role": "Co-founder, AI Empowered Club",
+          "detail": "[[One line on what Coach Jazmine teaches]]"
+        },
+        {
+          "name": "Coach Lloyd",
+          "role": "Co-founder, AI Empowered Club",
+          "detail": "[[One line on what Coach Lloyd teaches]]"
+        }
+      ]
+    },
+    {
+      "layout": "cta",
+      "values": [
+        "Own it",
+        "Speak up",
+        "Move forward"
+      ],
+      "title": "You are the hero.\n*AI is the tool.*",
+      "body": "Curious if ABC fits you? Send us a message.",
+      "button": "[[Message us: ABC]]"
+    }
+  ]
+}

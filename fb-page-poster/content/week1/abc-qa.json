@@ -1,0 +1,67 @@
+{
+  "post": "Week 1 · Sun · ABC Q&A: fit, schedule and payment",
+  "when": "2026-11-15 (Sun) [[time]]",
+  "platforms": [
+    "facebook",
+    "instagram"
+  ],
+  "caption": "Thinking about joining AI Builder's Camp? Here are the questions we get most 👇\n\n🧩 Do I need to be techy? [[beginner requirement]]\n🗓️ How much time does it take? A Saturday main session, a Tuesday Execution Lab, a small-group council meeting, a Thursday podcast and one weekly task.\n▶️ What if I miss a session? Replays are posted in the community.\n🎁 What will I have after 8 weeks? Your Builder's Purpose Blueprint, your own digital product, and the know-how to sell it.\n💳 How much is it? [[approved price and payment options]]\n\nStill have a question? Drop it in the comments or send us a message. We'll help you see if ABC fits.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "slides": [
+    {
+      "layout": "cover",
+      "tag": "ABC Q&A",
+      "title": "Your questions,\n*answered.*",
+      "subtitle": "Fit, schedule and payment: what to know before you join AI Builder's Camp."
+    },
+    {
+      "layout": "qa",
+      "theme": "light",
+      "kicker": "Fit",
+      "q": "Do I need to be techy?",
+      "a": "[[Beginner requirement, e.g. no coding needed]] You'll set up Claude and ChatGPT in Week 0 with step-by-step guides."
+    },
+    {
+      "layout": "qa",
+      "kicker": "Schedule",
+      "q": "How much time does it take?",
+      "a": "Each week: a Saturday main session, a Tuesday Execution Lab, a small-group council meeting and a Thursday podcast, plus one weekly task. [[Hours per week]]"
+    },
+    {
+      "layout": "qa",
+      "theme": "light",
+      "kicker": "Schedule",
+      "q": "What if I miss a session?",
+      "a": "Session replays are posted in the community, so you can catch up and still submit your weekly task."
+    },
+    {
+      "layout": "qa",
+      "kicker": "Outcome",
+      "q": "What will I have after 8 weeks?",
+      "a": "Your Builder's Purpose Blueprint, your own digital product, and the know-how to sell it."
+    },
+    {
+      "layout": "qa",
+      "theme": "light",
+      "kicker": "Payment",
+      "q": "How much is it, and how can I pay?",
+      "a": "[[Approved total price and payment options]]"
+    },
+    {
+      "layout": "qa",
+      "kicker": "Next batch",
+      "q": "When can I join?",
+      "a": "[[Next batch start date, or join the interest list]]"
+    },
+    {
+      "layout": "cta",
+      "values": [
+        "Own it",
+        "Speak up",
+        "Move forward"
+      ],
+      "title": "Still have a\n*question?*",
+      "body": "Send it our way. We'll help you see if ABC fits.",
+      "button": "[[Message us: ABC]]"
+    }
+  ]
+}
