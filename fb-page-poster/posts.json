@@ -19,5 +19,25 @@
     "facebook_sent_at": "2026-11-10T13:29:29Z",
     "instagram_id": "18079857554449418",
     "instagram_sent_at": "2026-11-10T13:30:35Z"
+  },
+  {
+    "text": "AI-empowered, not powered by AI. 💜\n\nMeet AI Empowered Club (AEC): a community where you learn AI with friends, not alone.\n\nInside AEC:\n📅 AI Pulse and live events\n✍️ Prompt Challenges\n🏆 Share Wins\n💬 Ask Jazmine\n🎬 Webinar and masterclass replays\n\nPlus self-paced courses on AI tools, content creation and growing your skills, and our 8-week program, AI Builder's Camp.\n\nWant to join? Send us a message.\n\n#AIEmpoweredClub #YourAIBestie #AIBuildersCamp",
+    "images": [
+      "graphics/week1/aec-intro-01.png",
+      "graphics/week1/aec-intro-02.png",
+      "graphics/week1/aec-intro-03.png",
+      "graphics/week1/aec-intro-04.png",
+      "graphics/week1/aec-intro-05.png",
+      "graphics/week1/aec-intro-06.png",
+      "graphics/week1/aec-intro-07.png"
+    ],
+    "platforms": [
+      "facebook",
+      "instagram"
+    ],
+    "at": "2026-11-11T09:00+08:00",
+    "spec": "content/week1/aec-intro.json",
+    "facebook_id": "1231207646740791_122138339985391416",
+    "facebook_sent_at": "2026-11-10T13:35:40.054Z"
   }
 ]
