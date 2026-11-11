@@ -34,6 +34,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .pill{border:1px solid var(--line);background:rgba(120,80,255,.08);color:var(--muted);border-radius:999px;padding:6px 10px;font:600 10px/1 var(--mono);letter-spacing:1px;cursor:pointer;text-transform:uppercase}
 .pill:active{background:rgba(157,92,255,.25)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.world{display:flex;gap:6px;margin-top:8px;overflow-x:auto;scrollbar-width:none;font-family:var(--mono)}.world::-webkit-scrollbar{display:none}
+.world div{flex:1 0 auto;min-width:74px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:rgba(157,92,255,.05);text-align:center}.world b{display:block;font:600 13px/1.1 var(--hud);color:var(--cy);letter-spacing:1px;text-shadow:0 0 8px rgba(94,231,255,.5)}.world span{display:block;font-size:8px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-top:2px}.world i{font-style:normal;color:var(--dim);font-size:8px}.world div.ph b{color:#fff}
 .stat{border:1px solid var(--line);border-radius:10px;padding:8px 8px 6px;background:linear-gradient(180deg,rgba(157,92,255,.10),rgba(157,92,255,.02));position:relative;overflow:hidden}
 .stat::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--v2),transparent);opacity:.7}
 .stat b{display:block;font-family:var(--hud);font-size:22px;letter-spacing:1px;color:#fff;text-shadow:0 0 14px rgba(157,92,255,.9)}
@@ -96,7 +98,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
 .log .close{position:sticky;top:0;display:block;margin:0 auto 12px;width:max-content}
 @media (max-width:760px){.side{display:none}.ticker{display:block}.stat b{font-size:18px}.brand{font-size:16px}.clock{font-size:11px}header .tools{width:100%;justify-content:flex-end}.logo{bottom:calc(max(10px,env(safe-area-inset-bottom)) + 124px);right:14px}.logo img{height:20px}}
 .logo{position:fixed;right:16px;bottom:max(14px,env(safe-area-inset-bottom));z-index:4;display:flex;flex-direction:column;align-items:flex-end;gap:3px;opacity:.85;pointer-events:none}.logo small{font:700 7.5px/1 var(--mono);letter-spacing:2px;color:var(--dim)}.logo img{height:26px;width:auto;filter:drop-shadow(0 0 10px rgba(157,92,255,.6))}
-@media (min-width:761px){.stats{position:fixed;top:64px;left:50%;transform:translateX(-50%);width:min(640px,calc(100vw - 28px));z-index:3}}
+@media (min-width:761px){.stats{position:fixed;top:64px;left:50%;transform:translateX(-50%);width:min(640px,calc(100vw - 28px));z-index:3}.world{position:fixed;top:128px;left:50%;transform:translateX(-50%);width:min(640px,calc(100vw - 28px));z-index:3;margin:0}}
 </style>
 </head>
 <body>
@@ -117,6 +119,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
     <div class="stat"><i></i><b id="sDone">—</b><span>Done today</span></div>
     <div class="stat"><i></i><b id="sWait">—</b><span>Waiting for you</span></div>
   </div>
+  <div class="world" id="world"></div>
   <div class="ticker" id="ticker"></div>
   <main>
     <div class="status" id="status">Tap the orb button to open the line</div>
@@ -221,6 +224,11 @@ addEventListener('resize', () => { size(); seed(); }); size(); seed(); requestAn
 const TZ = 'Asia/Manila';
 function clock(){ const d = new Date(); const t = new Intl.DateTimeFormat('en-GB', {timeZone:TZ, hour:'2-digit', minute:'2-digit', second:'2-digit'}).format(d); const ms = String(d.getMilliseconds()).padStart(3, '0').slice(0, 2); $('clock').innerHTML = t + '<span style="color:var(--dim)">.' + ms + '</span><small>MANILA · ' + new Intl.DateTimeFormat('en-US', {timeZone:TZ, weekday:'short', month:'short', day:'numeric'}).format(d).toUpperCase() + '</small>'; }
 setInterval(clock, 90); clock();
+// Her words (11 Nov): the time of day in PH, Dubai, California, New York, Japan, London, Italy, Paris, like a world clock.
+const WORLD = [['PH','Asia/Manila'],['Dubai','Asia/Dubai'],['California','America/Los_Angeles'],['New York','America/New_York'],['Japan','Asia/Tokyo'],['London','Europe/London'],['Italy','Europe/Rome'],['Paris','Europe/Paris']];
+function world(){ const d = new Date(); const here = new Intl.DateTimeFormat('en-CA', {timeZone:TZ, day:'2-digit'}).format(d);
+  $('world').innerHTML = WORLD.map(([name, tz]) => { const t = new Intl.DateTimeFormat('en-GB', {timeZone:tz, hour:'2-digit', minute:'2-digit'}).format(d); const day = new Intl.DateTimeFormat('en-CA', {timeZone:tz, day:'2-digit'}).format(d); const wd = new Intl.DateTimeFormat('en-US', {timeZone:tz, weekday:'short'}).format(d); return '<div'+(tz === TZ ? ' class="ph"' : '')+'><b>'+t+'</b><span>'+name+'</span><i>'+wd+(day !== here ? (day > here ? ' +1' : ' −1') : '')+'</i></div>'; }).join(''); }
+setInterval(world, 15000); world();
 function counters(){ for(const k of ['on','work','done','wait']){ const want = S.nums[k], have = S.shown[k]; if(have !== want){ S.shown[k] = have + Math.sign(want - have) * Math.max(1, Math.ceil(Math.abs(want - have) / 6)); if(Math.abs(S.shown[k] - want) < 1) S.shown[k] = want; } $({on:'sOn', work:'sWork', done:'sDone', wait:'sWait'}[k]).textContent = S.state ? String(S.shown[k]) : '—'; } }
 setInterval(counters, 70);
 const HEX = () => Array.from({length: 4}, () => Math.floor(Math.random() * 65536).toString(16).padStart(4, '0').toUpperCase()).join(' ');
