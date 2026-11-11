@@ -106,7 +106,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
 <div class="ui">
   <header>
     <b class="brand">MIMI<small>CHIEF OF STAFF · JAZMINE'S OFFICE</small></b>
-    <span class="tools"><span class="clock" id="clock">--:--:--<small>MANILA</small></span><span class="seg" role="group" aria-label="Demo or live"><button type="button" id="modeDemo" aria-pressed="false">DEMO</button><button type="button" id="modeLive" aria-pressed="false">LIVE</button></span><button class="pill" id="logBtn" type="button">Log</button><button class="pill" id="keyBtn" type="button">Key</button></span>
+    <span class="tools"><span class="clock" id="clock">--:--:--<small>MANILA</small></span><span class="seg" role="group" aria-label="Demo or live"><button type="button" id="modeDemo" aria-pressed="false">DEMO</button><button type="button" id="modeLive" aria-pressed="false">LIVE</button></span><button class="pill" id="logBtn" type="button">Log</button><button class="pill" id="keyBtn" type="button">Key</button><button class="pill" id="voiceBtn" type="button">Voice</button></span>
   </header>
   <div class="stats">
     <div class="stat"><i></i><b id="sOn">—</b><span>Agents on duty</span></div>
@@ -130,6 +130,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
 </div>
 <div class="logo"><small>POWERED BY</small><img src="luna-logo-white.png" alt="Luna AI Systems"></div>
 <div class="log" id="log"><button class="pill close" id="logClose" type="button">Close</button><div id="logBody"></div></div>
+<dialog id="voiceDlg"><h2>MIMI’S VOICE KEY</h2><p>Paste your ElevenLabs API key (it starts with sk_). The office keeps it and tests it at once.</p><form id="voiceForm"><input id="voiceIn" type="password" autocomplete="off" placeholder="sk_…"><button type="submit">SAVE AND TEST</button></form><p id="voiceMsg" style="margin-top:10px"></p></dialog>
 <dialog id="keyDlg"><h2>OFFICE KEY</h2><p>Mimi only talks to you. Paste the same key the office page uses; it stays on this phone.</p><form method="dialog"><input id="keyIn" type="password" autocomplete="current-password" placeholder="Office key"><button type="submit">OPEN THE LINE</button></form></dialog>
 <script>
 const LIVE_URL = 'https://jwgcjpsvjeesdttdihet.supabase.co/functions/v1/';
@@ -145,6 +146,8 @@ function api(path, body){
 function askKey(msg){ if(msg) $('keyDlg').querySelector('p').textContent = msg; $('keyIn').value = ''; if(!$('keyDlg').open) $('keyDlg').showModal(); }
 $('keyDlg').addEventListener('close', () => { const v = $('keyIn').value.trim(); if(v){ S.key = v; try{ localStorage.setItem('office-key', v); }catch(e){} checkVoice(); poll(); } });
 $('keyBtn').addEventListener('click', () => askKey('Paste the office key. It stays on this phone.'));
+$('voiceBtn').addEventListener('click', () => { if(!S.key){ askKey('The voice key needs your office key first.'); return; } $('voiceMsg').textContent = ''; $('voiceIn').value = ''; $('voiceDlg').showModal(); });
+$('voiceForm').addEventListener('submit', e => { e.preventDefault(); const v = $('voiceIn').value.trim(); if(!v) return; $('voiceMsg').textContent = 'Testing…'; api('ao-voice', {set_voice_key:v}).then(r => { $('voiceMsg').textContent = r.saved ? 'Saved. Mimi speaks with ElevenLabs now.' : ('Not saved: ' + (r.voice_problem || 'that key did not work.')); if(r.saved){ S.problemShown = false; setTimeout(() => { $('voiceDlg').close(); unlockAudio(); speak('Hi Jazmine. Five things are on the table; tap one or just name it.'); }, 900); } }).catch(err => { $('voiceMsg').textContent = err.message || 'That did not go through.'; }); });
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function status(t){ $('status').textContent = t; }
 function micLabel(on){ const l = $('micLabel'); l.textContent = on ? 'Mic on' : 'Mic off'; l.classList.toggle('on', !!on); }
