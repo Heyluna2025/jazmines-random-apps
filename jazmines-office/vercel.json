@@ -21,6 +21,18 @@
  ],
  "rewrites": [
   {
+   "source": "/mimi",
+   "destination": "/mimi.html"
+  },
+  {
+   "source": "/mimi/",
+   "destination": "/mimi.html"
+  },
+  {
+   "source": "/office/mimi",
+   "destination": "/mimi.html"
+  },
+  {
    "source": "/office",
    "destination": "/index.html"
   },

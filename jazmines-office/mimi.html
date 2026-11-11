@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0B0D1F">
+<title>Mimi</title>
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="portraits/cos-call.webp">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Her words (11 Nov): "www.jazmine.ai/mimi, but with the brain of Mimi. Like Jarvis in Iron Man: the UI speaking to me, communicating real time."
+   One screen: Mimi in the middle, a ring that breathes while she listens and glows while she talks, her words as captions.
+   The brain is the office's own voice endpoint (ao-voice): Mimi's notes, the office's facts, her rules, her ElevenLabs voice. */
+:root{--bg:#0B0D1F;--ink:#F2F1FA;--muted:#9A9CC0;--line:rgba(255,255,255,.12);--glow:#7C6CFF;--glow2:#39D2FF;--warm:#F6B44B;--you:#2A2D52;--font:'Nunito',system-ui,sans-serif;--display:'Fredoka',ui-rounded,system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);overflow:hidden}
+body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:max(12px,env(safe-area-inset-top)) 16px max(12px,env(safe-area-inset-bottom));background:radial-gradient(1200px 700px at 50% 30%,#171a3f 0%,#0B0D1F 60%)}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+header b{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.3px}
+header b small{display:block;font:600 11px/1.3 var(--font);color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+.pill{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);border-radius:999px;padding:7px 12px;font:600 12px/1 var(--font);cursor:pointer}
+.pill:active{background:rgba(255,255,255,.1)}
+main{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;min-height:0}
+.stage{position:relative;width:min(62vw,300px);aspect-ratio:1;flex:none}
+.ring{position:absolute;inset:-14px;border-radius:50%;background:conic-gradient(from 0deg,var(--glow),var(--glow2),var(--glow));opacity:.35;filter:blur(10px);transition:opacity .4s,transform .15s}
+.ring.listen{opacity:.75;animation:spin 6s linear infinite}
+.ring.think{opacity:.6;animation:spin 1.6s linear infinite}
+.ring.speak{opacity:.95;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg) scale(var(--s,1))}}
+.face{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#1b1d33;box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,255,255,.08)}
+.face video,.face img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
+.face video{position:absolute;inset:0;opacity:0;transition:opacity .3s}
+.face video.on{opacity:1}
+.status{font:600 13px/1.3 var(--font);color:var(--muted);letter-spacing:.4px;text-transform:uppercase;min-height:17px;text-align:center}
+.caps{width:min(680px,100%);text-align:center;min-height:120px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end}
+.caps .you{color:var(--muted);font-size:15px}
+.caps .you::before{content:"You · ";color:#6f72a0;font-weight:700}
+.caps .mimi{font-family:var(--display);font-weight:500;font-size:clamp(19px,4.6vw,26px);line-height:1.3}
+.caps .sys{color:var(--warm);font-size:14px}
+footer{display:flex;flex-direction:column;gap:10px;align-items:center}
+.talk{width:84px;height:84px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--glow),var(--glow2));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(124,108,255,.45);cursor:pointer;transition:transform .15s}
+.talk:active{transform:scale(.96)}
+.talk.on{background:linear-gradient(135deg,#FF5C8A,#F6B44B);box-shadow:0 10px 30px rgba(255,92,138,.45)}
+.talk svg{width:34px;height:34px}
+.row{display:flex;gap:8px;width:min(680px,100%)}
+.row input{flex:1;min-width:0;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);padding:12px 14px;font:inherit;font-size:16px;outline:none}
+.row input:focus{border-color:var(--glow)}
+.row button{border-radius:14px;border:0;background:rgba(255,255,255,.1);color:var(--ink);padding:0 16px;font:700 14px var(--font);cursor:pointer}
+.hint{color:var(--muted);font-size:12px;text-align:center}
+dialog{border:0;border-radius:18px;background:#1B1D33;color:var(--ink);padding:20px;width:min(92vw,380px);font-family:var(--font)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h2{font-family:var(--display);font-weight:600;margin:0 0 6px;font-size:20px}
+dialog p{margin:0 0 12px;color:var(--muted);font-size:14px}
+dialog input{width:100%;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);padding:12px;font-size:16px;margin-bottom:12px}
+dialog button{width:100%;border:0;border-radius:12px;background:var(--glow);color:#fff;padding:12px;font:700 15px var(--font);cursor:pointer}
+.log{position:fixed;inset:0;background:rgba(11,13,31,.96);padding:max(16px,env(safe-area-inset-top)) 16px 16px;overflow:auto;display:none;z-index:5}
+.log.open{display:block}
+.log p{max-width:680px;margin:0 auto 10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.06);font-size:15px;line-height:1.45;white-space:pre-wrap}
+.log p.you{background:var(--you)}
+.log p.sys{background:none;color:var(--warm);text-align:center;font-size:13px}
+.log .close{position:sticky;top:0;display:block;margin:0 auto 12px;width:max-content}
+</style>
+</head>
+<body>
+<header>
+  <b>Mimi<small>Chief of Staff · live</small></b>
+  <span style="display:flex;gap:8px"><button class="pill" id="logBtn" type="button">Transcript</button><button class="pill" id="keyBtn" type="button">Key</button></span>
+</header>
+<main>
+  <div class="stage">
+    <div class="ring" id="ring"></div>
+    <div class="face">
+      <img src="portraits/cos-call.webp" alt="">
+      <video id="vidIdle" src="media/call/cos.mp4" muted loop playsinline preload="auto"></video>
+      <video id="vidTalk" src="media/call/cos-talk.mp4" muted loop playsinline preload="auto"></video>
+    </div>
+  </div>
+  <div class="status" id="status">Tap the button and talk</div>
+  <div class="caps" id="caps"></div>
+</main>
+<footer>
+  <button class="talk" id="talk" type="button" aria-pressed="false" aria-label="Talk to Mimi">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/></svg>
+  </button>
+  <div class="hint" id="hint">One tap starts a live conversation: speak, pause, she answers, then she listens again. Tap again to end.</div>
+  <form class="row" id="typeRow"><input id="typeIn" type="text" placeholder="Or type to Mimi…" autocomplete="off" maxlength="2000"><button type="submit">Send</button></form>
+</footer>
+<div class="log" id="log"><button class="pill close" id="logClose" type="button">Close</button><div id="logBody"></div></div>
+<dialog id="keyDlg"><h2>Your office key</h2><p>Mimi only talks to you. Paste the same key the office page uses; it stays on this phone.</p><form method="dialog"><input id="keyIn" type="password" autocomplete="current-password" placeholder="Office key"><button type="submit">Open the line</button></form></dialog>
+<script>
+const LIVE_URL = 'https://jwgcjpsvjeesdttdihet.supabase.co/functions/v1/';
+const $ = id => document.getElementById(id);
+const S = {key:'', id:'m'+Date.now().toString(36), live:false, stream:null, ctx:null, an:null, rec:null, chunks:[], mime:'', busy:false, speaking:false, offered:false, audio:null, voice:null, log:[], raf:0, heard:false, quietSince:0, startedAt:0, synthVoice:null};
+try{ S.key = localStorage.getItem('office-key') || ''; S.log = JSON.parse(localStorage.getItem('mimi-log') || '[]'); }catch(e){}
+function api(path, body){
+  const h = {'x-office-key':S.key}; if(body) h['content-type'] = 'application/json';
+  return fetch(LIVE_URL+path, {method: body ? 'POST' : 'GET', headers:h, body: body ? JSON.stringify(body) : undefined}).then(r => {
+    if(r.status === 401){ askKey('That key did not work. Try again.'); throw new Error('401'); }
+    return r.json().catch(() => ({})).then(j => { if(!r.ok || j.ok === false) throw new Error(j.error || 'The office could not do that just now.'); return j; }); });
+}
+function askKey(msg){ if(msg) $('keyDlg').querySelector('p').textContent = msg; $('keyIn').value = ''; if(!$('keyDlg').open) $('keyDlg').showModal(); }
+$('keyDlg').addEventListener('close', () => { const v = $('keyIn').value.trim(); if(v){ S.key = v; try{ localStorage.setItem('office-key', v); }catch(e){} checkVoice(); } });
+$('keyBtn').addEventListener('click', () => askKey('Paste the office key. It stays on this phone.'));
+function status(t){ $('status').textContent = t; }
+function ring(mode, scale){ const r = $('ring'); r.className = 'ring' + (mode ? ' ' + mode : ''); r.style.setProperty('--s', scale || 1); }
+function say(kind, text){ const m = {kind, text, at:Date.now()}; S.log.push(m); S.log = S.log.slice(-200); try{ localStorage.setItem('mimi-log', JSON.stringify(S.log)); }catch(e){} drawCaps(); if($('log').classList.contains('open')) drawLog(); return m; }
+function drawCaps(){ const last = S.log.slice(-2); const you = last.find(m => m.kind === 'you'), mimi = [...S.log].reverse().find(m => m.kind === 'mimi' || m.kind === 'sys');
+  $('caps').innerHTML = (you && (!mimi || you.at <= mimi.at + 60000) ? '<div class="you">'+esc(you.text)+'</div>' : '') + (mimi ? '<div class="'+mimi.kind+'">'+esc(mimi.text)+'</div>' : ''); }
+function drawLog(){ $('logBody').innerHTML = S.log.map(m => '<p class="'+m.kind+'">'+esc(m.text)+'</p>').join('') || '<p class="sys">Nothing yet. Say hi.</p>'; $('log').scrollTop = 1e9; }
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+$('logBtn').addEventListener('click', () => { drawLog(); $('log').classList.add('open'); });
+$('logClose').addEventListener('click', () => $('log').classList.remove('open'));
+function face(talking){ const i = $('vidIdle'), t = $('vidTalk'); i.classList.toggle('on', !talking); t.classList.toggle('on', talking); (talking ? t : i).play().catch(() => {}); }
+function unlockAudio(){ try{ if(!S.audio){ S.audio = new Audio(); S.audio.setAttribute('playsinline',''); S.audio.addEventListener('ended', spoken); S.audio.addEventListener('error', spoken); } S.audio.src = 'data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA'; S.audio.play().catch(() => {}); if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){} }
+function checkVoice(){ if(!S.key) return; api('ao-voice').then(r => { S.voice = r.voice !== false; if(!S.voice) say('sys', 'Her ElevenLabs voice is not set up in the office yet, so this phone reads her answers aloud for now.'); }).catch(() => {}); }
+// ---- the live line: open the mic once; each utterance is cut on a pause and sent; she answers; the mic listens again.
+async function lineOpen(){
+  if(!S.key){ askKey(); return; }
+  unlockAudio();
+  if(!navigator.mediaDevices || !window.MediaRecorder){ say('sys', 'This browser cannot record. Open this page in Safari or Chrome.'); return; }
+  try{ S.stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}}); }
+  catch(e){ say('sys', 'The microphone was not allowed. Allow it for jazmine.ai and tap again.'); return; }
+  S.mime = ['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+  try{ S.ctx = new (window.AudioContext || window.webkitAudioContext)(); const src = S.ctx.createMediaStreamSource(S.stream); S.an = S.ctx.createAnalyser(); S.an.fftSize = 1024; src.connect(S.an); }catch(e){ S.an = null; }
+  S.live = true; $('talk').classList.add('on'); $('talk').setAttribute('aria-pressed', 'true'); $('hint').textContent = 'Live. Speak, then pause; she answers. Tap the button to end.';
+  face(false); listen();
+}
+function lineClose(){ S.live = false; stopRec(true); if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } if(S.ctx){ S.ctx.close().catch(() => {}); S.ctx = null; } if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); cancelAnimationFrame(S.raf); $('talk').classList.remove('on'); $('talk').setAttribute('aria-pressed', 'false'); $('hint').textContent = 'One tap starts a live conversation: speak, pause, she answers, then she listens again. Tap again to end.'; ring(''); face(false); status('Line closed. Tap to talk again.'); }
+function listen(){
+  if(!S.live || S.busy) return;
+  S.chunks = []; S.heard = false; S.quietSince = 0; S.startedAt = Date.now();
+  try{ S.rec = new MediaRecorder(S.stream, S.mime ? {mimeType:S.mime} : undefined); }catch(e){ S.rec = new MediaRecorder(S.stream); }
+  S.rec.ondataavailable = ev => { if(ev.data && ev.data.size) S.chunks.push(ev.data); };
+  S.rec.onstop = () => { if(S.live && S.heard) send(); else if(S.live) listen(); };
+  S.rec.start(); status('Listening'); ring('listen'); meter();
+}
+function stopRec(silent){ cancelAnimationFrame(S.raf); if(S.rec && S.rec.state === 'recording'){ if(silent) S.rec.onstop = null; S.rec.stop(); } }
+// A small level meter on the mic: speech above the floor starts an utterance; 1.3 s under it ends one. Tops at 40 s.
+const FLOOR = 0.015, QUIET_MS = 1300, MAX_MS = 40000, NO_SPEECH_MS = 12000;
+function meter(){
+  if(!S.live || !S.rec || S.rec.state !== 'recording') return;
+  let rms = 0;
+  if(S.an){ const buf = new Uint8Array(S.an.fftSize); S.an.getByteTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++){ const v = (buf[i] - 128) / 128; s += v * v; } rms = Math.sqrt(s / buf.length); }
+  const now = Date.now();
+  if(rms > FLOOR){ if(!S.heard){ S.heard = true; status('Listening…'); } S.quietSince = 0; ring('listen', 1 + Math.min(rms * 4, .35)); }
+  else if(S.heard){ if(!S.quietSince) S.quietSince = now; if(now - S.quietSince > QUIET_MS){ stopRec(false); return; } }
+  else if(!S.an){ // no meter in this browser: a fixed 6 s window per turn
+    if(now - S.startedAt > 6000){ S.heard = true; stopRec(false); return; } }
+  if(now - S.startedAt > MAX_MS){ stopRec(false); return; }
+  if(!S.heard && now - S.startedAt > NO_SPEECH_MS){ S.startedAt = now; } // keep waiting, quietly
+  S.raf = requestAnimationFrame(meter);
+}
+async function send(text){
+  if(S.busy) return; S.busy = true; status('Thinking'); ring('think'); face(false);
+  let you = null;
+  try{
+    let body;
+    if(text){ body = {call_id:S.id, text, offered:S.offered}; you = say('you', text); }
+    else {
+      const blob = new Blob(S.chunks, {type: (S.rec && S.rec.mimeType) || S.mime || 'audio/webm'});
+      if(blob.size < 1500){ S.busy = false; listen(); return; }
+      const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
+      you = say('you', '…');
+      body = {call_id:S.id, audio:b64, mime:blob.type, offered:S.offered};
+    }
+    const r = await api('ao-voice', body);
+    if(you && !text){ you.text = r.heard || '(nothing heard)'; drawCaps(); }
+    if(!r.heard && !text){ S.busy = false; if(S.live) listen(); return; }
+    const said = r.said || '…';
+    say('mimi', said);
+    if(/bandwidth|marinig|want to hear/i.test(said)) S.offered = true;
+    S.busy = false;
+    speak(said, r.audio);
+  }catch(e){
+    if(you && you.text === '…'){ S.log = S.log.filter(m => m !== you); }
+    say('sys', e.message === '401' ? 'The office key did not work.' : (e.message || 'That did not go through. Try again.'));
+    S.busy = false; status(S.live ? 'Listening' : 'Tap to talk'); ring(S.live ? 'listen' : ''); if(S.live) setTimeout(listen, 800);
+  }
+}
+function speak(text, b64){
+  S.speaking = true; status('Mimi'); ring('speak'); face(true);
+  if(b64 && S.audio){ S.audio.src = 'data:audio/mpeg;base64,' + b64; S.audio.play().catch(() => { spoken(); }); return; }
+  if(window.speechSynthesis){
+    const u = new SpeechSynthesisUtterance(text); u.rate = 1.02; u.pitch = 1.08;
+    const vs = speechSynthesis.getVoices(); const pick = vs.find(v => /Samantha|Karen|Moira|Google US English|Zira|Aria/i.test(v.name)) || vs.find(v => /^en/i.test(v.lang)); if(pick) u.voice = pick;
+    u.onend = spoken; u.onerror = spoken; speechSynthesis.cancel(); speechSynthesis.speak(u); return;
+  }
+  spoken();
+}
+function spoken(){ if(!S.speaking) return; S.speaking = false; face(false); if(S.live){ listen(); } else { status('Tap to talk'); ring(''); } }
+$('talk').addEventListener('click', () => { if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); spoken(); return; } if(S.live) lineClose(); else lineOpen(); });
+$('typeRow').addEventListener('submit', e => { e.preventDefault(); const v = $('typeIn').value.trim(); if(!v || S.busy) return; $('typeIn').value = ''; unlockAudio(); if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); S.speaking = false; face(false); } stopRec(true); send(v); });
+document.addEventListener('visibilitychange', () => { if(document.hidden && S.live) lineClose(); });
+drawCaps(); face(false); $('vidIdle').play().catch(() => {});
+if(!S.key) askKey(); else checkVoice();
+</script>
+</body>
+</html>
