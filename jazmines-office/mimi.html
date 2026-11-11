@@ -145,7 +145,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
 <script>
 const LIVE_URL = 'https://jwgcjpsvjeesdttdihet.supabase.co/functions/v1/';
 const $ = id => document.getElementById(id);
-const S = {key:'', id:'m'+Date.now().toString(36), live:false, stream:null, ctx:null, an:null, rec:null, chunks:[], mime:'', busy:false, speaking:false, offered:false, audio:null, playAn:null, voice:null, log:[], raf:0, heard:false, quietSince:0, startedAt:0, mode:'idle', level:0, state:null, cursor:'', nums:{on:0,work:0,done:0,wait:0}, shown:{on:0,work:0,done:0,wait:0}, demo:false, picked:[], greeted:false};
+const S = {useSR:true, sr:null, liveYou:'', key:'', id:'m'+Date.now().toString(36), live:false, stream:null, ctx:null, an:null, rec:null, chunks:[], mime:'', busy:false, speaking:false, offered:false, audio:null, playAn:null, voice:null, log:[], raf:0, heard:false, quietSince:0, startedAt:0, mode:'idle', level:0, state:null, cursor:'', nums:{on:0,work:0,done:0,wait:0}, shown:{on:0,work:0,done:0,wait:0}, demo:false, picked:[], greeted:false};
 try{ S.key = localStorage.getItem('office-key') || ''; S.log = JSON.parse(localStorage.getItem('mimi-log') || '[]'); S.demo = (localStorage.getItem('mimi-mode') || (S.key ? 'live' : 'demo')) === 'demo'; }catch(e){ S.demo = !S.key; }
 function api(path, body, again){
   const h = {'x-office-key':S.key}; if(body) h['content-type'] = 'application/json';
@@ -165,6 +165,7 @@ function micLabel(on){ const l = $('micLabel'); l.textContent = on ? 'Mic on' : 
 function mode(m){ S.mode = m; }
 function say(kind, text){ const m = {kind, text, at:Date.now()}; S.log.push(m); S.log = S.log.slice(-200); try{ localStorage.setItem('mimi-log', JSON.stringify(S.log)); }catch(e){} drawCaps(); if($('log').classList.contains('open')) drawLog(); return m; }
 function drawCaps(){ const you = [...S.log].reverse().find(m => m.kind === 'you'), mimi = [...S.log].reverse().find(m => m.kind === 'mimi' || m.kind === 'sys');
+  if(S.liveYou){ $('caps').innerHTML = (mimi ? '<div class="'+mimi.kind+'" style="opacity:.55">'+esc(mimi.text)+'</div>' : '') + '<div class="you" style="color:var(--cy)">'+esc(S.liveYou)+' …</div>'; return; }
   $('caps').innerHTML = (you && (!mimi || you.at >= mimi.at - 90000) ? '<div class="you">'+esc(you.text)+'</div>' : '') + (mimi ? '<div class="'+mimi.kind+'">'+esc(mimi.text)+'</div>' : ''); }
 function drawLog(){ $('logBody').innerHTML = S.log.map(m => '<p class="'+m.kind+'">'+esc(m.text)+'</p>').join('') || '<p class="sys">Nothing yet. Say hi.</p>'; $('log').scrollTop = 1e9; }
 $('logBtn').addEventListener('click', () => { drawLog(); $('log').classList.add('open'); });
@@ -287,15 +288,29 @@ async function lineOpen(){
   S.offered = true; const g = greet(); say('mimi', g); speak(g); // spoken() opens the mic when she is done
 }
 function lineClose(){ S.live = false; stopRec(true); if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); cancelAnimationFrame(S.raf); $('talk').classList.remove('on'); $('talk').setAttribute('aria-pressed', 'false'); micLabel(false); $('endWrap').classList.remove('on'); $('hint').textContent = 'One tap · live line · speak, pause, she answers · tap to end'; mode('idle'); S.level = 0; status('Line closed · tap to talk again'); }
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function listenSR(){
+  if(!S.live || S.busy) return;
+  const R = new SR(); S.sr = R; R.lang = 'en-US'; R.continuous = true; R.interimResults = true; R.maxAlternatives = 1;
+  let finals = '', interim = '', timer = 0, got = false;
+  const finish = () => { if(!got) return; got = false; clearTimeout(timer); const text = (finals + ' ' + interim).replace(/\s+/g, ' ').trim(); try{ R.onend = null; R.stop(); }catch(e){} S.sr = null; if(text) send(text); else listen(); };
+  R.onresult = ev => { interim = ''; for(let i = ev.resultIndex; i < ev.results.length; i++){ const r = ev.results[i]; if(r.isFinal) finals += ' ' + r[0].transcript; else interim += ' ' + r[0].transcript; } const shown = (finals + ' ' + interim).replace(/\s+/g, ' ').trim(); if(shown){ got = true; S.heard = true; status('Listening …'); S.liveYou = shown; drawCaps(); } clearTimeout(timer); timer = setTimeout(finish, 900); };
+  R.onerror = ev => { S.sr = null; if(ev.error === 'not-allowed' || ev.error === 'service-not-allowed'){ S.useSR = false; say('sys', 'Live transcription is not allowed here; using the office to transcribe instead.'); listen(); return; } if(S.live && !S.busy) setTimeout(listen, 400); };
+  R.onend = () => { S.sr = null; if(got){ finish(); return; } if(S.live && !S.busy) setTimeout(listen, 200); };
+  S.heard = false; S.liveYou = ''; status('Listening'); mode('listen'); try{ R.start(); }catch(e){ S.useSR = false; listen(); return; }
+  meterOnly();
+}
+function meterOnly(){ if(!S.live || !S.sr) return; S.level = S.an ? rmsOf(S.an) : 0; S.raf = requestAnimationFrame(meterOnly); }
 function listen(){
   if(!S.live || S.busy) return;
+  if(S.useSR && SR){ listenSR(); return; }
   S.chunks = []; S.heard = false; S.quietSince = 0; S.startedAt = Date.now();
   try{ S.rec = new MediaRecorder(S.stream, S.mime ? {mimeType:S.mime} : undefined); }catch(e){ S.rec = new MediaRecorder(S.stream); }
   S.rec.ondataavailable = ev => { if(ev.data && ev.data.size) S.chunks.push(ev.data); };
   S.rec.onstop = () => { if(S.live && S.heard) send(); else if(S.live) listen(); };
   S.rec.start(); status('Listening'); mode('listen'); meter();
 }
-function stopRec(silent){ cancelAnimationFrame(S.raf); if(S.rec && S.rec.state === 'recording'){ if(silent) S.rec.onstop = null; S.rec.stop(); } }
+function stopRec(silent){ cancelAnimationFrame(S.raf); if(S.sr){ try{ S.sr.onend = null; S.sr.onresult = null; S.sr.stop(); }catch(e){} S.sr = null; S.liveYou = ''; } if(S.rec && S.rec.state === 'recording'){ if(silent) S.rec.onstop = null; S.rec.stop(); } }
 const FLOOR = 0.015, QUIET_MS = 850, MAX_MS = 40000;
 function rmsOf(an){ const buf = new Uint8Array(an.fftSize); an.getByteTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++){ const v = (buf[i] - 128) / 128; s += v * v; } return Math.sqrt(s / buf.length); }
 function meter(){
@@ -308,7 +323,7 @@ function meter(){
   S.raf = requestAnimationFrame(meter);
 }
 async function send(text){
-  if(S.busy) return; S.busy = true; status('Thinking'); mode('think'); S.level = 0;
+  if(S.busy) return; S.busy = true; S.liveYou = ''; status('Thinking'); mode('think'); S.level = 0;
   if(!S.demo) filler();
   let you = null;
   try{
