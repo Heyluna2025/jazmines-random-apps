@@ -68,6 +68,9 @@ footer{display:flex;flex-direction:column;gap:10px;align-items:center}
 .talk{width:78px;height:78px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:radial-gradient(circle at 35% 30%,#5A5872,#34324A 60%,#1E1C2E);color:#B9B6CC;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(255,255,255,.04);cursor:pointer;transition:transform .15s,background .3s,box-shadow .3s}
 .miclabel{font:700 10px/1 var(--mono);letter-spacing:2.5px;color:var(--dim);padding:5px 10px;border:1px solid var(--line);border-radius:999px;text-transform:uppercase;transition:color .3s,border-color .3s}
 .miclabel.on{color:#fff;border-color:var(--pink);background:rgba(255,92,200,.18);text-shadow:0 0 8px rgba(255,92,200,.8)}
+.callrow{display:flex;align-items:center;justify-content:center;gap:18px}
+.endcall{width:56px;height:56px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:radial-gradient(circle at 35% 30%,#FF7A7A,#D92B3A 60%,#7A0E1A);color:#fff;display:none;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(217,43,58,.5);cursor:pointer}.endcall.on{display:flex}.endcall svg{width:26px;height:26px}
+.endwrap{display:none;flex-direction:column;align-items:center;gap:6px}.endwrap.on{display:flex}.endwrap small{font:700 9px/1 var(--mono);letter-spacing:2px;color:var(--dim);text-transform:uppercase}
 .talk:active{transform:scale(.95)}
 .talk.on{color:#fff;border-color:rgba(255,255,255,.3);background:radial-gradient(circle at 35% 30%,#FF8FD8,#FF3D9A 60%,#8A0C4F);box-shadow:0 0 0 6px rgba(255,92,200,.15),0 0 48px rgba(255,92,200,.6);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 12px rgba(255,92,200,.08),0 0 56px rgba(255,92,200,.75)}}
@@ -127,9 +130,10 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
     <div class="tasks" id="tasks"></div>
   </main>
   <footer>
-    <div class="talkwrap"><button class="talk" id="talk" type="button" aria-pressed="false" aria-label="Microphone">
+    <div class="callrow"><div class="talkwrap"><button class="talk" id="talk" type="button" aria-pressed="false" aria-label="Microphone">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/></svg>
     </button><span class="miclabel" id="micLabel">Mic off</span></div>
+    <div class="endwrap" id="endWrap"><button class="endcall" id="endCall" type="button" aria-label="End call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 13.5c4.9-4.7 12.1-4.7 17 0l-2.2 2.2c-.6.6-1.5.7-2.2.3l-2.1-1.3a1.6 1.6 0 0 1-.7-1.5v-1.2a11 11 0 0 0-2.6 0v1.2c0 .6-.3 1.2-.7 1.5l-2.1 1.3c-.7.4-1.6.3-2.2-.3z"/></svg></button><small>End call</small></div></div>
     <div class="hint" id="hint">One tap · live line · speak, pause, she answers · tap to end · F for full screen</div>
     <form class="row" id="typeRow"><input id="typeIn" type="text" placeholder="Or type to Mimi…" autocomplete="off" maxlength="2000"><button type="submit">SEND</button></form>
   </footer>
@@ -279,10 +283,10 @@ async function lineOpen(){
   catch(e){ say('sys', 'The microphone was not allowed. Allow it for jazmine.ai and tap again.'); return; }
   S.mime = ['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(m => MediaRecorder.isTypeSupported(m)) || '';
   try{ const ctx = audioCtx(); const src = ctx.createMediaStreamSource(S.stream); S.an = ctx.createAnalyser(); S.an.fftSize = 1024; src.connect(S.an); }catch(e){ S.an = null; }
-  S.live = true; $('talk').classList.add('on'); $('talk').setAttribute('aria-pressed', 'true'); micLabel(true); $('hint').textContent = 'LIVE · speak, then pause · she answers · tap to end';
+  S.live = true; $('talk').classList.add('on'); $('talk').setAttribute('aria-pressed', 'true'); micLabel(true); $('endWrap').classList.add('on'); $('hint').textContent = 'LIVE · speak, then pause · she answers · tap to end';
   S.offered = true; const g = greet(); say('mimi', g); speak(g); // spoken() opens the mic when she is done
 }
-function lineClose(){ S.live = false; stopRec(true); if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); cancelAnimationFrame(S.raf); $('talk').classList.remove('on'); $('talk').setAttribute('aria-pressed', 'false'); micLabel(false); $('hint').textContent = 'One tap · live line · speak, pause, she answers · tap to end'; mode('idle'); S.level = 0; status('Line closed · tap to talk again'); }
+function lineClose(){ S.live = false; stopRec(true); if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); cancelAnimationFrame(S.raf); $('talk').classList.remove('on'); $('talk').setAttribute('aria-pressed', 'false'); micLabel(false); $('endWrap').classList.remove('on'); $('hint').textContent = 'One tap · live line · speak, pause, she answers · tap to end'; mode('idle'); S.level = 0; status('Line closed · tap to talk again'); }
 function listen(){
   if(!S.live || S.busy) return;
   S.chunks = []; S.heard = false; S.quietSince = 0; S.startedAt = Date.now();
@@ -405,7 +409,7 @@ function hush(){ if(S.audio){ S.audio.pause(); } if(window.speechSynthesis) spee
 $('tasks').addEventListener('click', e => { const b = e.target.closest('.task'); if(!b) return; unlockAudio(); hush();
   if(b.dataset.ok){ const t = S.picked.find(x => x.open); if(!t) return; t.open = false; t.done = true; if(t.s === 'Approval') S.nums.wait = Math.max(0, S.nums.wait - 1); S.nums.done += 1; say('you', t.s === 'Approval' ? 'Approve it.' : 'Got it.'); say('mimi', t.ok); speak(t.ok); drawTasks(); return; }
   const t = S.picked[Number(b.dataset.i)]; if(!t) return; S.picked.forEach(x => x.open = false); t.open = true; say('you', t.t); say('mimi', t.r); speak(t.r); drawTasks(); });
-function demoLine(){ unlockAudio(); if(!S.greeted){ S.greeted = true; if(!S.picked.length) pickTasks(); const g = greeting(); say('mimi', g); speak(g); status('Demo · tap a task, or say you are ready'); return; }
+function demoLine(){ unlockAudio(); $('endWrap').classList.add('on'); if(!S.greeted){ S.greeted = true; if(!S.picked.length) pickTasks(); const g = greeting(); say('mimi', g); speak(g); status('Demo · tap a task, or say you are ready'); return; }
   if(window.webkitSpeechRecognition || window.SpeechRecognition){ const R = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); R.lang = 'en-US'; R.interimResults = false; status('Listening'); mode('listen'); $('talk').classList.add('on'); micLabel(true); R.onresult = ev => { const v = ev.results[0][0].transcript; say('you', v); demoAnswer(v); }; R.onerror = () => { mode('idle'); status('Demo · tap a task'); }; R.onend = () => { $('talk').classList.remove('on'); micLabel(false); if(S.mode === 'listen'){ mode('idle'); status('Demo · tap a task'); } }; R.start(); }
   else { say('sys', 'Voice in demo needs Safari or Chrome. Tap a task, or type below.'); }
 }
@@ -422,6 +426,7 @@ function setMode(demo){ S.demo = demo; try{ localStorage.setItem('mimi-mode', de
   if(S.live) lineClose(); S.greeted = false; S.picked = []; drawTasks();
   if(demo){ demoStart(); pickTasks(); status('Demo · tap the orb button and Mimi greets you'); }
   else { document.querySelector('.brand small').textContent = W < 760 ? 'CHIEF OF STAFF · LIVE' : 'CHIEF OF STAFF · JAZMINE’S OFFICE'; S.state = null; S.cursor = ''; S.nums = {on:0, work:0, done:0, wait:0}; $('agents').innerHTML = ''; $('events').innerHTML = ''; $('ticker').innerHTML = ''; status('Tap the orb button to open the line'); if(!S.key) askKey(); else { checkVoice(); poll(); pollTodos(); } } }
+$('endCall').addEventListener('click', () => { hush(); if(S.live) lineClose(); else { $('talk').classList.remove('on'); micLabel(false); mode('idle'); } $('endWrap').classList.remove('on'); S.greeted = false; S.offered = false; status(S.demo ? 'Call ended · tap the mic to start again' : 'Call ended · tap the mic to call again'); });
 $('modeDemo').addEventListener('click', () => setMode(true));
 $('modeLive').addEventListener('click', () => setMode(false));
 drawCaps();
