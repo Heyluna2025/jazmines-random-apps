@@ -48,7 +48,10 @@ main{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify
 .caps .you::before{content:"YOU  ";font:700 10px var(--mono);letter-spacing:2px;color:var(--dim)}
 .caps .mimi{font-weight:600;font-size:clamp(16px,4vw,23px);line-height:1.3;color:#fff;text-shadow:0 0 18px rgba(157,92,255,.5);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .caps .sys{color:var(--warn);font-size:13px}
-.side{position:fixed;z-index:3;top:118px;bottom:190px;width:min(34vw,250px);display:flex;flex-direction:column;gap:6px;pointer-events:none;font-family:var(--mono);font-size:10px;line-height:1.35;overflow:hidden;mask-image:linear-gradient(#000 80%,transparent);-webkit-mask-image:linear-gradient(#000 80%,transparent)}
+.side{position:fixed;z-index:3;top:118px;bottom:24px;width:min(34vw,250px);display:flex;flex-direction:column;gap:6px;pointer-events:none;font-family:var(--mono);font-size:10px;line-height:1.35}
+.side .half{flex:1 1 0;min-height:0;overflow:hidden;mask-image:linear-gradient(#000 82%,transparent);-webkit-mask-image:linear-gradient(#000 82%,transparent)}.side .half.low{pointer-events:auto}
+.side .wait{display:block;width:100%;text-align:inherit;border:1px solid var(--line);background:rgba(157,92,255,.07);color:var(--ink);border-radius:8px;padding:6px 8px;margin:0 0 5px;font:inherit;cursor:pointer;opacity:0;animation:fade .6s forwards}.side .wait:hover{border-color:var(--cy)}.side .wait small{display:block;color:var(--v2);font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
+.side .todo{color:var(--ink);opacity:0;animation:fade .6s forwards;padding:3px 0;border-bottom:1px solid rgba(170,130,255,.1)}.side .todo b{color:var(--warn);font-weight:700}.side .todo.urgent b{color:var(--pink)}.side .todo i{font-style:normal;color:var(--dim)}
 .side.l{left:14px}.side.r{right:14px;text-align:right}
 .side h6{margin:0 0 2px;font:700 9px/1 var(--mono);letter-spacing:2px;color:var(--v2);text-transform:uppercase}
 .side .ev{color:var(--muted);opacity:0;animation:fade .6s forwards}
@@ -101,8 +104,8 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
 <div class="grid"></div>
 <canvas id="orb"></canvas>
 <div class="scan"></div>
-<div class="side l"><h6>Agents · live</h6><div id="agents"></div><h6 style="margin-top:8px">Signal</h6><div id="hexL" class="hex"></div></div>
-<div class="side r"><h6>Office stream</h6><div id="events"></div></div>
+<div class="side l"><div class="half"><h6>Agents · live</h6><div id="agents"></div><h6 style="margin-top:8px">Signal</h6><div id="hexL" class="hex"></div></div><div class="half low"><h6>Waiting for you · tap to be briefed</h6><div id="waiting"></div></div></div>
+<div class="side r"><div class="half"><h6>Office stream</h6><div id="events"></div></div><div class="half low"><h6>Your list</h6><div id="todos"></div></div></div>
 <div class="ui">
   <header>
     <b class="brand">MIMI<small>CHIEF OF STAFF · JAZMINE'S OFFICE</small></b>
@@ -124,7 +127,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
     <div class="talkwrap"><button class="talk" id="talk" type="button" aria-pressed="false" aria-label="Microphone">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/></svg>
     </button><span class="miclabel" id="micLabel">Mic off</span></div>
-    <div class="hint" id="hint">One tap · live line · speak, pause, she answers · tap to end</div>
+    <div class="hint" id="hint">One tap · live line · speak, pause, she answers · tap to end · F for full screen</div>
     <form class="row" id="typeRow"><input id="typeIn" type="text" placeholder="Or type to Mimi…" autocomplete="off" maxlength="2000"><button type="submit">SEND</button></form>
   </footer>
 </div>
@@ -229,6 +232,8 @@ function applyState(st){
   if(Array.isArray(st.agents)) S.state.agents = st.agents;
   if(Array.isArray(st.events) && st.events.length) S.state.events = [...st.events, ...S.state.events].filter((e, i, a) => a.findIndex(x => x.id === e.id) === i).sort((a, b) => Number(b.id) - Number(a.id)).slice(0, 40);
   if(typeof st.inbox_open === 'number') S.nums.wait = st.inbox_open;
+  if(Array.isArray(st.inbox)){ const open = st.inbox.filter(i => i.status === 'open' || !i.status); if(open.length || !S.cursor) S.state.inbox = open; }
+  drawWaiting();
   if(st.cursor) S.cursor = String(st.cursor);
   const ag = S.state.agents.filter(a => a.kind !== 'decor');
   S.nums.on = ag.filter(a => a.connected && a.duty !== false).length;
@@ -241,6 +246,13 @@ function applyState(st){
   $('events').innerHTML = ev || '<div class="ev" style="color:var(--dim)">no events yet</div>';
   $('ticker').innerHTML = '<span>' + S.state.events.slice(0, 12).map(e => fmt(e.at) + ' ' + esc(String(e.title || '').slice(0, 60))).join('   ◆   ') + '</span>';
 }
+function drawWaiting(){ const byId = Object.fromEntries((S.state.agents || []).map(a => [a.id, a.name])); const rows = (S.state.inbox || []).slice(0, 6);
+  $('waiting').innerHTML = rows.map((i, n) => '<button class="wait" type="button" data-title="'+esc(i.title)+'" style="animation-delay:'+(n * 70)+'ms"><small>'+esc((byId[i.agent_id] || i.agent_id || '') + (i.kind === 'approval' ? ' · needs your OK' : ' · to read'))+'</small>'+esc(String(i.title).slice(0, 70))+'</button>').join('') || '<div class="todo" style="color:var(--dim)">nothing waiting</div>'; }
+function drawTodos(list){ const rows = (list || []).filter(t => !t.done).slice(0, 8);
+  $('todos').innerHTML = rows.map((t, n) => '<div class="todo'+(/urgent|high/i.test(t.priority || '') ? ' urgent' : '')+'" style="animation-delay:'+(n * 70)+'ms"><b>'+esc(String(t.priority || 'todo').toUpperCase().slice(0, 6))+'</b> '+esc(String(t.title).slice(0, 64))+(t.due ? ' <i>· '+esc(String(t.due).slice(0, 10))+'</i>' : '')+'</div>').join('') || '<div class="todo" style="color:var(--dim)">your list is clear</div>'; }
+$('waiting').addEventListener('click', e => { const b = e.target.closest('.wait'); if(!b || S.busy) return; unlockAudio(); const q = 'Brief me on: ' + b.dataset.title; if(S.demo){ say('you', q); demoAnswer(q); return; } stopRec(true); send(q); });
+function pollTodos(){ if(S.demo || !S.key) return; api('ao-state?view=todos').then(r => drawTodos(r.todos || [])).catch(() => {}); }
+setInterval(() => { if(!document.hidden) pollTodos(); }, 60000);
 let polling = false;
 function poll(){ if(S.demo || polling || !S.key) return; polling = true; api('ao-state' + (S.cursor ? '?since=' + S.cursor : '')).then(st => { polling = false; applyState(st); }).catch(() => { polling = false; }); }
 setInterval(() => { if(!document.hidden) poll(); }, 15000);
@@ -345,6 +357,8 @@ function spoken(){ if(!S.speaking) return; S.speaking = false; S.level = 0;
 $('talk').addEventListener('click', () => { if(S.fillerOn) return; if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); spoken(); return; } if(S.live) lineClose(); else lineOpen(); });
 $('typeRow').addEventListener('submit', e => { e.preventDefault(); const v = $('typeIn').value.trim(); if(!v || S.busy) return; $('typeIn').value = ''; unlockAudio(); if(S.demo){ say('you', v); demoAnswer(v); return; } if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); S.speaking = false; } stopRec(true); send(v); });
 document.addEventListener('visibilitychange', () => { if(document.hidden && S.live) lineClose(); });
+// Her words (11 Nov): F goes full screen.
+document.addEventListener('keydown', e => { if(e.key.toLowerCase() !== 'f' || e.metaKey || e.ctrlKey || e.altKey) return; const tag = (document.activeElement && document.activeElement.tagName) || ''; if(tag === 'INPUT' || tag === 'TEXTAREA') return; e.preventDefault(); const el = document.documentElement; if(document.fullscreenElement || document.webkitFullscreenElement){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); } else { (el.requestFullscreen || el.webkitRequestFullscreen).call(el); } });
 
 /* ---------------- Demo: no office needed. Mimi greets her, lays five of today's tasks on the table, and briefs her on the one she taps. ----------------
    Her words (11 Nov): "With demo, have Mimi greet me and give 5 random tasks. Have Mimi report on something and click one or something." */
@@ -360,9 +374,11 @@ const DEMO_TASKS = [
   {k:'camp', t:'Camp Week 3 highlights video', s:'Approval', r:'Edith cut the Week 3 highlights to ninety seconds. Jimmy wrote the caption for Camp Announcements, and Alicia planned the Wednesday post on your Page.', ok:'Approved. Jimmy posts in Camp Announcements, and the Page post goes Wednesday at seven.'},
   {k:'didi', t:'Didi’s 7-day content plan for the club', s:'Ready', r:'Didi drafted seven days for AI Empowered Club: three statics, two carousels, one GIF and one reel, all from the Freedom modules and AI Pulse. She is on hold until Patricia connects the club accounts in Blotato.', ok:'I will remind Patricia about the Blotato accounts today.'}
 ];
-const DEMO_STATE = {agents:[{name:'Alicia', status:'working', task:'Planning the week on TikTok and the Facebook Page', progress:.62, connected:true, done_today:4},{name:'Sam', status:'working', task:'Three talking-head scripts', progress:.35, connected:true, done_today:3},{name:'Harry', status:'working', task:'Reviewing scraped leads, batch #18', progress:.8, connected:true, done_today:6},{name:'Rebecca', status:'idle', connected:true, done_today:2},{name:'Iris', status:'working', task:'Carousel batch, slide 6 of 8', progress:.7, connected:true, done_today:1}].concat(Array.from({length:26}, (_, i) => ({name:'Agent '+(i+6), status:'idle', connected:true, done_today:i % 3}))),
+const DEMO_STATE = {agents:[{id:'so', name:'Alicia', status:'working', task:'Planning the week on TikTok and the Facebook Page', progress:.62, connected:true, done_today:4},{id:'sam', name:'Sam', status:'working', task:'Three talking-head scripts', progress:.35, connected:true, done_today:3},{id:'lf', name:'Harry', status:'working', task:'Reviewing scraped leads, batch #18', progress:.8, connected:true, done_today:6},{id:'em', name:'Rebecca', status:'idle', connected:true, done_today:2},{id:'ga', name:'Iris', status:'working', task:'Carousel batch, slide 6 of 8', progress:.7, connected:true, done_today:1}].concat(Array.from({length:26}, (_, i) => ({name:'Agent '+(i+6), status:'idle', connected:true, done_today:i % 3}))),
+  inbox:[{id:1, agent_id:'so', kind:'approval', title:'FB Reels Nov 16-20 on Jazmine de Luna page', status:'open'},{id:2, agent_id:'sam', kind:'delivery', title:'3 Reel Scripts for today (PDF)', status:'open'},{id:3, agent_id:'em', kind:'approval', title:'Welcome sequence: 7 emails for new trial members', status:'open'},{id:4, agent_id:'ga', kind:'approval', title:'Carousel batch: Claude on your laptop, 4 ways', status:'open'},{id:5, agent_id:'lf', kind:'delivery', title:'Review scraped leads, batch #18: 1 new', status:'open'}],
+  todos:[{title:'Connect Instagram in Blotato', priority:'urgent', due:'2026-11-12'},{title:'Record Sam’s script 1 (Stop asking AI for content ideas)', priority:'high'},{title:'Approve Alicia’s week on the FB Page', priority:'high'},{title:'Breakfast Club reminder: check Rebecca’s email', priority:'normal', due:'2026-11-13'},{title:'Build Day QC: 39 seats to fill', priority:'normal'},{title:'TikTok caption export for Didi', priority:'low'}],
   events:['Alicia scheduled 6 posts through Blotato','Sam sent you: 3 Reel Scripts for today','Harry finished: Review scraped leads, batch #18','Lewis checked: FB Reels Nov 16-20','Leonardo forwarded: Rebecca’s welcome sequence','Lawrence updated the scoreboard','Jinny uploaded the AI Pulse replay to Circle','Emma: 12 members active in Show & Tell today'].map((t, i) => ({id: 100 - i, at: new Date(Date.now() - i * 7 * 60000).toISOString(), title: t}))};
-function demoStart(){ S.state = null; S.cursor = ''; applyState({agents: DEMO_STATE.agents, events: DEMO_STATE.events, inbox_open: 5, cursor: 'demo'}); document.querySelector('.brand small').textContent = W < 760 ? 'DEMO · NOT REAL' : 'CHIEF OF STAFF · DEMO · NOTHING HERE IS REAL'; }
+function demoStart(){ S.state = null; S.cursor = ''; applyState({agents: DEMO_STATE.agents, events: DEMO_STATE.events, inbox: DEMO_STATE.inbox, inbox_open: 5, cursor: 'demo'}); drawTodos(DEMO_STATE.todos); document.querySelector('.brand small').textContent = W < 760 ? 'DEMO · NOT REAL' : 'CHIEF OF STAFF · DEMO · NOTHING HERE IS REAL'; }
 function greeting(){ const hour = Number(new Intl.DateTimeFormat('en-US', {timeZone:TZ, hour:'numeric', hour12:false}).format(new Date())); return (hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening') + ', Jazmine. Mimi here. Five things on my desk for you today. Tap one and I will brief you.'; }
 function pickTasks(){ const pool = DEMO_TASKS.slice().sort(() => Math.random() - .5); S.picked = pool.slice(0, 5); drawTasks(); prefetchVoice([greeting(), ...S.picked.map(t => t.r), ...S.picked.map(t => t.ok), 'Hi Jazmine. Five things are on the table; tap one or just name it.', 'In demo I can only brief you on the five tasks on the table. Switch to Live and I answer from the real office.']); }
 function drawTasks(){ $('tasks').innerHTML = S.picked.map((t, i) => '<button class="task'+(t.done ? ' done' : '')+'" type="button" data-i="'+i+'"><small>'+esc(t.s)+(t.done ? ' · done' : '')+'</small>'+esc(t.t)+'</button>').join('') + (S.picked.some(t => t.open) ? '<button class="task go" type="button" data-ok="1"><small>Your call</small>'+(S.picked.find(t => t.open).s === 'Approval' ? 'Approve it' : 'Got it, next')+'</button>' : ''); }
@@ -384,7 +400,7 @@ function demoAnswer(v){ const q = v.toLowerCase(); let t = S.picked.find(x => x.
 function setMode(demo){ S.demo = demo; try{ localStorage.setItem('mimi-mode', demo ? 'demo' : 'live'); }catch(e){} $('modeDemo').setAttribute('aria-pressed', String(demo)); $('modeLive').setAttribute('aria-pressed', String(!demo));
   if(S.live) lineClose(); S.greeted = false; S.picked = []; drawTasks();
   if(demo){ demoStart(); pickTasks(); status('Demo · tap the orb button and Mimi greets you'); }
-  else { document.querySelector('.brand small').textContent = W < 760 ? 'CHIEF OF STAFF · LIVE' : 'CHIEF OF STAFF · JAZMINE’S OFFICE'; S.state = null; S.cursor = ''; S.nums = {on:0, work:0, done:0, wait:0}; $('agents').innerHTML = ''; $('events').innerHTML = ''; $('ticker').innerHTML = ''; status('Tap the orb button to open the line'); if(!S.key) askKey(); else { checkVoice(); poll(); } } }
+  else { document.querySelector('.brand small').textContent = W < 760 ? 'CHIEF OF STAFF · LIVE' : 'CHIEF OF STAFF · JAZMINE’S OFFICE'; S.state = null; S.cursor = ''; S.nums = {on:0, work:0, done:0, wait:0}; $('agents').innerHTML = ''; $('events').innerHTML = ''; $('ticker').innerHTML = ''; status('Tap the orb button to open the line'); if(!S.key) askKey(); else { checkVoice(); poll(); pollTodos(); } } }
 $('modeDemo').addEventListener('click', () => setMode(true));
 $('modeLive').addEventListener('click', () => setMode(false));
 drawCaps();
