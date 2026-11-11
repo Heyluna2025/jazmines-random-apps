@@ -46,7 +46,7 @@ main{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify
 .caps{width:min(720px,100%);text-align:center;min-height:96px;display:flex;flex-direction:column;gap:8px;justify-content:flex-end;margin-top:6px}
 .caps .you{color:var(--muted);font-size:14px}
 .caps .you::before{content:"YOU  ";font:700 10px var(--mono);letter-spacing:2px;color:var(--dim)}
-.caps .mimi{font-weight:600;font-size:clamp(16px,4vw,23px);line-height:1.3;color:#fff;text-shadow:0 0 18px rgba(157,92,255,.5);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.caps .mimi{font-weight:600;font-size:clamp(16px,4vw,23px);line-height:1.3;color:#fff;text-shadow:0 0 18px rgba(157,92,255,.5);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .caps .sys{color:var(--warn);font-size:13px}
 .side{position:fixed;z-index:3;top:118px;bottom:190px;width:min(34vw,250px);display:flex;flex-direction:column;gap:6px;pointer-events:none;font-family:var(--mono);font-size:10px;line-height:1.35;overflow:hidden;mask-image:linear-gradient(#000 80%,transparent);-webkit-mask-image:linear-gradient(#000 80%,transparent)}
 .side.l{left:14px}.side.r{right:14px;text-align:right}
@@ -87,7 +87,7 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
 .log p.you{background:rgba(94,231,255,.08)}
 .log p.sys{background:none;border:0;color:var(--warn);text-align:center;font-size:13px}
 .log .close{position:sticky;top:0;display:block;margin:0 auto 12px;width:max-content}
-@media (max-width:760px){.side{display:none}.ticker{display:block}.stat b{font-size:18px}.brand{font-size:16px}.clock{font-size:11px}header .tools{width:100%;justify-content:flex-end}.logo{bottom:calc(max(10px,env(safe-area-inset-bottom)) + 64px)}}
+@media (max-width:760px){.side{display:none}.ticker{display:block}.stat b{font-size:18px}.brand{font-size:16px}.clock{font-size:11px}header .tools{width:100%;justify-content:flex-end}.logo{bottom:calc(max(10px,env(safe-area-inset-bottom)) + 124px);right:14px}.logo img{height:20px}}
 .logo{position:fixed;right:16px;bottom:max(14px,env(safe-area-inset-bottom));z-index:4;display:flex;flex-direction:column;align-items:flex-end;gap:3px;opacity:.85;pointer-events:none}.logo small{font:700 7.5px/1 var(--mono);letter-spacing:2px;color:var(--dim)}.logo img{height:26px;width:auto;filter:drop-shadow(0 0 10px rgba(157,92,255,.6))}
 @media (min-width:761px){.stats{position:fixed;top:64px;left:50%;transform:translateX(-50%);width:min(640px,calc(100vw - 28px));z-index:3}}
 </style>
@@ -161,7 +161,7 @@ function seed(){
   DUST = []; for(let i = 0; i < 220; i++) DUST.push({a: Math.random() * 6.28, r: Math.random(), v: (Math.random() - .5) * .004 + .003, z: Math.random() * 2 - 1, s: Math.random()});
   STARS = []; for(let i = 0; i < 160; i++) STARS.push({x: Math.random(), y: Math.random(), s: Math.random() * 1.4 + .3, v: Math.random() * .00008 + .00002, p: Math.random() * 6.28});
 }
-function center(){ return {cx: W / 2, cy: W < 760 ? H * .36 : H * .43, R: Math.min(W, H) * (W < 760 ? .22 : .17)}; }
+function center(){ return {cx: W / 2, cy: W < 760 ? H * .36 : H * .38, R: Math.min(W, H) * (W < 760 ? .22 : .15)}; }
 function draw(t){
   const dt = Math.min(50, t - tPrev) / 1000; tPrev = t;
   const {cx, cy, R} = center();
