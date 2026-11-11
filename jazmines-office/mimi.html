@@ -312,14 +312,14 @@ async function send(text){
 }
 const VOICE = {};
 let prefetching = Promise.resolve();
-function prefetchVoice(lines){ for(const line of lines){ if(VOICE[line]) continue; prefetching = prefetching.then(() => api('ao-voice', {say:spoken(line)}).then(r => { if(r.url){ VOICE[line] = r.url; const a = new Audio(); a.preload = 'auto'; a.src = r.url; a.load(); } }).catch(() => {})); } }
-const spoken = t => String(t).replace(/Switch to Live/g, 'Switch to the real office').replace(/\bLive\b/g, 'the real office');
+function prefetchVoice(lines){ for(const line of lines){ if(VOICE[line]) continue; prefetching = prefetching.then(() => api('ao-voice', {say:sayable(line)}).then(r => { if(r.url){ VOICE[line] = r.url; const a = new Audio(); a.preload = 'auto'; a.src = r.url; a.load(); } }).catch(() => {})); } }
+const sayable = t => String(t).replace(/Switch to Live/g, 'Switch to the real office').replace(/\bLive\b/g, 'the real office');
 function speak(text, b64, problem){
   S.speaking = true; status('Mimi'); mode('speak'); S.level = 0;
   // In demo, with a key on this phone, her ElevenLabs voice is fetched for the line; without one the phone reads it.
   // A demo line is spoken by the office in her voice with no key at all (the set of lines is closed); a live answer brings its own audio.
   if(!b64 && b64 !== null && VOICE[text]){ speak(text, VOICE[text]); return; }
-  if(!b64 && b64 !== null){ api('ao-voice', {say:spoken(text)}).then(r => { if(!S.speaking) return; if(r.url) speak(text, r.url); else if(r.audio) speak(text, r.audio); else speak(text, null, r.voice_problem); }).catch(() => { if(S.speaking) speak(text, null, 'the office did not answer'); }); return; }
+  if(!b64 && b64 !== null){ api('ao-voice', {say:sayable(text)}).then(r => { if(!S.speaking) return; if(r.url) speak(text, r.url); else if(r.audio) speak(text, r.audio); else speak(text, null, r.voice_problem); }).catch(() => { if(S.speaking) speak(text, null, 'the office did not answer'); }); return; }
   if(problem && !S.problemShown){ S.problemShown = true; say('sys', 'Phone voice for now: ' + problem); }
   if(b64 && S.audio){
     S.audio.src = /^https?:/.test(b64) ? b64 : 'data:audio/mpeg;base64,' + b64;
@@ -328,7 +328,7 @@ function speak(text, b64, problem){
     S.audio.play().catch(() => { spoken(); }); return;
   }
   if(window.speechSynthesis){
-    const u = new SpeechSynthesisUtterance(spoken(text)); u.rate = 1.02; u.pitch = 1.08;
+    const u = new SpeechSynthesisUtterance(sayable(text)); u.rate = 1.02; u.pitch = 1.08;
     const vs = speechSynthesis.getVoices(); const pick = vs.find(v => /Samantha|Karen|Moira|Google US English|Zira|Aria/i.test(v.name)) || vs.find(v => /^en/i.test(v.lang)); if(pick) u.voice = pick;
     u.onend = spoken; u.onerror = spoken; speechSynthesis.cancel(); speechSynthesis.speak(u); return;
   }
