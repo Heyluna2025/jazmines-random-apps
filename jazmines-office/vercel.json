@@ -1,1 +1,156 @@
-{"headers": [{"source": "/models/index.json", "headers": [{"key": "Cache-Control", "value": "no-cache"}]}, {"source": "/models/(.*)\\.glb", "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]}], "rewrites": [{"source": "/office", "destination": "/index.html"}, {"source": "/office/", "destination": "/index.html"}, {"source": "/office/:path*", "destination": "/:path*"}, {"source": "/tools", "destination": "/tools/index.html"}, {"source": "/tools/", "destination": "/tools/index.html"}, {"source": "/editor", "destination": "/editor/index.html"}, {"source": "/editor/", "destination": "/editor/index.html"}, {"source": "/scheduler", "destination": "/scheduler/index.html"}, {"source": "/scheduler/", "destination": "/scheduler/index.html"}, {"source": "/leadsfinder", "destination": "/leadsfinder/index.html"}, {"source": "/leadsfinder/", "destination": "/leadsfinder/index.html"}]}
+{
+ "headers": [
+  {
+   "source": "/models/index.json",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-cache"
+    }
+   ]
+  },
+  {
+   "source": "/models/(.*)\\.glb",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=31536000, immutable"
+    }
+   ]
+  }
+ ],
+ "rewrites": [
+  {
+   "source": "/office",
+   "destination": "/index.html"
+  },
+  {
+   "source": "/office/",
+   "destination": "/index.html"
+  },
+  {
+   "source": "/office/:path*",
+   "destination": "/:path*"
+  },
+  {
+   "source": "/tools",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/tools/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/tools/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/tools/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/tools",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/tools/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/tools/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/tools/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/editor",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/editor/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/editor/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/editor/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/editor",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/editor/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/editor/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/editor/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/scheduler",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/scheduler/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/scheduler/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/scheduler/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/scheduler",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/scheduler/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/scheduler/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/scheduler/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/leadsfinder",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/leadsfinder/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/leadsfinder/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/leadsfinder/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/leadsfinder",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/leadsfinder/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/leadsfinder/",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/leadsfinder/index.html?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/media/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/media/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/media/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/media/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/models/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/models/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/models/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/models/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/sounds/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/sounds/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/sounds/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/sounds/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/editor/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/editor/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/editor/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/editor/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/scheduler/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/scheduler/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/scheduler/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/scheduler/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/leadsfinder/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/leadsfinder/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/leadsfinder/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/leadsfinder/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/tools/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/tools/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  },
+  {
+   "source": "/office/tools/:path*",
+   "destination": "https://jazmines-office-c4r5wgxca-heylunas-projects.vercel.app/tools/:path*?x-vercel-protection-bypass=qkRhydQUdforA2wnfyJglfHMeNbrnrlw"
+  }
+ ]
+}
