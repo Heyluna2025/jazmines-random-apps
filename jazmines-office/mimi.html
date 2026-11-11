@@ -271,7 +271,7 @@ function listen(){
   S.rec.start(); status('Listening'); mode('listen'); meter();
 }
 function stopRec(silent){ cancelAnimationFrame(S.raf); if(S.rec && S.rec.state === 'recording'){ if(silent) S.rec.onstop = null; S.rec.stop(); } }
-const FLOOR = 0.015, QUIET_MS = 1200, MAX_MS = 40000;
+const FLOOR = 0.015, QUIET_MS = 850, MAX_MS = 40000;
 function rmsOf(an){ const buf = new Uint8Array(an.fftSize); an.getByteTimeDomainData(buf); let s = 0; for(let i = 0; i < buf.length; i++){ const v = (buf[i] - 128) / 128; s += v * v; } return Math.sqrt(s / buf.length); }
 function meter(){
   if(!S.live || !S.rec || S.rec.state !== 'recording') return;
@@ -287,13 +287,13 @@ async function send(text){
   let you = null;
   try{
     let body;
-    if(text){ body = {call_id:S.id, text, offered:S.offered}; you = say('you', text); }
+    if(text){ body = {call_id:S.id, text, offered:S.offered, fast:true}; you = say('you', text); }
     else {
       const blob = new Blob(S.chunks, {type: (S.rec && S.rec.mimeType) || S.mime || 'audio/webm'});
       if(blob.size < 1500){ S.busy = false; listen(); return; }
       const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
       you = say('you', '…');
-      body = {call_id:S.id, audio:b64, mime:blob.type, offered:S.offered};
+      body = {call_id:S.id, audio:b64, mime:blob.type, offered:S.offered, fast:true};
     }
     const r = await api('ao-voice', body);
     if(you && !text){ you.text = r.heard || '(nothing heard)'; drawCaps(); }
@@ -302,7 +302,7 @@ async function send(text){
     say('mimi', said);
     if(/bandwidth|marinig|want to hear/i.test(said)) S.offered = true;
     S.busy = false;
-    speak(said, r.audio || null, r.audio ? '' : (r.voice_problem || 'her ElevenLabs voice did not answer'));
+    if(r.speak_url) speak(said, r.speak_url); else speak(said, r.audio || null, r.audio ? '' : (r.voice_problem || 'her ElevenLabs voice did not answer'));
     setTimeout(poll, 1500);
   }catch(e){
     if(you && you.text === '…'){ S.log = S.log.filter(m => m !== you); drawCaps(); }
