@@ -299,7 +299,7 @@ async function send(text){
     say('mimi', said);
     if(/bandwidth|marinig|want to hear/i.test(said)) S.offered = true;
     S.busy = false;
-    speak(said, r.audio);
+    speak(said, r.audio || null, r.audio ? '' : (r.voice_problem || 'her ElevenLabs voice did not answer'));
     setTimeout(poll, 1500);
   }catch(e){
     if(you && you.text === '…'){ S.log = S.log.filter(m => m !== you); drawCaps(); }
@@ -307,8 +307,11 @@ async function send(text){
     S.busy = false; mode(S.live ? 'listen' : 'idle'); status(S.live ? 'Listening' : 'Tap to talk'); if(S.live) setTimeout(listen, 800);
   }
 }
-function speak(text, b64){
+function speak(text, b64, problem){
   S.speaking = true; status('Mimi'); mode('speak'); S.level = 0;
+  // In demo, with a key on this phone, her ElevenLabs voice is fetched for the line; without one the phone reads it.
+  if(!b64 && S.key && b64 !== null){ api('ao-voice', {say:text}).then(r => { if(!S.speaking) return; if(r.audio) speak(text, r.audio); else speak(text, null, r.voice_problem); }).catch(() => { if(S.speaking) speak(text, null, 'the office did not answer'); }); return; }
+  if(problem && !S.problemShown){ S.problemShown = true; say('sys', 'Phone voice for now: ' + problem); }
   if(b64 && S.audio){
     S.audio.src = 'data:audio/mpeg;base64,' + b64;
     try{ const ctx = audioCtx(); if(ctx && !S.playAn){ const src = ctx.createMediaElementSource(S.audio); S.playAn = ctx.createAnalyser(); S.playAn.fftSize = 512; src.connect(S.playAn); S.playAn.connect(ctx.destination); } if(ctx && ctx.state === 'suspended') ctx.resume(); }catch(e){}
