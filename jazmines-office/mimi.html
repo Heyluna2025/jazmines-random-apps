@@ -59,9 +59,13 @@ main{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify
 .side .hex{color:var(--dim);letter-spacing:1px;font-size:9px}
 @keyframes fade{to{opacity:1}}
 footer{display:flex;flex-direction:column;gap:10px;align-items:center}
-.talk{width:78px;height:78px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:radial-gradient(circle at 35% 30%,#C77DFF,#5B2BD6 60%,#2A0F6E);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(157,92,255,.12),0 0 40px rgba(157,92,255,.55);cursor:pointer;transition:transform .15s}
+.talkwrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.talk{width:78px;height:78px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:radial-gradient(circle at 35% 30%,#5A5872,#34324A 60%,#1E1C2E);color:#B9B6CC;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(255,255,255,.04);cursor:pointer;transition:transform .15s,background .3s,box-shadow .3s}
+.miclabel{font:700 10px/1 var(--mono);letter-spacing:2.5px;color:var(--dim);padding:5px 10px;border:1px solid var(--line);border-radius:999px;text-transform:uppercase;transition:color .3s,border-color .3s}
+.miclabel.on{color:#fff;border-color:var(--pink);background:rgba(255,92,200,.18);text-shadow:0 0 8px rgba(255,92,200,.8)}
 .talk:active{transform:scale(.95)}
-.talk.on{background:radial-gradient(circle at 35% 30%,#FF8FD8,#FF3D9A 60%,#8A0C4F);box-shadow:0 0 0 6px rgba(255,92,200,.15),0 0 48px rgba(255,92,200,.6)}
+.talk.on{color:#fff;border-color:rgba(255,255,255,.3);background:radial-gradient(circle at 35% 30%,#FF8FD8,#FF3D9A 60%,#8A0C4F);box-shadow:0 0 0 6px rgba(255,92,200,.15),0 0 48px rgba(255,92,200,.6);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 12px rgba(255,92,200,.08),0 0 56px rgba(255,92,200,.75)}}
 .talk svg{width:32px;height:32px}
 .row{display:flex;gap:8px;width:min(720px,100%)}
 .row input{flex:1;min-width:0;border-radius:12px;border:1px solid var(--line);background:rgba(20,8,60,.6);color:var(--ink);padding:11px 14px;font:inherit;font-size:16px;outline:none}
@@ -117,9 +121,9 @@ dialog button{width:100%;border:0;border-radius:12px;background:linear-gradient(
     <div class="tasks" id="tasks"></div>
   </main>
   <footer>
-    <button class="talk" id="talk" type="button" aria-pressed="false" aria-label="Talk to Mimi">
+    <div class="talkwrap"><button class="talk" id="talk" type="button" aria-pressed="false" aria-label="Microphone">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/></svg>
-    </button>
+    </button><span class="miclabel" id="micLabel">Mic off</span></div>
     <div class="hint" id="hint">One tap · live line · speak, pause, she answers · tap to end</div>
     <form class="row" id="typeRow"><input id="typeIn" type="text" placeholder="Or type to Mimi…" autocomplete="off" maxlength="2000"><button type="submit">SEND</button></form>
   </footer>
@@ -143,6 +147,7 @@ $('keyDlg').addEventListener('close', () => { const v = $('keyIn').value.trim();
 $('keyBtn').addEventListener('click', () => askKey('Paste the office key. It stays on this phone.'));
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function status(t){ $('status').textContent = t; }
+function micLabel(on){ const l = $('micLabel'); l.textContent = on ? 'Mic on' : 'Mic off'; l.classList.toggle('on', !!on); }
 function mode(m){ S.mode = m; }
 function say(kind, text){ const m = {kind, text, at:Date.now()}; S.log.push(m); S.log = S.log.slice(-200); try{ localStorage.setItem('mimi-log', JSON.stringify(S.log)); }catch(e){} drawCaps(); if($('log').classList.contains('open')) drawLog(); return m; }
 function drawCaps(){ const you = [...S.log].reverse().find(m => m.kind === 'you'), mimi = [...S.log].reverse().find(m => m.kind === 'mimi' || m.kind === 'sys');
@@ -250,10 +255,10 @@ async function lineOpen(){
   catch(e){ say('sys', 'The microphone was not allowed. Allow it for jazmine.ai and tap again.'); return; }
   S.mime = ['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'].find(m => MediaRecorder.isTypeSupported(m)) || '';
   try{ const ctx = audioCtx(); const src = ctx.createMediaStreamSource(S.stream); S.an = ctx.createAnalyser(); S.an.fftSize = 1024; src.connect(S.an); }catch(e){ S.an = null; }
-  S.live = true; $('talk').classList.add('on'); $('talk').setAttribute('aria-pressed', 'true'); $('hint').textContent = 'LIVE · speak, then pause · she answers · tap to end';
+  S.live = true; $('talk').classList.add('on'); $('talk').setAttribute('aria-pressed', 'true'); micLabel(true); $('hint').textContent = 'LIVE · speak, then pause · she answers · tap to end';
   listen();
 }
-function lineClose(){ S.live = false; stopRec(true); if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); cancelAnimationFrame(S.raf); $('talk').classList.remove('on'); $('talk').setAttribute('aria-pressed', 'false'); $('hint').textContent = 'One tap · live line · speak, pause, she answers · tap to end'; mode('idle'); S.level = 0; status('Line closed · tap to talk again'); }
+function lineClose(){ S.live = false; stopRec(true); if(S.stream){ S.stream.getTracks().forEach(t => t.stop()); S.stream = null; } if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); cancelAnimationFrame(S.raf); $('talk').classList.remove('on'); $('talk').setAttribute('aria-pressed', 'false'); micLabel(false); $('hint').textContent = 'One tap · live line · speak, pause, she answers · tap to end'; mode('idle'); S.level = 0; status('Line closed · tap to talk again'); }
 function listen(){
   if(!S.live || S.busy) return;
   S.chunks = []; S.heard = false; S.quietSince = 0; S.startedAt = Date.now();
@@ -345,7 +350,7 @@ $('tasks').addEventListener('click', e => { const b = e.target.closest('.task');
   if(b.dataset.ok){ const t = S.picked.find(x => x.open); if(!t) return; t.open = false; t.done = true; if(t.s === 'Approval') S.nums.wait = Math.max(0, S.nums.wait - 1); S.nums.done += 1; say('you', t.s === 'Approval' ? 'Approve it.' : 'Got it.'); say('mimi', t.ok); speak(t.ok); drawTasks(); return; }
   const t = S.picked[Number(b.dataset.i)]; if(!t) return; S.picked.forEach(x => x.open = false); t.open = true; say('you', t.t); say('mimi', t.r); speak(t.r); drawTasks(); });
 function demoLine(){ unlockAudio(); if(!S.greeted){ S.greeted = true; pickTasks(); const hour = Number(new Intl.DateTimeFormat('en-US', {timeZone:TZ, hour:'numeric', hour12:false}).format(new Date())); const g = (hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening') + ', Jazmine. Mimi here. Five things on my desk for you today. Tap one and I will brief you.'; say('mimi', g); speak(g); status('Demo · tap a task'); return; }
-  if(window.webkitSpeechRecognition || window.SpeechRecognition){ const R = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); R.lang = 'en-US'; R.interimResults = false; status('Listening'); mode('listen'); R.onresult = ev => { const v = ev.results[0][0].transcript; say('you', v); demoAnswer(v); }; R.onerror = () => { mode('idle'); status('Demo · tap a task'); }; R.onend = () => { if(S.mode === 'listen'){ mode('idle'); status('Demo · tap a task'); } }; R.start(); }
+  if(window.webkitSpeechRecognition || window.SpeechRecognition){ const R = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); R.lang = 'en-US'; R.interimResults = false; status('Listening'); mode('listen'); $('talk').classList.add('on'); micLabel(true); R.onresult = ev => { const v = ev.results[0][0].transcript; say('you', v); demoAnswer(v); }; R.onerror = () => { mode('idle'); status('Demo · tap a task'); }; R.onend = () => { $('talk').classList.remove('on'); micLabel(false); if(S.mode === 'listen'){ mode('idle'); status('Demo · tap a task'); } }; R.start(); }
   else { say('sys', 'Voice in demo needs Safari or Chrome. Tap a task, or type below.'); }
 }
 function demoAnswer(v){ const q = v.toLowerCase(); let t = S.picked.find(x => x.t.toLowerCase().split(/\W+/).some(w => w.length > 4 && q.includes(w)));
