@@ -2783,11 +2783,11 @@ function idleTick(){ if(!MEET.id || MEET.ended) return; MEET.invited.forEach(id 
 function meetSpeak(id, on){ document.querySelectorAll('.tile.speaking').forEach(t => { t.classList.remove('speaking'); tileTalk(t, false); }); if(on && id && id !== 'you'){ const t = $('tile-'+id); if(t){ const mo = t.querySelector('video.moment'); if(mo) mo.remove(); tileTalk(t, true); } } if(on && id){ const t = id === 'you' ? $('tileYou') : $('tile-'+id); if(t) t.classList.add('speaking'); } MEET.speaking = on ? id : null; const g = $('meetGrid'); if(g) g.classList.toggle('spot', !!(on && id) && MEET.view !== 'gallery'); }
 $('meetView').addEventListener('click', () => { MEET.view = MEET.view === 'gallery' ? 'speaker' : 'gallery'; setText($('meetView'), MEET.view === 'gallery' ? 'Gallery view' : 'Speaker view'); $('meetView').setAttribute('aria-pressed', String(MEET.view !== 'gallery')); const g = $('meetGrid'); if(g) g.classList.toggle('spot', !!MEET.speaking && MEET.view !== 'gallery'); });
 function meetVoiceFor(a){ const vs = (window.speechSynthesis ? speechSynthesis.getVoices() : []).filter(v => /^en/i.test(v.lang)); if(!vs.length) return null; let n = 0; for(let i = 0; i < a.id.length; i++) n = (n*31 + a.id.charCodeAt(i)) % 9973; return vs[n % vs.length]; }
-function meetSay(a, text, audioB64){ return new Promise(res => { meetSpeak(a.id, true); let fin = false; const done = () => { if(fin) return; fin = true; meetSpeak(a.id, false); res(); }; setTimeout(done, Math.min(14000, 1500 + String(text || '').length*70)); // never wait forever on a voice that does not report back
+function meetSay(a, text, audioB64){ return new Promise(res => { if(MEET.ended || !$('meetDlg').open){ res(); return; } meetSpeak(a.id, true); let fin = false; const done = () => { if(fin) return; fin = true; meetSpeak(a.id, false); res(); }; setTimeout(done, Math.min(14000, 1500 + String(text || '').length*70)); // never wait forever on a voice that does not report back
   if(audioB64){ try{ if(!MEET.audio){ MEET.audio = new Audio(); MEET.audio.setAttribute('playsinline',''); } MEET.audio.onended = done; MEET.audio.onerror = done; MEET.audio.src = 'data:audio/mpeg;base64,'+audioB64; MEET.audio.play().catch(done); return; }catch(e){} }
   // Her words: no robotic voice. Without real audio from the office the line is read, not spoken by the browser.
   setTimeout(done, Math.min(4000, 600 + text.length*40)); }); }
-async function meetPlay(turns){ for(const t of turns){ const a = byId[t.agent_id]; if(!a || !t.text) continue; meetLog('them', a.name, t.text); await meetSay(a, t.text, t.audio || null); } }
+async function meetPlay(turns){ for(const t of turns){ if(MEET.ended || !$('meetDlg').open) break; const a = byId[t.agent_id]; if(!a || !t.text) continue; meetLog('them', a.name, t.text); await meetSay(a, t.text, t.audio || null); } }
 /* Her words (11 Nov): "in the demo mode they should have like a short meeting like checking on each other." Demo meetings open
    with a quick round: Mimi asks, each person says how their side is, Mimi hands it to Jazmine. Made-up lines only. */
 const DEMO_CHECKIN = {
@@ -2878,7 +2878,7 @@ $('meetListDlg').addEventListener('change', e => { const c = e.target.closest('[
 $('planOk').addEventListener('click', () => { const d = $('planDlg'); if(d.close) d.close(); else d.removeAttribute('open'); });
 $('meetEnd').addEventListener('click', meetEnd); $('meetCam').addEventListener('click', meetCamToggle); $('meetSend').addEventListener('click', meetSendText); $('meetIn').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); meetSendText(); } });
 $('meetTalk').addEventListener('click', meetMicToggle);
-$('meetDlg').addEventListener('close', () => { if(MEET.stream){ MEET.stream.getTracks().forEach(t => t.stop()); MEET.stream = null; } if(window.speechSynthesis) speechSynthesis.cancel(); });
+$('meetDlg').addEventListener('close', () => { MEET.ended = true; if(MEET.stream){ MEET.stream.getTracks().forEach(t => t.stop()); MEET.stream = null; } if(window.speechSynthesis) speechSynthesis.cancel(); if(MEET.audio){ MEET.audio.onended = null; MEET.audio.onerror = null; MEET.audio.pause(); MEET.audio.removeAttribute('src'); try{ MEET.audio.load(); }catch(e){} } meetSpeak(null, false); });
 
 const CALL = {id:'', rec:null, chunks:[], stream:null, busy:false, offered:false, audio:null, mime:''};
 function callLog(kind, text){ const p = document.createElement('p'); p.className = kind; p.textContent = text; $('callLog').appendChild(p); $('callLog').scrollTop = 1e9; return p; }
