@@ -284,6 +284,7 @@ function meter(){
 }
 async function send(text){
   if(S.busy) return; S.busy = true; status('Thinking'); mode('think'); S.level = 0;
+  if(!S.demo) filler();
   let you = null;
   try{
     let body;
@@ -305,16 +306,20 @@ async function send(text){
     if(r.speak_url) speak(said, r.speak_url); else speak(said, r.audio || null, r.audio ? '' : (r.voice_problem || 'her ElevenLabs voice did not answer'));
     setTimeout(poll, 1500);
   }catch(e){
+    S.pending = null; if(S.fillerOn){ S.fillerOn = false; S.speaking = false; if(S.audio) S.audio.pause(); }
     if(you && you.text === '…'){ S.log = S.log.filter(m => m !== you); drawCaps(); }
     say('sys', e.message === '401' ? 'The office key did not work.' : (e.message || 'That did not go through. Try again.'));
     S.busy = false; mode(S.live ? 'listen' : 'idle'); status(S.live ? 'Listening' : 'Tap to talk'); if(S.live) setTimeout(listen, 800);
   }
 }
+const FILLERS = ['Just a moment.', 'Wait a sec.', 'Let me get back to you on that.', 'Hmm, let me check.', 'One sec, checking.', 'Hold on, let me look.'];
 const VOICE = {};
 let prefetching = Promise.resolve();
 function prefetchVoice(lines){ for(const line of lines){ if(VOICE[line]) continue; prefetching = prefetching.then(() => api('ao-voice', {say:sayable(line)}).then(r => { if(r.url){ VOICE[line] = r.url; const a = new Audio(); a.preload = 'auto'; a.src = r.url; a.load(); } }).catch(() => {})); } }
 const sayable = t => String(t).replace(/Switch to Live/g, 'Switch to the real office').replace(/\bLive\b/g, 'the real office');
+function filler(){ const ready = FILLERS.filter(f => VOICE[f]); if(!ready.length || !S.audio) return; const f = ready[Math.floor(Math.random() * ready.length)]; S.fillerOn = true; S.pending = null; mode('speak'); S.level = 0; S.speaking = true; S.audio.src = VOICE[f]; S.audio.play().catch(() => { S.fillerOn = false; S.speaking = false; }); }
 function speak(text, b64, problem){
+  if(S.fillerOn){ S.pending = [text, b64, problem]; return; } // she finishes her 'just a moment' first
   S.speaking = true; status('Mimi'); mode('speak'); S.level = 0;
   // In demo, with a key on this phone, her ElevenLabs voice is fetched for the line; without one the phone reads it.
   // A demo line is spoken by the office in her voice with no key at all (the set of lines is closed); a live answer brings its own audio.
@@ -334,8 +339,10 @@ function speak(text, b64, problem){
   }
   spoken();
 }
-function spoken(){ if(!S.speaking) return; S.speaking = false; S.level = 0; if(S.live){ listen(); } else { status('Tap to talk'); mode('idle'); } }
-$('talk').addEventListener('click', () => { if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); spoken(); return; } if(S.live) lineClose(); else lineOpen(); });
+function spoken(){ if(!S.speaking) return; S.speaking = false; S.level = 0;
+  if(S.fillerOn){ S.fillerOn = false; if(S.pending){ const p = S.pending; S.pending = null; speak(p[0], p[1], p[2]); } else { mode('think'); status('Thinking'); } return; }
+  if(S.live){ listen(); } else { status('Tap to talk'); mode('idle'); } }
+$('talk').addEventListener('click', () => { if(S.fillerOn) return; if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); spoken(); return; } if(S.live) lineClose(); else lineOpen(); });
 $('typeRow').addEventListener('submit', e => { e.preventDefault(); const v = $('typeIn').value.trim(); if(!v || S.busy) return; $('typeIn').value = ''; unlockAudio(); if(S.demo){ say('you', v); demoAnswer(v); return; } if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); S.speaking = false; } stopRec(true); send(v); });
 document.addEventListener('visibilitychange', () => { if(document.hidden && S.live) lineClose(); });
 
@@ -382,6 +389,7 @@ $('modeDemo').addEventListener('click', () => setMode(true));
 $('modeLive').addEventListener('click', () => setMode(false));
 drawCaps();
 setMode(S.demo);
+prefetchVoice(FILLERS);
 </script>
 </body>
 </html>
