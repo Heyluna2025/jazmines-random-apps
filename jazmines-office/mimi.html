@@ -153,7 +153,7 @@ function askKey(msg){ if(msg) $('keyDlg').querySelector('p').textContent = msg; 
 $('keyDlg').addEventListener('close', () => { const v = $('keyIn').value.trim(); if(v){ S.key = v; try{ localStorage.setItem('office-key', v); }catch(e){} checkVoice(); poll(); } });
 $('keyBtn').addEventListener('click', () => askKey('Paste the office key. It stays on this phone.'));
 $('voiceBtn').addEventListener('click', () => { if(!S.key){ askKey('The voice key needs your office key first.'); return; } $('voiceMsg').textContent = ''; $('voiceIn').value = ''; $('voiceDlg').showModal(); });
-$('voiceForm').addEventListener('submit', e => { e.preventDefault(); const v = $('voiceIn').value.trim(); if(!v) return; $('voiceMsg').textContent = 'Testing…'; api('ao-voice', {set_voice_key:v}).then(r => { $('voiceMsg').textContent = r.saved ? 'Saved. Mimi speaks with ElevenLabs now.' : ('Not saved: ' + (r.voice_problem || 'that key did not work.')); if(r.saved){ S.problemShown = false; setTimeout(() => { $('voiceDlg').close(); unlockAudio(); speak('Hi Jazmine. Five things are on the table; tap one or just name it.'); }, 900); } }).catch(err => { $('voiceMsg').textContent = err.message || 'That did not go through.'; }); });
+$('voiceForm').addEventListener('submit', e => { e.preventDefault(); const v = $('voiceIn').value.trim(); if(!v) return; $('voiceMsg').textContent = 'Testing…'; api('ao-voice', {set_voice_key:v}).then(r => { $('voiceMsg').textContent = r.saved ? 'Saved. Mimi speaks with ElevenLabs now.' : ('Not saved: ' + (r.voice_problem || 'that key did not work.')); if(r.saved){ S.problemShown = false; setTimeout(() => { $('voiceDlg').close(); unlockAudio(); speak('Five things are on the table today, Jazmine. Tap one, or just name it.'); }, 900); } }).catch(err => { $('voiceMsg').textContent = err.message || 'That did not go through.'; }); });
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function status(t){ $('status').textContent = t; }
 function micLabel(on){ const l = $('micLabel'); l.textContent = on ? 'Mic on' : 'Mic off'; l.classList.toggle('on', !!on); }
@@ -359,7 +359,7 @@ function speak(text, b64, problem){
     S.audio.src = /^https?:/.test(b64) ? b64 : 'data:audio/mpeg;base64,' + b64;
     try{ const ctx = audioCtx(); if(ctx && !S.playAn){ const src = ctx.createMediaElementSource(S.audio); S.playAn = ctx.createAnalyser(); S.playAn.fftSize = 512; src.connect(S.playAn); S.playAn.connect(ctx.destination); } if(ctx && ctx.state === 'suspended') ctx.resume(); }catch(e){}
     const tick = () => { if(!S.speaking) return; if(S.playAn) S.level = rmsOf(S.playAn); requestAnimationFrame(tick); }; tick();
-    S.audio.play().catch(() => { spoken(); }); return;
+    S.audio.play().catch(() => { spoken(); }); setTimeout(() => { if(S.speaking && S.audio && (S.audio.paused || S.audio.error) && !S.audio.ended) spoken(); }, 4000); return;
   }
   if(window.speechSynthesis){
     const u = new SpeechSynthesisUtterance(sayable(text)); u.rate = 1.02; u.pitch = 1.08;
@@ -370,7 +370,7 @@ function speak(text, b64, problem){
 }
 function spoken(){ if(!S.speaking) return; S.speaking = false; S.level = 0;
   if(S.fillerOn){ S.fillerOn = false; if(S.pending){ const p = S.pending; S.pending = null; speak(p[0], p[1], p[2]); } else { mode('think'); status('Thinking'); } return; }
-  if(S.live){ listen(); } else { status('Tap to talk'); mode('idle'); } }
+  if(S.live){ listen(); } else { status(S.demo ? 'Demo · tap a task, or the mic to talk' : 'Tap to talk'); mode('idle'); } }
 $('talk').addEventListener('click', () => { if(S.fillerOn) return; if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); spoken(); return; } if(S.live) lineClose(); else lineOpen(); });
 $('typeRow').addEventListener('submit', e => { e.preventDefault(); const v = $('typeIn').value.trim(); if(!v || S.busy) return; $('typeIn').value = ''; unlockAudio(); if(S.demo){ say('you', v); demoAnswer(v); return; } if(S.speaking){ if(S.audio) S.audio.pause(); if(window.speechSynthesis) speechSynthesis.cancel(); S.speaking = false; } stopRec(true); send(v); });
 document.addEventListener('visibilitychange', () => { if(document.hidden && S.live) lineClose(); });
@@ -397,9 +397,10 @@ const DEMO_STATE = {agents:[{id:'so', name:'Alicia', status:'working', task:'Pla
   events:['Alicia scheduled 6 posts through Blotato','Sam sent you: 3 Reel Scripts for today','Harry finished: Review scraped leads, batch #18','Lewis checked: FB Reels Nov 16-20','Leonardo forwarded: Rebecca’s welcome sequence','Lawrence updated the scoreboard','Jinny uploaded the AI Pulse replay to Circle','Emma: 12 members active in Show & Tell today'].map((t, i) => ({id: 100 - i, at: new Date(Date.now() - i * 7 * 60000).toISOString(), title: t}))};
 function demoStart(){ S.state = null; S.cursor = ''; applyState({agents: DEMO_STATE.agents, events: DEMO_STATE.events, inbox: DEMO_STATE.inbox, inbox_open: 5, cursor: 'demo'}); drawTodos(DEMO_STATE.todos); document.querySelector('.brand small').textContent = W < 760 ? 'DEMO · NOT REAL' : 'CHIEF OF STAFF · DEMO · NOTHING HERE IS REAL'; }
 function greeting(){ if(!S.greetLine) S.greetLine = greet(); return S.greetLine; }
-function pickTasks(){ const pool = DEMO_TASKS.slice().sort(() => Math.random() - .5); S.picked = pool.slice(0, 5); drawTasks(); prefetchVoice([greeting(), ...GREETINGS, ...S.picked.map(t => t.r), ...S.picked.map(t => t.ok), 'Hi Jazmine. Five things are on the table; tap one or just name it.', 'In demo I can only brief you on the five tasks on the table. Switch to Live and I answer from the real office.']); }
+function pickTasks(){ const pool = DEMO_TASKS.slice().sort(() => Math.random() - .5); S.picked = pool.slice(0, 5); drawTasks(); prefetchVoice([greeting(), ...GREETINGS, ...S.picked.map(t => t.r), ...S.picked.map(t => t.ok), 'Five things are on the table today, Jazmine. Tap one, or just name it.', 'In demo I can only brief you on the five tasks on the table. Switch to Live and I answer from the real office.']); }
 function drawTasks(){ $('tasks').innerHTML = S.picked.map((t, i) => '<button class="task'+(t.done ? ' done' : '')+'" type="button" data-i="'+i+'"><small>'+esc(t.s)+(t.done ? ' · done' : '')+'</small>'+esc(t.t)+'</button>').join('') + (S.picked.some(t => t.open) ? '<button class="task go" type="button" data-ok="1"><small>Your call</small>'+(S.picked.find(t => t.open).s === 'Approval' ? 'Approve it' : 'Got it, next')+'</button>' : ''); }
-$('tasks').addEventListener('click', e => { const b = e.target.closest('.task'); if(!b || S.speaking) return; unlockAudio();
+function hush(){ if(S.audio){ S.audio.pause(); } if(window.speechSynthesis) speechSynthesis.cancel(); S.speaking = false; S.fillerOn = false; S.pending = null; S.level = 0; }
+$('tasks').addEventListener('click', e => { const b = e.target.closest('.task'); if(!b) return; unlockAudio(); hush();
   if(b.dataset.ok){ const t = S.picked.find(x => x.open); if(!t) return; t.open = false; t.done = true; if(t.s === 'Approval') S.nums.wait = Math.max(0, S.nums.wait - 1); S.nums.done += 1; say('you', t.s === 'Approval' ? 'Approve it.' : 'Got it.'); say('mimi', t.ok); speak(t.ok); drawTasks(); return; }
   const t = S.picked[Number(b.dataset.i)]; if(!t) return; S.picked.forEach(x => x.open = false); t.open = true; say('you', t.t); say('mimi', t.r); speak(t.r); drawTasks(); });
 function demoLine(){ unlockAudio(); if(!S.greeted){ S.greeted = true; if(!S.picked.length) pickTasks(); const g = greeting(); say('mimi', g); speak(g); status('Demo · tap a task, or say you are ready'); return; }
@@ -411,7 +412,7 @@ function demoAnswer(v){ const q = v.toLowerCase(); let t = S.picked.find(x => x.
   let a; if(/approve|go ahead|yes|okay|ok\b/.test(q) && S.picked.some(x => x.open)){ const o = S.picked.find(x => x.open); o.open = false; o.done = true; if(o.s === 'Approval') S.nums.wait = Math.max(0, S.nums.wait - 1); S.nums.done += 1; a = o.ok; }
   else if(t){ S.picked.forEach(x => x.open = false); t.open = true; a = t.r; }
   else if(/ready|go ahead|hit me|shoot|i am good|i'm good|fine|okay|great|doing (well|good)/.test(q) && !S.picked.some(x => x.done)) a = 'Glad to hear it. Five things are on the table today: ' + S.picked.slice(0, 3).map(x => x.t).join(', ') + ', and two more. Tap one or name it and I will brief you.';
-  else if(/hello|hi\b|hey|kumusta/.test(q)) a = 'Hi Jazmine. Five things are on the table; tap one or just name it.';
+  else if(/hello|hi\b|hey|kumusta/.test(q)) a = 'Five things are on the table today, Jazmine. Tap one, or just name it.';
   else if(/what.*(need|today|desk)|priority|first/.test(q)) a = 'First: ' + S.picked[0].t + '. Then ' + S.picked[1].t.toLowerCase() + '. Tap either and I will brief you.';
   else a = 'In demo I can only brief you on the five tasks on the table. Switch to Live and I answer from the real office.';
   say('mimi', a); speak(a); drawTasks(); }
