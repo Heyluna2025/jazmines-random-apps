@@ -174,8 +174,17 @@ function createClient({
       containerId = (await call('POST', `${ig.id}/media`, { media_type: 'CAROUSEL', children: children.join(','), caption })).id;
     }
     await waitUntilReady(containerId);
-    const data = await call('POST', `${ig.id}/media_publish`, { creation_id: containerId });
-    return { id: data.id, photos: urls.length };
+    // Instagram can report FINISHED a little before the media can actually be
+    // published ("Media ID is not available"), so give it a few more tries.
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const data = await call('POST', `${ig.id}/media_publish`, { creation_id: containerId });
+        return { id: data.id, photos: urls.length };
+      } catch (err) {
+        if (attempt >= 4 || !/not available|not ready/i.test(err.message)) throw err;
+        await sleep(5000 * attempt);
+      }
+    }
   }
 
   async function showInstagram(mediaId) {
