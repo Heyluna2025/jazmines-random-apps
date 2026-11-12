@@ -12,7 +12,7 @@ Per person: enhance (2x upscale, denoise, local contrast, sharpen) for small
 or harsh photos, strong (stricter edge clean-up for busy backgrounds), fill
 (continue clothing cut off at the left/right edge), fill_top: N (draw N px
 of the head cut off at the top edge), natural (no colour or exposure
-changes: keep the original skin tone), hero:false (no cover).
+changes: keep the original skin tone), denoise: N (remove grain, 4-10), hero:false (no cover).
 Writes cutouts/<name>-tile.png (684x600), -tilewide.png (918x600) and
 -poster.png (1080x1350). Photos stay local: cutouts/ is git-ignored."""
 import json, sys
@@ -131,6 +131,19 @@ def grade(rgba, fbox, enhance=False, natural=False):
     out = rgb.convert('RGBA'); out.putalpha(a)
     return out, fbox
 
+def denoise(rgba, strength):
+    """Smooth out grain and JPEG noise (colour and luminance), then restore
+    a little crispness, without changing the tones."""
+    a = rgba.getchannel('A')
+    bgr = cv2.cvtColor(np.array(rgba.convert('RGB')), cv2.COLOR_RGB2BGR)
+    bgr = cv2.fastNlMeansDenoisingColored(bgr, None, strength, strength + 3, 7, 21)
+    bgr = cv2.bilateralFilter(bgr, 5, 18, 5)
+    rgb = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)).filter(ImageFilter.UnsharpMask(1.4, 60, 3))
+    # tighten the edge by a pixel so the old background's light halo goes
+    al = np.array(a); al = cv2.erode(al, np.ones((3, 3), np.uint8)); al = cv2.GaussianBlur(al, (3, 3), 0)
+    out = rgb.convert('RGBA'); out.putalpha(Image.fromarray(al))
+    return out
+
 def place(rgba, fbox, W, H, face_h, face_top, cx, fit=None):
     x, y, fw, fh = fbox
     if fit is not None:  # whole cut-out, top of head `fit` x H from the top
@@ -158,6 +171,7 @@ for p in people:
     im = im.crop(im.getbbox())
     fb = face(im)
     im, fb = grade(im, fb, p.get('enhance', False), p.get('natural', False))
+    if p.get('denoise'): im = denoise(im, p['denoise'])
     # tiles: coaches 684x600, founders 918x600 (face 34% of height, top at 17%)
     # grid tiles: coaches 684x600 (face 36% of the height, its top at 22%, so
     # there is headroom above the hair); first-row (founder) tiles 918x600 use
