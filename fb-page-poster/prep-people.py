@@ -160,10 +160,10 @@ for p in people:
     im, fb = grade(im, fb, p.get('enhance', False), p.get('natural', False))
     # tiles: coaches 684x600, founders 918x600 (face 34% of height, top at 17%)
     # grid tiles: coaches 684x600 (face 36% of the height, its top at 22%, so
-    # there is headroom above the hair); first-row tiles 918x600 show the
-    # whole cut-out with 12% headroom (founders' photos are close-ups)
+    # there is headroom above the hair); first-row (founder) tiles 918x600 use
+    # a closer framing, face 57.5% with its top at 22%, the same for both
     place(im, fb, 684, 600, 0.36 * 600, 0.22 * 600, 342).save(f'cutouts/{n}-tile.png')
-    place(im, fb, 918, 600, 0, 0, 459, fit=0.12).save(f'cutouts/{n}-tilewide.png')
+    place(im, fb, 918, 600, 0.575 * 600, 0.22 * 600, 459).save(f'cutouts/{n}-tilewide.png')
     if p.get('hero', True):
         place(im, fb, 1080, 1350, 215, 430, 540).save(f'cutouts/{n}-poster.png')
     print(n, 'face', [round(v) for v in fb])
