@@ -6,3 +6,4 @@ Small apps built for talks, workshops and experiments. Each one lives in its own
 | --- | --- |
 | [your-future-starts-here](your-future-starts-here/) | Audience participation app for the talk *AI and the Future of Work* — students join by QR code, answer a poll, vote on an app feature, and build a one-card project idea. Audience, presenter and projector views on one live session. |
 | [jazmines-office](jazmines-office/) | Jazmine's Agent Office — the 3D office of AI agent teams live at jazmine.ai/office. Snapshot of the deployed Vercel project `jazmines-office` (static `index.html`, models, sounds). |
+| [ai-empowered-club-events](ai-empowered-club-events/) | One-page schedule of the AI Empowered Club's in-person events: the Show & Tell Breakfast Club and AI Build Days in Quezon City and Baguio, with calendar, directions and copy-to-chat buttons. |

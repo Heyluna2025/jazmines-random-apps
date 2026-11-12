@@ -1,0 +1,477 @@
+<title>AI Empowered Club Events</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="In-person AI Empowered Club events in Quezon City and Baguio, Nov to Dec 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap">
+<style>
+  /* Layout: an itinerary. Big Bebas date stamps on a vertical rail of network dots, details to the right.
+     Single committed brand look (AI Empowered Club violet), so no light theme. */
+  :root {
+    --ink: #10082c;          /* deepest violet, page ground */
+    --night: #160b3a;        /* brand violet-900 */
+    --plum: #261561;         /* solid surface */
+    --lav: #c9b8f5;          /* brand lavender, the accent */
+    --lav-soft: #e4daff;
+    --mist: rgba(201, 184, 245, 0.28);   /* borders, grid */
+    --white: #ffffff;
+    --dim: rgba(255, 255, 255, 0.74);
+    --faint: rgba(255, 255, 255, 0.52);
+    --display: "Bebas Neue", "Oswald", "Arial Narrow", Impact, sans-serif;
+    --text: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--ink); }
+  body {
+    margin: 0;
+    font-family: var(--text);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--white);
+    background-color: var(--night);
+    background-image:
+      radial-gradient(ellipse at 15% 0%, rgba(143, 116, 217, 0.38), transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(58, 36, 135, 0.65), transparent 50%),
+      radial-gradient(circle, rgba(201, 184, 245, 0.26) 1.4px, transparent 2px),
+      linear-gradient(rgba(201, 184, 245, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201, 184, 245, 0.07) 1px, transparent 1px);
+    background-size: auto, auto, 44px 44px, 44px 44px, 44px 44px;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  a { color: var(--lav-soft); }
+  :focus-visible { outline: 3px solid var(--lav); outline-offset: 3px; border-radius: 8px; }
+
+  /* Logo, same geometry as the club's shared logo.js */
+  .logo { display: inline-flex; align-items: center; gap: 0.42em; color: var(--white); text-decoration: none; line-height: 1; font-size: 30px; }
+  .logo svg { height: 1.5em; width: auto; fill: currentColor; display: block; }
+  .logo-text { display: inline-flex; flex-direction: column; align-items: center; }
+  .logo-name, .logo-sub { font-family: var(--display); text-transform: uppercase; font-weight: 400; }
+  .logo-name { font-size: 1.12em; letter-spacing: 0.03em; line-height: 0.9; }
+  .logo-sub { font-size: 0.46em; letter-spacing: 0.5em; text-indent: 0.5em; margin-top: 0.14em; }
+
+  header.top { padding-block: 28px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .join-link {
+    font-weight: 800; font-size: 0.92rem; text-decoration: none; color: var(--lav-soft);
+    border: 1.5px solid var(--mist); border-radius: 999px; padding: 8px 16px;
+    transition: background 0.15s ease;
+  }
+  .join-link:hover { background: rgba(255, 255, 255, 0.08); }
+
+  /* Hero */
+  .hero { padding-block: 56px 36px; display: grid; gap: 18px; }
+  .eyebrow { font-weight: 800; font-size: 0.8rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--lav); margin: 0; }
+  h1 {
+    font-family: var(--text); font-weight: 900; letter-spacing: -0.02em;
+    font-size: clamp(2.5rem, 7.5vw, 4.4rem); line-height: 1.02; margin: 0; text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--lav); }
+  .lede { color: var(--dim); font-size: 1.12rem; max-width: 34em; margin: 0; }
+
+  .next {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 6px; padding: 14px 18px; border-radius: 16px;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid var(--mist);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    max-width: 100%; width: fit-content;
+  }
+  .next .pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--lav); box-shadow: 0 0 0 0 rgba(201, 184, 245, 0.7); animation: pulse 2s infinite; flex: none; }
+  .next strong { font-weight: 800; }
+  .next .count { font-family: var(--display); font-size: 1.7rem; letter-spacing: 0.03em; line-height: 1; color: var(--lav-soft); font-variant-numeric: tabular-nums; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(201, 184, 245, 0.6); } 70% { box-shadow: 0 0 0 12px rgba(201, 184, 245, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 184, 245, 0); } }
+
+  /* Filter */
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; padding-block: 8px 28px; }
+  .chip {
+    font: inherit; font-weight: 800; font-size: 0.9rem; cursor: pointer;
+    padding: 8px 16px; border-radius: 999px; min-height: 40px;
+    color: var(--dim); background: transparent; border: 1.5px solid var(--mist);
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .chip:hover { color: var(--white); background: rgba(255, 255, 255, 0.06); }
+  .chip[aria-pressed="true"] { background: var(--lav); border-color: var(--lav); color: var(--night); }
+
+  /* Itinerary */
+  .events { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; position: relative; }
+  .event {
+    display: grid; grid-template-columns: 116px 1fr; gap: 0 26px; position: relative;
+  }
+  .event::before {   /* the rail */
+    content: ""; position: absolute; left: 57px; top: 0; bottom: -22px; width: 2px;
+    background: linear-gradient(var(--mist), var(--mist)) center / 2px 100% no-repeat;
+  }
+  .event:last-child::before { bottom: 0; }
+
+  .stamp {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--plum); border: 1px solid var(--mist); border-radius: 20px;
+    padding-block: 14px 12px; text-align: center; align-self: start;
+    font-family: var(--display); line-height: 0.88;
+  }
+  .stamp .mon { font-size: 1.4rem; letter-spacing: 0.14em; text-indent: 0.14em; color: var(--lav); }
+  .stamp .day { font-size: 4.4rem; letter-spacing: 0.01em; font-variant-numeric: tabular-nums; }
+  .stamp .dow { font-family: var(--text); font-weight: 800; font-size: 0.72rem; letter-spacing: 0.2em; text-indent: 0.2em; text-transform: uppercase; color: var(--dim); margin-top: 8px; line-height: 1; }
+
+  .card {
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.06); border: 1px solid var(--mist); border-radius: 20px;
+    padding: 22px 24px 20px;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    display: grid; gap: 14px;
+  }
+  .event.is-next .card { background: var(--lav-soft); color: var(--night); border-color: transparent; box-shadow: 0 18px 40px rgba(8, 3, 25, 0.5); }
+  .event.is-next .stamp { background: var(--lav); color: var(--night); border-color: transparent; }
+  .event.is-next .stamp .mon, .event.is-next .stamp .dow { color: var(--night); }
+
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tag {
+    font-weight: 800; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 999px; border: 1px solid var(--mist); color: var(--lav-soft);
+  }
+  .tag.solid { background: var(--night); color: var(--white); border-color: var(--night); }
+  .event.is-next .tag { color: var(--plum); border-color: rgba(31, 17, 80, 0.3); }
+  .event.is-next .tag.solid { color: var(--white); }
+  .tag.done { color: var(--faint); }
+
+  .card h2 { margin: 0; font-weight: 900; font-size: clamp(1.4rem, 3.6vw, 1.85rem); line-height: 1.12; letter-spacing: -0.01em; text-wrap: balance; }
+  .card h2 small { display: block; font-weight: 700; font-size: 0.6em; color: var(--dim); letter-spacing: 0; margin-top: 4px; }
+  .event.is-next .card h2 small { color: rgba(22, 11, 58, 0.72); }
+  .card p.blurb { margin: 0; color: var(--dim); max-width: 36em; }
+  .event.is-next .card p.blurb { color: rgba(22, 11, 58, 0.8); }
+
+  .facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: 0.98rem; }
+  .facts dt { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--lav); padding-top: 3px; }
+  .event.is-next .facts dt { color: var(--plum); }
+  .facts dd { margin: 0; font-weight: 700; min-width: 0; font-variant-numeric: tabular-nums; }
+  .facts dd span { font-weight: 600; color: var(--dim); }
+  .event.is-next .facts dd span { color: rgba(22, 11, 58, 0.7); }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 44px; padding: 8px 18px; border-radius: 999px;
+    font: inherit; font-weight: 800; font-size: 0.92rem; text-decoration: none; cursor: pointer;
+    border: 2px solid var(--lav); background: var(--lav); color: var(--night);
+    transition: transform 0.08s ease, background 0.15s ease;
+  }
+  .btn:hover { background: var(--lav-soft); border-color: var(--lav-soft); }
+  .btn:active { transform: scale(0.98); }
+  .btn.ghost { background: transparent; color: var(--lav-soft); border-color: var(--mist); }
+  .btn.ghost:hover { background: rgba(255, 255, 255, 0.08); }
+  .event.is-next .btn { background: var(--night); border-color: var(--night); color: var(--white); }
+  .event.is-next .btn:hover { background: var(--plum); border-color: var(--plum); }
+  .event.is-next .btn.ghost { background: transparent; color: var(--night); border-color: rgba(31, 17, 80, 0.3); }
+  .event.is-next .btn.ghost:hover { background: rgba(31, 17, 80, 0.08); }
+  .btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  .event.is-past { opacity: 0.55; }
+  .event.is-past .actions .cal { display: none; }
+
+  .empty { color: var(--dim); padding: 24px 0; }
+
+  /* Footer */
+  footer { padding-block: 64px 48px; display: grid; gap: 18px; justify-items: start; }
+  .cta {
+    display: grid; gap: 10px; padding: 26px 26px 24px; border-radius: 22px; width: 100%;
+    background: var(--plum); border: 1px solid var(--mist);
+  }
+  .cta h3 { margin: 0; font-weight: 900; font-size: 1.4rem; letter-spacing: -0.01em; }
+  .cta p { margin: 0; color: var(--dim); max-width: 36em; }
+  .cta .actions { margin-top: 6px; }
+  .fine { color: var(--faint); font-size: 0.86rem; margin: 0; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px);
+    background: var(--lav-soft); color: var(--night); font-weight: 800; padding: 12px 20px; border-radius: 999px;
+    box-shadow: 0 12px 30px rgba(8, 3, 25, 0.5); opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease; z-index: 20; max-width: calc(100% - 32px); text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 560px) {
+    .hero { padding-block: 40px 28px; }
+    .event { grid-template-columns: 1fr; gap: 0; }
+    .event::before { display: none; }
+    .stamp {
+      flex-direction: row; justify-content: flex-start; align-items: baseline; gap: 10px;
+      padding: 12px 18px 10px; border-radius: 20px 20px 0 0; border-bottom: none;
+    }
+    .stamp .day { font-size: 2.6rem; order: 1; }
+    .stamp .mon { font-size: 1.6rem; order: 2; text-indent: 0; }
+    .stamp .dow { order: 3; margin: 0 0 0 auto; align-self: center; }
+    .card { border-radius: 0 0 20px 20px; padding: 18px 18px 18px; }
+    .event.is-next .card { box-shadow: 0 18px 40px rgba(8, 3, 25, 0.5); }
+    .facts { grid-template-columns: 1fr; gap: 2px; }
+    .facts dd { margin-bottom: 8px; }
+    .btn { flex: 1 1 auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .next .pulse { animation: none; }
+    .btn, .toast { transition: none; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="https://members.aiempoweredclub.com" aria-label="AI Empowered Club">
+      <svg viewBox="0 0 240 200" aria-hidden="true" focusable="false"><path d="M76 45A24 24 0 0 1 114 45L232 192H114L32 100Z"/><circle cx="34" cy="164" r="28"/></svg>
+      <span class="logo-text"><span class="logo-name">AI Empowered</span><span class="logo-sub">Club</span></span>
+    </a>
+    <a class="join-link" href="https://members.aiempoweredclub.com">Member hub</a>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">In person · Quezon City &amp; Baguio · Nov–Dec 2026</p>
+    <h1>Three days to build with AI, <em>together.</em></h1>
+    <p class="lede">A breakfast Show &amp; Tell and two afternoon Build Days. Bring your laptop and your ideas, and meet the people building alongside you.</p>
+    <div class="next" id="next" hidden>
+      <span class="pulse" aria-hidden="true"></span>
+      <span><strong id="next-label">Next up</strong> · <span id="next-name"></span></span>
+      <span class="count" id="next-count"></span>
+    </div>
+  </section>
+
+  <div class="filters" role="group" aria-label="Filter by city">
+    <button class="chip" type="button" id="f-all" data-city="all" aria-pressed="true">All events</button>
+    <button class="chip" type="button" id="f-qc" data-city="Quezon City" aria-pressed="false">Quezon City</button>
+    <button class="chip" type="button" id="f-baguio" data-city="Baguio City" aria-pressed="false">Baguio</button>
+  </div>
+
+  <ol class="events" id="events"></ol>
+  <p class="empty" id="empty" hidden>No events in this city right now.</p>
+
+  <footer>
+    <div class="cta">
+      <h3>Not a member yet?</h3>
+      <p>The AI Empowered Club runs live classes, replays and a community of builders all year. These in-person days are where it all comes together.</p>
+      <div class="actions">
+        <a class="btn" href="https://members.aiempoweredclub.com">Visit the club</a>
+      </div>
+      <p class="fine">Questions: <span style="user-select: all">admin@aiempoweredclub.com</span></p>
+    </div>
+    <p class="fine">All times are Philippine Time (PHT, UTC+8).</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // Times are Philippine Time (UTC+8). Edit this list to change the page.
+  const EVENTS = [
+    {
+      id: 'show-and-tell',
+      kind: 'Breakfast Club',
+      edition: '3rd edition',
+      title: 'Show & Tell',
+      subtitle: 'The 3rd AI Empowered Breakfast Club',
+      blurb: 'Members show what they have built with AI over breakfast. Short demos, real results, and good coffee.',
+      date: '2026-11-15', start: '10:00', end: '13:00',
+      venue: 'Highgrounds Cafe',
+      address: 'Sct. Rallos',
+      city: 'Quezon City',
+      mapQuery: 'Highgrounds Cafe, Sct. Rallos, Quezon City'
+    },
+    {
+      id: 'build-day-baguio',
+      kind: 'AI Build Day',
+      title: 'AI Build Day Baguio',
+      blurb: 'Five hours of hands-on building in the mountains. Come with an idea and leave with something that works.',
+      date: '2026-11-29', start: '12:00', end: '17:00',
+      venue: 'Hillstation, Casa Vallejo',
+      address: 'Upper Session Road',
+      city: 'Baguio City',
+      mapQuery: 'Hillstation, Casa Vallejo, Upper Session Road, Baguio City'
+    },
+    {
+      id: 'build-day-qc',
+      kind: 'AI Build Day',
+      title: 'AI Build Day Quezon City',
+      blurb: 'Five hours of hands-on building in Manila. Come with an idea and leave with something that works.',
+      date: '2026-12-06', start: '12:00', end: '17:00',
+      venue: 'Highgrounds Cafe',
+      address: 'Sct. Rallos',
+      city: 'Quezon City',
+      mapQuery: 'Highgrounds Cafe, Sct. Rallos, Quezon City'
+    }
+  ];
+
+  const TZ = '+08:00';
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  const at = (date, time) => new Date(`${date}T${time}:00${TZ}`);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function clock(t) {
+    const [h, m] = t.split(':').map(Number);
+    const h12 = ((h + 11) % 12) + 1;
+    return `${h12}${m ? ':' + String(m).padStart(2, '0') : ''} ${h < 12 ? 'AM' : 'PM'}`;
+  }
+  function weekday(date) {
+    const [y, mo, d] = date.split('-').map(Number);
+    return DAYS[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()];
+  }
+  function gcalStamp(d) { return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+
+  function gcalUrl(e) {
+    const p = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: `${e.title} · AI Empowered Club`,
+      dates: `${gcalStamp(at(e.date, e.start))}/${gcalStamp(at(e.date, e.end))}`,
+      details: `${e.subtitle ? e.subtitle + '\n\n' : ''}${e.blurb}\n\nhttps://members.aiempoweredclub.com`,
+      location: `${e.venue}, ${e.address}, ${e.city}`,
+      ctz: 'Asia/Manila'
+    });
+    return `https://calendar.google.com/calendar/render?${p}`;
+  }
+  const mapUrl = (e) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.mapQuery)}`;
+
+  function shareText(e) {
+    const [, mo, d] = e.date.split('-').map(Number);
+    return [
+      `${e.title.toUpperCase()}${e.subtitle ? ' · ' + e.subtitle : ''}`,
+      `${weekday(e.date)}, ${MONTHS[mo - 1]} ${d} · ${clock(e.start)} to ${clock(e.end)}`,
+      `${e.venue}, ${e.address}, ${e.city}`,
+      `Map: ${mapUrl(e)}`,
+      '',
+      'AI Empowered Club · members.aiempoweredclub.com'
+    ].join('\n');
+  }
+
+  const icon = {
+    cal: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+    pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="13" height="13" rx="3"/><path d="M16 8V6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3h2"/></svg>'
+  };
+
+  function render(city) {
+    const now = new Date();
+    const list = document.getElementById('events');
+    const upcoming = EVENTS.filter((e) => at(e.date, e.end) > now);
+    const nextId = upcoming[0] && upcoming[0].id;
+
+    const shown = EVENTS.filter((e) => city === 'all' || e.city === city);
+    list.innerHTML = shown.map((e) => {
+      const [, mo, d] = e.date.split('-').map(Number);
+      const past = at(e.date, e.end) <= now;
+      const live = !past && at(e.date, e.start) <= now;
+      const hours = (at(e.date, e.end) - at(e.date, e.start)) / 36e5;
+      const cls = ['event', e.id === nextId ? 'is-next' : '', past ? 'is-past' : ''].join(' ').trim();
+      const status = past ? '<span class="tag done">Done</span>'
+        : live ? '<span class="tag solid">Happening now</span>'
+        : e.id === nextId ? '<span class="tag solid">Next up</span>' : '';
+      return `
+        <li class="${cls}" id="${e.id}">
+          <div class="stamp" aria-hidden="true">
+            <span class="mon">${MONTHS[mo - 1]}</span>
+            <span class="day">${d}</span>
+            <span class="dow">${weekday(e.date).slice(0, 3)}</span>
+          </div>
+          <article class="card" aria-labelledby="${e.id}-title">
+            <div class="tags">
+              ${status}
+              <span class="tag">${esc(e.kind)}</span>
+              ${e.edition ? `<span class="tag">${esc(e.edition)}</span>` : ''}
+              <span class="tag">${e.city === 'Quezon City' ? 'QC' : esc(e.city.replace(' City', ''))}</span>
+            </div>
+            <h2 id="${e.id}-title">${esc(e.title)}${e.subtitle ? `<small>${esc(e.subtitle)}</small>` : ''}</h2>
+            <p class="blurb">${esc(e.blurb)}</p>
+            <dl class="facts">
+              <dt>When</dt>
+              <dd>${weekday(e.date)}, ${MONTHS[mo - 1]} ${d} · ${clock(e.start)} to ${clock(e.end)} <span>(${hours} hrs)</span></dd>
+              <dt>Where</dt>
+              <dd>${esc(e.venue)} <span>· ${esc(e.address)}, ${esc(e.city)}</span></dd>
+            </dl>
+            <div class="actions">
+              <a class="btn cal" href="${gcalUrl(e)}" target="_blank" rel="noopener">${icon.cal}Add to calendar</a>
+              <a class="btn ghost" href="${mapUrl(e)}" target="_blank" rel="noopener">${icon.pin}Directions</a>
+              <button class="btn ghost" type="button" data-copy="${e.id}">${icon.copy}Copy details</button>
+            </div>
+          </article>
+        </li>`;
+    }).join('');
+    document.getElementById('empty').hidden = shown.length > 0;
+    renderNext(upcoming[0], now);
+  }
+
+  function renderNext(e, now) {
+    const box = document.getElementById('next');
+    if (!e) { box.hidden = true; return; }
+    const start = at(e.date, e.start);
+    const live = start <= now;
+    document.getElementById('next-label').textContent = live ? 'Happening now' : 'Next up';
+    document.getElementById('next-name').textContent = e.title;
+    let count = '';
+    if (!live) {
+      const ms = start - now;
+      const days = Math.floor(ms / 864e5);
+      const hrs = Math.floor((ms % 864e5) / 36e5);
+      const mins = Math.floor((ms % 36e5) / 6e4);
+      count = days > 0 ? `${days}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+    }
+    document.getElementById('next-count').textContent = count;
+    box.hidden = false;
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  document.getElementById('events').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('[data-copy]');
+    if (!btn) return;
+    const e = EVENTS.find((x) => x.id === btn.dataset.copy);
+    const text = shareText(e);
+    const done = () => toast('Copied. Paste it in your group chat.');
+    const fail = () => (fallbackCopy(text) ? done() : toast('Copy is blocked here. Long-press the details to copy them.'));
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+    else fail();
+  });
+
+  let city = 'all';
+  try { city = localStorage.getItem('aec-events-city') || 'all'; } catch (_) {}
+  const chips = document.querySelectorAll('.chip');
+  function setCity(c) {
+    city = c;
+    chips.forEach((ch) => ch.setAttribute('aria-pressed', String(ch.dataset.city === c)));
+    try { localStorage.setItem('aec-events-city', c); } catch (_) {}
+    render(c);
+  }
+  chips.forEach((ch) => ch.addEventListener('click', () => setCity(ch.dataset.city)));
+
+  setCity([...chips].some((ch) => ch.dataset.city === city) ? city : 'all');
+  setInterval(() => render(city), 60000);
+})();
+</script>
