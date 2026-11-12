@@ -154,6 +154,26 @@ test('Instagram carousel hosts local files through the Page and keeps order', as
   assert.equal(parent.form.caption, 'Leaders');
 });
 
+test('Instagram Reel: video container, wait for processing, publish', async () => {
+  let polls = 0;
+  const { fetch, calls } = fakeGraph((method, p) => {
+    if (p === '900/media') return { id: 'r1' };
+    if (p === 'r1') return { status_code: ++polls < 3 ? 'IN_PROGRESS' : 'FINISHED' };
+    if (p === '900/media_publish') return { id: 'm7' };
+    throw new Error(`unexpected ${method} ${p}`);
+  });
+  const fb = createClient({ pageId: '123', token: 'tok', igUserId: '900', fetch, sleep: async () => {} });
+  const out = await fb.publishInstagramReel({ videoUrl: 'https://video.example/v.mp4', caption: 'Week 1' });
+  assert.equal(out.id, 'm7');
+  const create = calls.find((c) => c.path === '900/media');
+  assert.equal(create.form.media_type, 'REELS');
+  assert.equal(create.form.video_url, 'https://video.example/v.mp4');
+  assert.equal(create.form.share_to_feed, 'true');
+  assert.equal(create.form.caption, 'Week 1');
+  assert.equal(calls.filter((c) => c.path === 'r1').length, 3);
+  await assert.rejects(fb.publishInstagramReel({ videoUrl: 'local.mp4' }), /public video URL/);
+});
+
 test('Instagram refuses text-only posts and gives up on failed processing', async () => {
   const fb = createClient({ pageId: '123', token: 'tok', igUserId: '900', fetch: fakeGraph(() => ({})).fetch });
   await assert.rejects(fb.publishInstagram({ text: 'no picture' }), /at least one image/);

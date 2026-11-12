@@ -8,8 +8,11 @@
 //   node post.js queue posts.json [--dry-run]
 //   node post.js show POST_ID [--platform instagram]
 //   node post.js delete POST_ID
+//   node post.js crosspost-video PAGE_VIDEO_ID [--dry-run]
 //
 // Repeat --image for a multi-photo (carousel) post; photos keep their order.
+// crosspost-video publishes a video already on the Facebook Page to Instagram
+// as a Reel, with the Facebook caption.
 // --platform defaults to facebook.
 //
 // Facebook: --at hands the post to Facebook's own scheduler, so nothing needs
@@ -74,7 +77,7 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const [command, ...rest] = opts._;
   if (!command) {
-    console.error('Usage:\n  node post.js check\n  node post.js "text" [--link URL] [--image FILE|URL ...] [--at ISO-TIME] [--platform facebook,instagram] [--dry-run]\n  node post.js queue posts.json [--dry-run]\n  node post.js show POST_ID [--platform instagram]\n  node post.js delete POST_ID');
+    console.error('Usage:\n  node post.js check\n  node post.js "text" [--link URL] [--image FILE|URL ...] [--at ISO-TIME] [--platform facebook,instagram] [--dry-run]\n  node post.js queue posts.json [--dry-run]\n  node post.js show POST_ID [--platform instagram]\n  node post.js delete POST_ID\n  node post.js crosspost-video PAGE_VIDEO_ID [--dry-run]');
     process.exit(1);
   }
 
@@ -120,6 +123,20 @@ async function main() {
       ? `published ${p.created_time}`
       : `scheduled for ${new Date(p.scheduled_publish_time * 1000).toISOString()}`;
     console.log(`${p.id}: ${state}\n${p.permalink_url || ''}\n${p.message || ''}`.trim());
+    return;
+  }
+
+  if (command === 'crosspost-video') {
+    const videoId = rest[0];
+    if (!videoId) throw new Error('Usage: node post.js crosspost-video PAGE_VIDEO_ID');
+    const v = await fb.pageVideoSource(videoId);
+    const caption = v.description || '';
+    if (opts.dryRun) {
+      console.log(`would post to instagram as a Reel: video ${videoId} (${Math.round(v.length || 0)}s), caption ${JSON.stringify(caption.slice(0, 60))}...`);
+      return;
+    }
+    const result = await fb.publishInstagramReel({ videoUrl: v.source, caption });
+    console.log(`Instagram Reel posted: ${result.id}`);
     return;
   }
 

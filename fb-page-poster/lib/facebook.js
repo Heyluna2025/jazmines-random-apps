@@ -174,12 +174,16 @@ function createClient({
       containerId = (await call('POST', `${ig.id}/media`, { media_type: 'CAROUSEL', children: children.join(','), caption })).id;
     }
     await waitUntilReady(containerId);
-    // Instagram can report FINISHED a little before the media can actually be
-    // published ("Media ID is not available"), so give it a few more tries.
+    const id = await publishContainer(ig.id, containerId);
+    return { id, photos: urls.length };
+  }
+
+  // Instagram can report FINISHED a little before the media can actually be
+  // published ("Media ID is not available"), so give it a few more tries.
+  async function publishContainer(igId, containerId) {
     for (let attempt = 1; ; attempt++) {
       try {
-        const data = await call('POST', `${ig.id}/media_publish`, { creation_id: containerId });
-        return { id: data.id, photos: urls.length };
+        return (await call('POST', `${igId}/media_publish`, { creation_id: containerId })).id;
       } catch (err) {
         if (attempt >= 4 || !/not available|not ready/i.test(err.message)) throw err;
         await sleep(5000 * attempt);
@@ -187,11 +191,32 @@ function createClient({
     }
   }
 
+  // Videos go to Instagram as Reels (the only video type the API publishes),
+  // also shown in the main feed. Instagram downloads the video itself, so it
+  // must be a public URL, such as a Page video's `source`.
+  async function publishInstagramReel({ videoUrl, caption, shareToFeed = true }) {
+    if (!/^https?:\/\//i.test(videoUrl || '')) throw new Error('Reels need a public video URL.');
+    const ig = await instagramAccount();
+    const containerId = (await call('POST', `${ig.id}/media`, {
+      media_type: 'REELS', video_url: videoUrl, caption, share_to_feed: shareToFeed ? 'true' : 'false',
+    })).id;
+    // Video processing takes minutes, not seconds.
+    await waitUntilReady(containerId, { tries: 60, delayMs: 10000 });
+    return { id: await publishContainer(ig.id, containerId) };
+  }
+
+  // A Page video's direct URL, for cross-posting it to Instagram.
+  async function pageVideoSource(videoId) {
+    const v = await call('GET', String(videoId), { fields: 'source,description,length' });
+    if (!v.source) throw new Error(`Facebook gave no downloadable source for video ${videoId}.`);
+    return v;
+  }
+
   async function showInstagram(mediaId) {
     return call('GET', mediaId, { fields: 'caption,timestamp,permalink,media_type' });
   }
 
-  return { whoAmI, publish, show, remove, instagramAccount, publishInstagram, showInstagram };
+  return { whoAmI, publish, show, remove, instagramAccount, publishInstagram, publishInstagramReel, pageVideoSource, showInstagram };
 }
 
 function normalize(post) {
