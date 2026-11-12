@@ -1,11 +1,11 @@
 {
-  "post": "Week 1 · Sat · Meet your Council Leaders",
+  "post": "Week 1 · Sat · Meet your AI Council (no names; see council-leaders-named.json for the version with each leader)",
   "when": "2026-11-14 (Sat) [[time]]",
   "platforms": [
     "facebook",
     "instagram"
   ],
-  "caption": "Meet the people who'll guide you inside AI Builder's Camp 👋\n\nEvery ABC builder joins a small AI Council led by a Council Leader. You meet every week to share progress, get unstuck and keep each other moving forward.\n\nSay hi to Coach Ann, Coach David, Coach Renz, Coach Maron, Coach Arv, Coach Joshua, Coach Gab and Coach Clark. 💜\n\nQuestions about the support you'll get in ABC? Ask us in the comments or send us a message.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "caption": "Nobody builds alone inside AI Builder's Camp. 💜\n\nEvery builder joins a small AI Council led by a Council Leader. You meet every week to share progress, get unstuck and keep each other moving forward.\n\nBatch 2 has 8 councils, and every builder has a Council Leader in their corner.\n\nBatch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "cover",
@@ -17,86 +17,47 @@
       "layout": "statement",
       "kicker": "What's an AI Council?",
       "title": "A small group that keeps you *moving forward*",
-      "body": "Every builder joins a small council led by a Council Leader. You meet every week to share progress, get unstuck and keep each other going.",
-      "footnote": "[[What else leaders do: feedback on projects? Q&A?]]"
+      "body": "Every builder joins a small council led by a Council Leader. You meet every week to share progress, get unstuck and keep each other going."
     },
     {
-      "layout": "people",
-      "theme": "light",
-      "kicker": "Your Council Leaders",
-      "title": "Meet the council",
-      "people": [
+      "layout": "hub",
+      "kicker": "How your council helps",
+      "title": "Support that keeps you *building*",
+      "center": "Your AI Council",
+      "nodes": [
         {
-          "name": "Coach Ann",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
+          "icon": "calendar",
+          "label": "Weekly meeting",
+          "sub": "With your council"
         },
         {
-          "name": "Coach David",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
+          "icon": "trophy",
+          "label": "Share progress",
+          "sub": "Celebrate wins"
+        },
+        {
+          "icon": "help",
+          "label": "Get unstuck",
+          "sub": "Ask your leader"
+        },
+        {
+          "icon": "rocket",
+          "label": "Keep going",
+          "sub": "Week after week"
         }
       ]
     },
     {
-      "layout": "people",
-      "theme": "light",
-      "kicker": "Your Council Leaders",
-      "title": "Meet the council",
-      "people": [
-        {
-          "name": "Coach Renz",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
-        },
-        {
-          "name": "Coach Maron",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
-        }
-      ]
-    },
-    {
-      "layout": "people",
-      "theme": "light",
-      "kicker": "Your Council Leaders",
-      "title": "Meet the council",
-      "people": [
-        {
-          "name": "Coach Arv",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
-        },
-        {
-          "name": "Coach Joshua",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
-        }
-      ]
-    },
-    {
-      "layout": "people",
-      "theme": "light",
-      "kicker": "Your Council Leaders",
-      "title": "Meet the council",
-      "people": [
-        {
-          "name": "Coach Gab",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
-        },
-        {
-          "name": "Coach Clark",
-          "role": "AI Council Leader",
-          "detail": "[[Known for / one project / how they help]]"
-        }
-      ]
+      "layout": "statement",
+      "kicker": "Batch 2",
+      "title": "8 councils.\n*Nobody builds alone.*",
+      "body": "Every builder is part of a small council led by a Council Leader, so everyone gets guidance and a group that keeps them moving."
     },
     {
       "layout": "cta",
       "title": "Builders don't\n*build alone.*",
-      "body": "Questions about the support you'll get in ABC? Ask us anything.",
-      "button": "[[Message us]]"
+      "body": "Batch 3 is coming. Learn more at aibuilderscamp.ph",
+      "button": "aibuilderscamp.ph"
     }
   ]
 }

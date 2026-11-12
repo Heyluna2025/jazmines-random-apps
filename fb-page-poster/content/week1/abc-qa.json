@@ -5,7 +5,7 @@
     "facebook",
     "instagram"
   ],
-  "caption": "Thinking about joining AI Builder's Camp? Here are the questions we get most 👇\n\n🧩 Do I need to be techy? [[beginner requirement]]\n🗓️ How much time does it take? A Saturday main session, a Tuesday hands-on lab, small-group coaching, a Thursday podcast and one weekly task.\n▶️ What if I miss a session? Replays are posted in the community.\n🎁 What will I have after 8 weeks? Your personal purpose blueprint, your own digital product, and the know-how to sell it.\n💳 How much is it? [[approved price and payment options]]\n\nStill have a question? Drop it in the comments or send us a message. We'll help you see if ABC fits.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "caption": "Thinking about joining AI Builder's Camp? Here are the questions we get most 👇\n\n🧩 Do I need to be techy? You'll set up Claude and ChatGPT with step-by-step guides, and your coaches and council support you every week.\n🗓️ How much time does it take? A Saturday main session, a Tuesday hands-on lab, small-group coaching, a Thursday podcast and one weekly task.\n▶️ What if I miss a session? Replays are posted in the community.\n🎁 What will I have after 8 weeks? Your personal purpose blueprint, your own digital product, and the know-how to sell it.\n💳 How much is it? Full details and pricing for Batch 3 are at aibuilderscamp.ph.\n\nBatch 3 is coming. 👉 aibuilderscamp.ph\n\nStill have a question? Drop it in the comments or send us a message.\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "cover",
@@ -18,13 +18,13 @@
       "theme": "light",
       "kicker": "Fit",
       "q": "Do I need to be techy?",
-      "a": "[[Beginner requirement, e.g. no coding needed]] Before the program starts, you'll set up Claude and ChatGPT with step-by-step guides."
+      "a": "You'll set up Claude and ChatGPT before the program starts, with step-by-step guides, and your coaches and council support you every week."
     },
     {
       "layout": "qa",
       "kicker": "Schedule",
       "q": "How much time does it take?",
-      "a": "Each week: a Saturday main session, a Tuesday hands-on lab, small-group coaching and a Thursday podcast, plus one weekly task. [[Hours per week]]"
+      "a": "Each week: a Saturday main session, a Tuesday hands-on lab, small-group coaching and a Thursday podcast, plus one weekly task."
     },
     {
       "layout": "qa",
@@ -43,14 +43,14 @@
       "layout": "qa",
       "theme": "light",
       "kicker": "Payment",
-      "q": "How much is it, and how can I pay?",
-      "a": "[[Approved total price and payment options]]"
+      "q": "How much is it?",
+      "a": "Full details and pricing for Batch 3 are at aibuilderscamp.ph."
     },
     {
       "layout": "qa",
       "kicker": "Next batch",
       "q": "When can I join?",
-      "a": "[[Next batch start date, or join the interest list]]"
+      "a": "Batch 3 is coming. Visit aibuilderscamp.ph for dates and details."
     },
     {
       "layout": "cta",
@@ -60,8 +60,8 @@
         "Move forward"
       ],
       "title": "Still have a\n*question?*",
-      "body": "Send it our way. We'll help you see if ABC fits.",
-      "button": "[[Message us: ABC]]"
+      "body": "Send it our way, or visit aibuilderscamp.ph.",
+      "button": "aibuilderscamp.ph"
     }
   ]
 }
