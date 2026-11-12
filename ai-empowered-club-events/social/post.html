@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>AEC events post</title>
+<style>
+@font-face { font-family: 'Bebas Neue'; src: url(../../your-future-starts-here/public/shared/fonts/bebas-neue-400-latin.woff2) format('woff2'); }
+@font-face { font-family: 'Nunito'; font-weight: 200 1000; src: url(../../your-future-starts-here/public/shared/fonts/nunito-variable-latin.woff2) format('woff2'); }
+:root { --night:#160b3a; --plum:#261561; --lav:#c9b8f5; --lav-soft:#e4daff; --mist:rgba(201,184,245,.3); --dim:rgba(255,255,255,.76); }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1080px; height: 1350px; }
+body {
+  font-family: 'Nunito', sans-serif; color: #fff; overflow: hidden;
+  background-color: var(--night);
+  background-image:
+    radial-gradient(ellipse at 10% 0%, rgba(143,116,217,.45), transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(58,36,135,.75), transparent 55%),
+    radial-gradient(circle, rgba(201,184,245,.26) 1.6px, transparent 2.3px),
+    linear-gradient(rgba(201,184,245,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,184,245,.07) 1px, transparent 1px);
+  background-size: auto, auto, 54px 54px, 54px 54px, 54px 54px;
+  padding: 72px 76px 64px; display: flex; flex-direction: column; gap: 40px;
+}
+.logo { display: inline-flex; align-items: center; gap: .42em; font-size: 46px; line-height: 1; }
+.logo svg { height: 1.5em; fill: #fff; }
+.lt { display: inline-flex; flex-direction: column; align-items: center; font-family: 'Bebas Neue'; }
+.ln { font-size: 1.12em; letter-spacing: .03em; line-height: .9; }
+.ls { font-size: .46em; letter-spacing: .5em; text-indent: .5em; margin-top: .14em; }
+.eyebrow { font-weight: 800; font-size: 22px; letter-spacing: .24em; text-transform: uppercase; color: var(--lav); }
+h1 { font-weight: 900; font-size: 92px; line-height: .98; letter-spacing: -.025em; margin-top: 14px; }
+h1 em { font-style: normal; color: var(--lav); }
+.events { display: flex; flex-direction: column; gap: 22px; }
+.ev { display: grid; grid-template-columns: 168px 1fr; gap: 30px; align-items: stretch; }
+.stamp { background: var(--plum); border: 1.5px solid var(--mist); border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Bebas Neue'; line-height: .86; padding-top: 6px; }
+.stamp .m { font-size: 36px; letter-spacing: .16em; text-indent: .16em; color: var(--lav); }
+.stamp .d { font-size: 104px; }
+.card { background: rgba(255,255,255,.06); border: 1.5px solid var(--mist); border-radius: 26px; padding: 26px 32px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.ev.hi .stamp { background: var(--lav); border-color: transparent; color: var(--night); }
+.ev.hi .stamp .m { color: var(--night); }
+.ev.hi .card { background: var(--lav-soft); color: var(--night); border-color: transparent; }
+.kind { font-weight: 800; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; color: var(--lav); }
+.ev.hi .kind { color: var(--plum); }
+.t { font-weight: 900; font-size: 42px; line-height: 1.05; letter-spacing: -.01em; }
+.t small { font-weight: 700; font-size: 25px; letter-spacing: 0; opacity: .78; display: block; margin-top: 4px; }
+.meta { font-weight: 700; font-size: 24px; color: var(--dim); line-height: 1.3; }
+.ev.hi .meta { color: rgba(22,11,58,.78); }
+.meta b { color: #fff; font-weight: 800; }
+.ev.hi .meta b { color: var(--night); }
+.foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.cta { background: var(--lav); color: var(--night); font-weight: 900; font-size: 28px; padding: 18px 34px; border-radius: 999px; }
+.url { font-weight: 800; font-size: 26px; color: var(--lav-soft); letter-spacing: .01em; }
+</style></head>
+<body>
+  <div class="logo"><svg viewBox="0 0 240 200"><path d="M76 45A24 24 0 0 1 114 45L232 192H114L32 100Z"/><circle cx="34" cy="164" r="28"/></svg><span class="lt"><span class="ln">AI EMPOWERED</span><span class="ls">CLUB</span></span></div>
+  <div>
+    <p class="eyebrow">In person · Quezon City &amp; Baguio</p>
+    <h1>Come build with AI, <em>together.</em></h1>
+  </div>
+  <div class="events">
+    <div class="ev hi">
+      <div class="stamp"><span class="m">NOV</span><span class="d">15</span></div>
+      <div class="card">
+        <span class="kind">Breakfast Club · 3rd edition</span>
+        <span class="t">Show &amp; Tell<small>The 3rd AI Empowered Breakfast Club</small></span>
+        <span class="meta"><b>10 AM – 1 PM</b> · Highgrounds Cafe, Sct. Rallos, Quezon City</span>
+      </div>
+    </div>
+    <div class="ev">
+      <div class="stamp"><span class="m">NOV</span><span class="d">29</span></div>
+      <div class="card">
+        <span class="kind">AI Build Day</span>
+        <span class="t">AI Build Day Baguio</span>
+        <span class="meta"><b>12 – 5 PM</b> · Hillstation, Casa Vallejo, Upper Session Road, Baguio City</span>
+      </div>
+    </div>
+    <div class="ev">
+      <div class="stamp"><span class="m">DEC</span><span class="d">6</span></div>
+      <div class="card">
+        <span class="kind">AI Build Day</span>
+        <span class="t">AI Build Day Quezon City</span>
+        <span class="meta"><b>12 – 5 PM</b> · Highgrounds Cafe, Sct. Rallos, Quezon City</span>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <span class="cta">Save your seat</span>
+    <span class="url">members.aiempoweredclub.com</span>
+  </div>
+</body></html>
