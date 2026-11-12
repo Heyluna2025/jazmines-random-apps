@@ -1,0 +1,37 @@
+{
+  "post": "Coach Spotlight · Coach Joshua",
+  "when": "[[date and time]]",
+  "platforms": [
+    "facebook",
+    "instagram"
+  ],
+  "caption": "Coach Spotlight: meet Coach Joshua! 💜\n\n[[Who they are, in 1–2 lines]]\n\n[[What they've built with AI, in 1 line]]\n\nTheir tip for beginners: \"[[tip]]\"\n\nWant to learn with Coach Joshua? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
+  "slides": [
+    {
+      "layout": "spotlight",
+      "tag": "Coach Spotlight",
+      "name": "Coach Joshua",
+      "role": "[[Title, e.g. Automation Coach]]",
+      "tagline": "[[Known for, in one line]]"
+    },
+    {
+      "layout": "statement",
+      "kicker": "What I built with AI",
+      "title": "[[Project name or result]]",
+      "body": "[[The problem, what they built and the tool they used]]"
+    },
+    {
+      "layout": "quote",
+      "theme": "light",
+      "kicker": "My tip for beginners",
+      "text": "[[Their tip or favourite line]]",
+      "by": "Coach Joshua"
+    },
+    {
+      "layout": "cta",
+      "title": "Learn with\n*Coach Joshua.*",
+      "body": "Batch 3 is coming. Learn more at aibuilderscamp.ph",
+      "button": "aibuilderscamp.ph"
+    }
+  ]
+}

@@ -9,7 +9,8 @@
 //
 // Writes <out>-01.png, <out>-02.png, ... and with --sheet a <out>-sheet.png
 // overview for review. Spec: { "slides": [ { "layout": "...", ... } ] } with
-// layouts cover, statement ("logo": true adds the ABC logo), bullets, steps, hub, people, qa and cta (see the
+// layouts cover, statement ("logo": true adds the ABC logo), spotlight (a
+// person: photo, tag, name, role, tagline), quote (text, by), bullets, steps, hub, people, qa and cta (see the
 // render functions below). In any text, *word* gets the accent colour and
 // [[note]] renders a dashed "to confirm" box, so drafts can't be mistaken for
 // approved copy. Add "theme": "light" to a slide for the light version, and
@@ -169,7 +170,28 @@ function cta(s) {
   </div>`;
 }
 
-const LAYOUTS = { cover, statement, bullets, steps, hub, people, qa, cta };
+// A person-led cover: large photo, tag, name and role.
+function spotlight(s) {
+  const initial = escape(String(s.name || '?').replace(/^Coach\s+/i, '').charAt(0));
+  return `<div class="spot">
+    <div class="spotphoto">${s.photo ? `<img src="${photoSrc(s.photo)}">` : `<span class="initial big">${initial}</span>`}</div>
+    ${s.tag ? `<div class="tag">${rich(s.tag)}</div>` : ''}
+    <h1 class="xl">${rich(s.name)}</h1>
+    ${s.role ? `<div class="spotrole">${rich(s.role)}</div>` : ''}
+    ${s.tagline ? `<p class="lead">${rich(s.tagline)}</p>` : ''}
+  </div>`;
+}
+
+function quote(s) {
+  return `<div class="block">
+    ${s.kicker ? `<div class="kicker">${rich(s.kicker)}</div>` : ''}
+    <div class="qmark">“</div>
+    <h1 class="quote">${rich(s.text)}</h1>
+    ${s.by ? `<p class="by">${rich(s.by)}</p>` : ''}
+  </div>`;
+}
+
+const LAYOUTS = { cover, statement, bullets, steps, hub, people, qa, cta, spotlight, quote };
 
 function page(slide, index, total, brand = 'abc') {
   slide = { ...slide, brand };
@@ -246,6 +268,16 @@ h3{font-family:'Inter Display';font-weight:700;font-size:38px;margin:0 0 6px}
 .values{display:flex;gap:18px;justify-content:center;margin-bottom:56px}
 .values span{font-family:'Inter Display';font-weight:700;font-size:26px;letter-spacing:2px;text-transform:uppercase;padding:14px 26px;border-radius:40px;border:2px solid ${c.line};color:${c.sub}}
 .button{display:inline-block;margin-top:48px;font-family:'Inter Display';font-weight:800;font-size:40px;padding:30px 58px;border-radius:70px;background:${BRAND.violet};color:#fff;box-shadow:0 18px 50px rgba(112,85,250,.45)}
+.spot{text-align:center;display:flex;flex-direction:column;align-items:center;max-width:860px;margin:0 auto}
+.spotphoto{width:560px;height:560px;border-radius:50%;overflow:hidden;border:6px solid ${c.accent};box-shadow:0 0 90px ${c.glow};margin-bottom:44px;display:flex;align-items:center;justify-content:center;background:${light ? '#fff' : BRAND.deep}}
+.spotphoto img{width:100%;height:100%;object-fit:cover}
+.initial.big{font-size:240px}
+.spot .tag{margin-bottom:28px}
+.spot h1.xl{margin-bottom:16px}
+.spotrole{font-family:'Inter Display';font-weight:700;font-size:32px;letter-spacing:4px;text-transform:uppercase;color:${c.accent};margin-bottom:24px}
+.qmark{font-family:'Inter Display';font-weight:900;font-size:220px;line-height:.7;color:${c.accent};margin-bottom:10px}
+h1.quote{font-size:64px;line-height:1.18;font-weight:700;letter-spacing:-1px}
+.by{font-family:'Inter Display';font-weight:700;font-size:30px;letter-spacing:3px;text-transform:uppercase;color:${c.sub};margin:20px 0 0}
 .tbc{display:inline;outline:3px dashed ${BRAND.gold};outline-offset:4px;background:rgba(239,168,49,.16);color:${c.fg};border-radius:6px;padding:0 6px}
 .tbc::before{content:'TO CONFIRM: ';font-size:.6em;font-weight:800;letter-spacing:2px;color:${BRAND.gold}}
 </style></head><body>
