@@ -712,7 +712,7 @@ const AG = [
    tasks:['Write the Camp launch emails','Update the AEC welcome emails','Schedule reminder emails'], steps:['Writing email 2','Checking names and links','Scheduling sends']},
   {id:'ads', name:'Gabriel', role:'Ads specialist', dept:'mkt', kind:'rat', fur:'#BDB5B3', dark:'#8E8688', shirt:'#2B3A55', coat:'#2B3A55', pants:['#D9D2C5','#4A4440'], loafers:'#5A3A22', specs:true, curls:'#3A2A22', to:['you','mkt'],
    tasks:['Plan this week’s Meta ads','Write 5 hooks for the camp ad','Read yesterday’s ad results'], steps:['Picking the audience','Writing the angle','Drafting the copy','Checking the numbers'], need:'The camp ad set is ready. Approve the budget?'},
-  {id:'lk', name:'Hazel', role:'CRM Manager', dept:'mkt', kind:'shiba', fur:'#C96A3E', dark:'#8E4424', shirt:'#B8436C', to:['you','cos'],
+  {id:'lk', name:'Hazel', inactive:true, role:'CRM Manager', dept:'mkt', kind:'shiba', fur:'#C96A3E', dark:'#8E4424', shirt:'#B8436C', to:['you','cos'],
    tasks:['Collect new leads from every sign-up form','Add new leads to the master list','Remove duplicates and bounced emails','Mark who unsubscribed','Give Rebecca and Anita the right group for each send'], steps:['Collecting new sign-ups','Checking for duplicates','Tagging where each lead came from','Updating the master list','Preparing the send list']},
   {id:'so', name:'Alicia', role:'Social Media Manager for JDL', dept:'smm', kind:'dog', fur:'#F0D3A2', dark:'#A9682A', shirt:'#E06A93', to:['you'],
    tasks:['Queue tomorrow’s posts','Schedule this week’s reels','Check the posting calendar'], steps:['Scheduling posts','Checking the calendar','Picking posting times'], need:'3 posts for tomorrow are ready. Approve?'},
@@ -760,7 +760,7 @@ const AG = [
    tasks:['Map the Content to Social handoff','Find this week’s slowest step','Write a simpler class upload checklist','Remove a duplicate step in follow-ups'], steps:['Mapping the workflow','Timing each step','Spotting bottlenecks','Writing a simpler checklist']},
   {id:'adm', name:'Kristina', role:'Inbox, invoices, and calendar admin', dept:'ops', kind:'bird', fur:'#2E3040', dark:'#1E2030', shirt:'#7EC8E3', face:'#FFFFFF', beak:'#F2A33A', feet:'#F2A33A', wing:'#2E3040', to:['fin','fin','you'],
    tasks:['Clean up your three inboxes','Pull invoices from email and send them to Finance','Tidy this week’s calendar','Flag calendar clashes and double bookings','Flag emails that need your reply'], steps:['Sorting new mail','Finding invoices','Sending invoices to Finance','Checking the calendar','Archiving old threads']},
-  {id:'cx', name:'Daisy', role:'Customer service', dept:'ops', kind:'bird', fur:'#FFFFFF', dark:'#E6E2D8', shirt:'#6FB7E0', face:'#FFFFFF', beak:'#6A6D78', feet:'#8E919C', wing:'#F2EFE6', to:['mkt','you'],
+  {id:'cx', name:'Daisy', inactive:true, role:'Customer service', dept:'ops', kind:'bird', fur:'#FFFFFF', dark:'#E6E2D8', shirt:'#6FB7E0', face:'#FFFFFF', beak:'#6A6D78', feet:'#8E919C', wing:'#F2EFE6', to:['mkt','you'],
    tasks:['Answer page messages with answers you approved','Send the 7-day trial link when someone asks how to join','Hand questions that are not on the sheet to you','Pass new contacts to Hazel','Draft new answers for your approval'], steps:['Reading the message','Finding the approved answer','Replying through ManyChat','Handing off what is not on the sheet','Logging the question']},
   {id:'qa', name:'Lewis', role:'Quality Assurance Officer', dept:'ops', kind:'bear', fur:'#9A9CA6', dark:'#5C5E6A', shirt:'#FFFFFF', tie:true, patch:'#F2F2F2', paws:'#4A4C58', to:['you','cos'],
    tasks:['Check today’s deliverables before they reach you','Verify facts and links in the camp emails','Check the new carousel against the brand board','Look for duplicate posts in the week’s plan','Run the done checklist on Edith’s highlights'], steps:['Reading the draft','Checking every link','Comparing with the brand board','Looking for duplicates','Ticking the done checklist']},
@@ -1209,7 +1209,7 @@ function smallMeeting(cx, color){ // a meeting room one grid cell wide (x cx-5 t
 }
 function buildLunaFloor(){ // Floor 3: LUNA AI Systems. LUNA's desk, her team's desks, the client meeting room, the build lab and the client lounge
   const lu = byId.lu; if(lu) deskSet(lu.seatW[0], lu.seatW[1], lu.seatA, {exec:true, tray:true});
-  AG.forEach(a => { if(!a.staff && a.homeF === 3) deskSet(a.seatW[0], a.seatW[1], a.seatA, {}); });
+  AG.forEach(a => { if(!a.staff && a.homeF === 3) a.deskG = deskSet(a.seatW[0], a.seatW[1], a.seatA, {}); });
   smallMeeting(25, byDept.lmeet.color); byDept.lmeet.spots = [24.1,25.9].map(x => seatSpot([x,3.7],[0,1],[[28.6,12],[28.6,2.3],[x,2.3]])).concat([24.1,25.9].map(x => seatSpot([x,6.7],[0,-1],[[x,12],[x,8.5]])));
   // build lab (x 30 to 50): shelves, a server rack, two test benches, cabinets
   zoneRug(byDept.llab.color,[42.5,5.4],[6.8,3.9],true); roomLight(42.5,5.4); shelf(33.0,.9); shelf(35.2,.9);
@@ -1222,7 +1222,9 @@ function buildLunaFloor(){ // Floor 3: LUNA AI Systems. LUNA's desk, her team's 
   box(1.6,.95,.6,'#8E93A8',47.8,.475,23.4); box(1.5,.04,.5,'#6F748A',47.8,.5,23.08,ROOT,false); cyl(.08,.06,.16,'#FFFDF6',47.4,1.03,23.4); cyl(.08,.06,.16,'#FFFDF6',48.1,1.03,23.4);
   sofa(9.5,19.5,Math.PI/2,2.6,'#C8845A'); rbox(1.2,.4,.9,.08,WOOD_L,11.6,.2,19.5,ROOT); sofa(40.5,19.5,-Math.PI/2,2.6,'#C8845A'); rbox(1.2,.4,.9,.08,WOOD_L,38.4,.2,19.5,ROOT);
   [[1,15.4],[1,23.2],[48.9,15.4],[44.5,23.2],[16.5,23.2],[33.5,23.2]].forEach(q => plant(q[0],q[1],.9));
-  byDept.llounge.spots = [seatSpot([24,17.3],[0,1],[[24,12],[24,17.3]]), seatSpot([26,17.3],[0,1],[[26,12],[26,17.3]]), seatSpot([21.1,19.5],[1,0],[[21.1,12],[21.1,19.5]]), seatSpot([28.9,19.5],[-1,0],[[28.9,12],[28.9,19.5]])];
+  byDept.llounge.spots = [seatSpot([24,17.3],[0,1],[[24,12],[24,17.3]]), seatSpot([26,17.3],[0,1],[[26,12],[26,17.3]]), seatSpot([21.1,19.5],[1,0],[[21.1,12],[21.1,19.5]]), seatSpot([28.9,19.5],[-1,0],[[28.9,12],[28.9,19.5]]),
+    seatSpot([9.5,18.6],[1,0],[[12.6,12],[12.6,18.6]]), seatSpot([9.5,20.4],[1,0],[[12.6,12],[12.6,20.4]]), seatSpot([40.5,18.6],[-1,0],[[37.4,12],[37.4,18.6]]), seatSpot([40.5,20.4],[-1,0],[[37.4,12],[37.4,20.4]]),
+    standSpot([16.5,17.2],[0,1],[[16.5,12],[16.5,17.2]]), standSpot([33.5,17.2],[0,1],[[33.5,12],[33.5,17.2]]), standSpot([14.0,21.8],[1,0],[[14.0,12],[14.0,21.8]]), standSpot([36.0,21.8],[-1,0],[[36.0,12],[36.0,21.8]])];
 }
 const PONG = {ball:null, top:.875};
 function mealOn(g){ // a plate's worth of food: pancakes in the morning, the day's special after
@@ -1466,7 +1468,7 @@ function applyMode(k){
   shaftMat.opacity = mixN(DAY.shaft,NIGHT.shaft,k); glowMat.opacity = mixN(DAY.glow,NIGHT.glow,k);
 }
 ROOT = F2; BF = 2; buildShell('work'); buildRooms(2); smallMeeting(45, byDept.f2meet.color);
-AG.forEach(a => { if(!a.staff && !a.homeF) deskSet(a.seatW[0], a.seatW[1], a.seatA, {exec:a.id === 'cos'}); makeCritter(a); });
+AG.forEach(a => { if(!a.staff && !a.homeF) a.deskG = deskSet(a.seatW[0], a.seatW[1], a.seatA, {exec:a.id === 'cos'}); makeCritter(a); });
 // real 3D character models (made from the character sheets) replace the simple shapes where one exists
 const MODEL_BASE = 'models/'; let MODEL_LIST = [], MODEL_VER = {}, modelsBad = 0;
 function b64buf(b){ const s = atob(b), u = new Uint8Array(s.length); for(let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u.buffer; }
@@ -1770,7 +1772,7 @@ const STUDY = {mkt:['Hooks that stop the scroll','Subject lines that get opened'
   acq:['Cold emails that get replies','Why past leads said yes','Better follow-up timing'], aec:['What members asked for this month','Class formats that keep people watching','Better lesson notes'],
   it:['Faster page speed','Last week’s bugs and their causes','Smarter testing checklists'], fin:['Official receipt rules for taxes','Last month’s revenue patterns','Cleaner bookkeeping'],
   cos:['Running better meetings','What slowed the team down','Clearer daily reports'], trends:['This week’s AI trends','Rising hooks on TikTok','What competitors launched']};
-const MSG = {cafe:['Latte time','Coffee break','Iced mocha, please'], sunday:['Lunch at Sunday House','Trying today’s special','So good'], lounge:['Quick rest','Five-minute breather'], play:['Quick game','Play break','One more round'], board:['Planning the week','Sharing updates','Sounds good','Noted'], score:['Updating the scoreboard'], kpi:['Checking team performance'], targets:['Reviewing this month’s targets'], pantry:['Snack time','Grabbing water','Quick snack'], garden:['Fresh air','Quiet minute','Watering the plants'], archive:['Filing the final cut','Archiving finished files']};
+const MSG = {llounge:['On standby','Waiting for a job','Nice and quiet here'], lmeet:['Client call','Pilot review'], llab:['Testing the build'], cafe:['Latte time','Coffee break','Iced mocha, please'], sunday:['Lunch at Sunday House','Trying today’s special','So good'], lounge:['Quick rest','Five-minute breather'], play:['Quick game','Play break','One more round'], board:['Planning the week','Sharing updates','Sounds good','Noted'], score:['Updating the scoreboard'], kpi:['Checking team performance'], targets:['Reviewing this month’s targets'], pantry:['Snack time','Grabbing water','Quick snack'], garden:['Fresh air','Quiet minute','Watering the plants'], archive:['Filing the final cut','Archiving finished files']};
 function floorTrip(a,z,sp,stay,msg,done){
   sp.busy = true;
   const out2 = pathOut(a), H = homeFloorOf(a), lane = [2.6,12+a.lane*.4], r1 = [[2.6,12]].concat(sp.via, [sp.p]);
@@ -1781,7 +1783,7 @@ function floorTrip(a,z,sp,stay,msg,done){
     if(z.id === 'archive'){ filed++; drawWall('archive'); logTo(a,'Archived finished videos'); const ab = byId.arc; logTo(ab,'Filed assets from '+a.name); later(.7, () => say(ab,'Filed and labelled',2000)); }
     if(z.id === 'score'){ const o = pick(OFFERS); o.v = Math.min(1.2, o.v + rand(.01,.03)); drawWall('score'); logTo(a,'Updated the scoreboard: '+o.name); a.d.delivered++; a.done++; nextTask(a); } a.liftH = sp.lift; a.t = stay; a.rotGoal = Math.atan2(sp.f[0], sp.f[1]); const topic = z.id === 'lounge' && !isLive() ? pick(sp.sit ? (STUDY[a.dept] || STUDY.trends) : STUDY.trends) : null;
     if(topic){ a.studyNow = topic; if(a.learned.indexOf(topic) < 0) a.learned.unshift(topic); if(a.learned.length > 4) a.learned.pop(); studyCount++; logTo(a,'Studied: '+topic); }
-    say(a, msg ? msg : topic ? (sp.sit ? 'Reading: ' : 'Studying: ')+topic : a.id === 'cos' && z.id === 'board' ? 'Let’s plan the week' : pick(MSG[z.id]), topic ? 4600 : 2600); if(done) done();
+    say(a, msg ? msg : topic ? (sp.sit ? 'Reading: ' : 'Studying: ')+topic : a.id === 'cos' && z.id === 'board' ? 'Let’s plan the week' : pick(MSG[z.id] || ['Here now']), topic ? 4600 : 2600); if(done) done();
     const st = z.id === 'cafe' ? byId.chunky : z.id === 'sunday' ? byId.luna : null;
     if(st){ logTo(st,'Served '+a.name); later(.8, () => say(st, pick(z.id === 'cafe' ? ['One latte, coming up','Your usual?','Fresh pastries today'] : ['Order up','Today’s special, coming up','Bon appétit']), 2400)); }
     a.onArrive = () => { a.st = 'work'; a.t = workTime(); a.rotGoal = a.seatA; a.onArrive = null; dirty(); }; dirty(); };
@@ -1959,8 +1961,17 @@ function setDuty(a,on){
     if(a.st === 'visit'){ if(a.floor === 1 && !a.idle){ a.idle = true; a.cur = 'Off duty'; a.prog = 0; a.t = 1e9; say(a,'Off duty',2000); } else if(!a.idle) a.t = 0; else { a.cur = 'Off duty'; a.t = 1e9; } } }
   dirty();
 }
+// Her rule (12 Nov): a character with no agent behind them stays in the office (the 3D render is not wasted) but loses their desk and
+// their job, and waits in the client lounge on Floor 3. Set with inactive:true on the page, or in Live mode when the office has no such agent.
+function retire(a){
+  if(!a || a.staff || a.retired) return; a.retired = true; a.inactive = true; a.off = true; a.idle = true; a.cur = 'On standby. No job assigned.'; a.step = ''; a.prog = 0; a.queue = []; a.asking = false; if(a.st === 'need') a.st = 'work';
+  if(a.deskG) a.deskG.visible = false;
+  if(a.spot){ a.spot.busy = false; a.spot = null; } a.path = []; a.x = a.seatW[0]; a.z = a.seatW[1]; a.floor = homeFloorOf(a); a.st = 'work'; a.onArrive = null; // from their old seat, straight to the lounge
+  const z = byDept.llounge, sp = z.spots.filter(x => !x.busy)[0]; if(sp) floorTrip(a, z, sp, 1e9); else a.t = 1e9; dirty();
+}
 function decide(a){
   const task = a.cur;
+  if(a.inactive){ a.t = 1e9; return; }
   if(a.off){ if(!goIdle(a)) a.t = 4; return; }
   if(a.id === 'cos'){
     if(wantReport){ wantReport = false; trip(a,'you','Your daily report', () => { inbox.unshift({who:a.name, dept:'Daily at 7:00 PM', what:'End-of-day report', t:timeStr(), lines:buildReport()}); logTo(a,'Delivered your end-of-day report'); nextTask(a); }); return; }
@@ -2417,7 +2428,7 @@ function mailHTML(){
 /* ---------------- Chat: Messenger-style messages with one agent or a whole team (her words, 10 Nov: "I ask something small from an agent and then they reply back"; "clustered per departments but still has an individual chat capability") ---------------- */
 const DM = {open:null, draft:'', busy:{}, msgs: mailLoad('office-chat'), meet: mailLoad('office-chat-meet'), seen: mailLoad('office-chat-seen'), tasks: mailLoad('office-chat-tasks'), got: mailLoad('office-chat-got')};
 const chatSave = () => { Object.keys(DM.msgs).forEach(id => { if(DM.msgs[id].length > 80) DM.msgs[id].splice(0, DM.msgs[id].length-80); }); mailSave('office-chat', DM.msgs); mailSave('office-chat-meet', DM.meet); mailSave('office-chat-seen', DM.seen); mailSave('office-chat-tasks', DM.tasks); mailSave('office-chat-got', DM.got); };
-const chatAgents = () => AG.filter(a => !a.staff && a.id !== 'chunky' && a.id !== 'luna');
+const chatAgents = () => AG.filter(a => !a.staff && !a.inactive && a.id !== 'chunky' && a.id !== 'luna');
 // A chat target: one agent (key = agent id) or a whole team (key = 'd:' + department id).
 function chatTarget(key){ if(!key) return null; if(key.indexOf('d:') === 0){ const d = byDept[key.slice(2)]; if(!d) return null; const ok = chatAgents(), ag = d.agents.filter(a => ok.indexOf(a) >= 0); return ag.length ? {key, d, a:null, name:d.name, agents:ag, group:true} : null; } const a = byId[key]; return a ? {key, a, d:a.d, name:a.name, agents:[a], group:false} : null; }
 const chatStatus = a => { if(isLive() && a.live){ const p = pillFor(a); return p ? p[1] : a.role; } return a.role; };
@@ -3657,7 +3668,8 @@ function applyState(st){
   if(!first && sig === LV.sig){ LV.state.now = st.now; return; } LV.sig = sig;
   LV.state = st; LV.ok = true; LV.err = '';
   (st.agents || []).forEach(sa => { const a = byId[sa.id]; if(!a) return; a.live = sa; a.done = sa.done_today || 0; });
-  AG.forEach(a => { if(!a.live) a.live = {id:a.id, status:'not_connected', why:'Not connected yet', duty:true, done_today:0, kpi:null}; });
+  if((st.agents || []).length) AG.forEach(a => { if(!a.staff && !a.live && !a.retired) retire(a); });
+  AG.forEach(a => { if(!a.live) a.live = a.inactive ? {id:a.id, status:'paused', why:'No agent behind this character right now. On standby in the client lounge on Floor 3.', duty:false, done_today:0, kpi:null} : {id:a.id, status:'not_connected', why:'Not connected yet', duty:true, done_today:0, kpi:null}; });
   DEPTS.forEach(d => { d.delivered = d.agents.reduce((n,a) => n + (a.done || 0), 0); });
   (st.events || []).forEach(ev => { const a = byId[ev.agent_id]; if(!a) return; a.log.unshift({t:fmtTime(ev.at), text:ev.title}); if(a.log.length > 8) a.log.pop(); if(!first && a.liveQ.length < 6) a.liveQ.push(ev); });
   if(st.cursor) LV.cursor = st.cursor;
@@ -3737,6 +3749,7 @@ function frame(now){
   panelT += dt; if(dirtyFlag || panelT > .5){ dirtyFlag = false; panelT = 0; refreshPanel(); }
   if(renderer) renderer.render(scene, cam);
 }
+later(1.5, () => AG.forEach(a => { if(a.inactive && !a.retired) retire(a); }));
 if(isLive()) liveStart();
 else { later(9, () => runCheck('quick')); later(3, () => { ['rd','fl'].forEach(id => { const a = byId[id]; if(atDesk(a)) goIdle(a); }); }); const first = byId.so; first.t = 1e9; later(.6, () => raise(first, first.need)); }
 setNote(); $('modeDemo').setAttribute('aria-pressed', String(!isLive())); $('modeLive').setAttribute('aria-pressed', String(isLive()));
