@@ -1,1 +1,8 @@
 .env
+# Coaches' photos and the slides that contain them come from a private Drive;
+# this repository is public, so keep them local.
+brand/people/coaches-original/
+brand/people/coach-*.jpg
+!brand/people/coach-jazmine.jpg
+!brand/people/coach-lloyd.jpg
+graphics/coaches/
