@@ -15,49 +15,44 @@
         {
           "name": "Coach Jazmine",
           "badge": "Founder",
-          "cutout": "brand/people/cutouts/jazmine-bust.png"
+          "cutout": "brand/people/cutouts/jazmine-tilewide.png"
         },
         {
           "name": "Coach Lloyd",
           "badge": "Founder",
-          "cutout": "brand/people/cutouts/lloyd-bust.png"
+          "cutout": "brand/people/cutouts/lloyd-tilewide.png"
         },
         {
           "name": "Coach Ann",
-          "cutout": "brand/people/cutouts/ann-bust.png",
-          "zoom": 112
+          "cutout": "brand/people/cutouts/ann-tile.png"
         },
         {
           "name": "Coach Maron",
-          "cutout": "brand/people/cutouts/maron-bust.png"
+          "cutout": "brand/people/cutouts/maron-tile.png"
         },
         {
           "name": "Coach Clark",
-          "cutout": "brand/people/cutouts/clark-bust.png"
+          "cutout": "brand/people/cutouts/clark-tile.png"
         },
         {
           "name": "Coach Renz",
-          "cutout": "brand/people/cutouts/renz-bust.png",
-          "zoom": 108
+          "cutout": "brand/people/cutouts/renz-tile.png"
         },
         {
           "name": "Coach David",
-          "cutout": "brand/people/cutouts/david-bust.png",
-          "zoom": 84
+          "cutout": "brand/people/cutouts/david-tile.png"
         },
         {
           "name": "Coach Gab",
-          "cutout": "brand/people/cutouts/gab-bust.png",
-          "zoom": 118
+          "cutout": "brand/people/cutouts/gab-tile.png"
         },
         {
           "name": "Coach Joshua",
-          "cutout": "brand/people/cutouts/joshua-bust.png",
-          "zoom": 125
+          "cutout": "brand/people/cutouts/joshua-tile.png"
         },
         {
           "name": "Coach Arv",
-          "cutout": "brand/people/cutouts/arvin-bust.png"
+          "cutout": "brand/people/cutouts/arvin-tile.png"
         }
       ]
     },

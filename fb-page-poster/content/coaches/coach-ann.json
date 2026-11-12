@@ -12,9 +12,8 @@
       "tag": "Coach Spotlight",
       "name": "Coach Ann",
       "role": "Queen of Operations",
-      "cutout": "brand/people/cutouts/ann-hero.png",
-      "photo": "brand/people/coach-ann.jpg",
-      "height": 800
+      "cutout": "brand/people/cutouts/ann-poster.png",
+      "photo": "brand/people/coach-ann.jpg"
     },
     {
       "layout": "statement",

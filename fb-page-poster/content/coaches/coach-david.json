@@ -12,9 +12,8 @@
       "tag": "Coach Spotlight",
       "name": "Coach David",
       "role": "The Visual Storyteller",
-      "cutout": "brand/people/cutouts/david-hero.png",
-      "photo": "brand/people/coach-david.jpg",
-      "height": 720
+      "cutout": "brand/people/cutouts/david-poster.png",
+      "photo": "brand/people/coach-david.jpg"
     },
     {
       "layout": "statement",

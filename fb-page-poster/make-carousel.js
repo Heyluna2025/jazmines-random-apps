@@ -207,7 +207,8 @@ const pager = (index, total, color) => `<div class="pfoot" style="color:${color}
 const firstName = (name) => String(name).replace(/^Coach\s+/i, '');
 
 // Sports-poster cover for one coach: giant name behind a cut-out photo (a
-// transparent PNG in "cutout"), a duotone tile of their regular photo, the
+// transparent 1080x1350 PNG in "cutout", already sized so every coach's face
+// lands in the same place; see brand/people/README.md), a duotone tile of their regular photo, the
 // title in a block and a signature. Fields: name, role, cutout, photo, tag.
 function hero(s, index, total) {
   const first = firstName(s.name).toUpperCase();
@@ -229,8 +230,7 @@ body{background:linear-gradient(165deg,#6A4DF5 0%,#4B2FD6 45%,#2A1690 100%)}
 .label{position:absolute;right:60px;top:190px;z-index:6;display:flex;align-items:center;gap:18px;color:${BRAND.gold};font-family:'Archivo Black';font-size:34px;line-height:.95;text-align:right;text-transform:uppercase}
 .label svg{flex:none}
 .big{position:absolute;left:0;right:0;top:${s.nameTop || 330}px;z-index:2;text-align:center;font-family:'Anton';color:#F6F3FF;line-height:.9;white-space:nowrap;letter-spacing:4px;text-shadow:0 10px 40px rgba(20,8,60,.35)}
-.person{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:${s.height || 930}px;max-width:980px;z-index:4;filter:drop-shadow(0 30px 40px rgba(15,5,50,.55))}
-.person.wide{height:auto;width:900px}
+.person{position:absolute;left:0;top:0;width:1080px;height:1350px;z-index:4;filter:drop-shadow(0 30px 40px rgba(15,5,50,.55))}
 .panel{position:absolute;right:40px;bottom:96px;z-index:5;width:520px;padding:30px 34px 26px;background:#4B2FD6;box-shadow:0 20px 50px rgba(15,5,50,.45)}
 .panel h2{margin:0;font-family:'Archivo Black';font-weight:400;font-size:52px;line-height:.98;color:#fff;letter-spacing:-.5px}
 .sig{display:flex;align-items:flex-end;gap:12px;margin-top:22px;border-bottom:2px solid rgba(255,255,255,.8);padding-bottom:4px}
@@ -251,19 +251,20 @@ ${pager(index, total, '#fff')}
 <script>
 window.fitPoster=()=>{const big=document.getElementById('big');if(!big)return;let fs=500;big.style.fontSize=fs+'px';
 while(big.offsetWidth>1000&&fs>160){fs-=4;big.style.fontSize=fs+'px'}
-if(big.offsetWidth<980)big.style.letterSpacing=Math.min(36,(1000-big.offsetWidth)/big.textContent.length)+'px';
-const p=document.getElementById('person');if(p.naturalWidth/p.naturalHeight*${s.height || 930}>980)p.classList.add('wide')};
+if(big.offsetWidth<980)big.style.letterSpacing=Math.min(36,(1000-big.offsetWidth)/big.textContent.length)+'px';};
 
 </script>`;
 }
 
 // Team roster: torn-paper header and a grid of cut-out photos with name bars.
 // Fields: kicker, title, people: [{ name, cutout, badge }]; people with a
-// badge (e.g. "Founder") go in a larger first row.
+// badge (e.g. "Founder") go in a larger first row. Cut-outs are pre-sized
+// canvases (684x600 for coaches, 918x600 for the first row) with every face
+// at the same size and position, so the grid lines up.
 function roster(s, index, total) {
   const leads = s.people.filter((p) => p.badge);
   const rest = s.people.filter((p) => !p.badge);
-  const tile = (p, big) => `<div class="rt${big ? ' big' : ''}"><div class="rph"><img src="${photoSrc(p.cutout)}"${p.zoom ? ` style="height:${p.zoom}%"` : ''}></div>
+  const tile = (p, big) => `<div class="rt${big ? ' big' : ''}"><div class="rph"><img src="${photoSrc(p.cutout)}"></div>
     <div class="bar">${escape(firstName(p.name).toUpperCase())}${p.badge ? `<small>${escape(p.badge)}</small>` : ''}</div></div>`;
   let seed = 7;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
@@ -295,10 +296,12 @@ body{background:#2A1690}
 .rt{width:228px;display:flex;flex-direction:column;box-shadow:0 14px 30px rgba(8,2,30,.5)}
 .rt.big{width:360px}
 .rph{position:relative;height:200px;overflow:hidden;background:
-  radial-gradient(circle at 50% 35%,rgba(140,110,255,.55) 0,transparent 60%),
+  radial-gradient(circle at 50% 34%,rgba(150,120,255,.6) 0,rgba(112,85,250,.18) 38%,transparent 62%),
   radial-gradient(rgba(0,0,0,.35) 1px,transparent 1.3px) 0 0/6px 6px,#1A0B2E}
 .rt.big .rph{height:236px}
-.rph img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:96%;max-width:none;filter:contrast(1.06) saturate(.92)}
+.rph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.rph::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,rgba(26,11,46,.55))}
+.rt.big .rph{outline:3px solid ${BRAND.gold};outline-offset:-3px}
 .bar{background:#7055FA;color:#fff;font-family:'Archivo Black';font-size:30px;text-align:center;padding:9px 6px 8px;letter-spacing:.5px;line-height:1}
 .rt.big .bar{background:${BRAND.gold};color:#1A0B2E;font-size:36px}
 .bar small{display:block;font-family:'Inter Display';font-weight:800;font-size:18px;letter-spacing:5px;margin-top:6px;text-transform:uppercase}
