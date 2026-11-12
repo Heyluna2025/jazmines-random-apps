@@ -11,7 +11,8 @@ Cut-outs come from rembg first (isnet-general-use). Run from brand/people:
 Per person: enhance (2x upscale, denoise, local contrast, sharpen) for small
 or harsh photos, strong (stricter edge clean-up for busy backgrounds), fill
 (continue clothing cut off at the left/right edge), fill_top: N (draw N px
-of the head cut off at the top edge), hero:false (no cover).
+of the head cut off at the top edge), natural (no colour or exposure
+changes: keep the original skin tone), hero:false (no cover).
 Writes cutouts/<name>-tile.png (684x600), -tilewide.png (918x600) and
 -poster.png (1080x1350). Photos stay local: cutouts/ is git-ignored."""
 import json, sys
@@ -94,7 +95,7 @@ def face(rgba):
     x, y, fw, fh = (f[:4] / scale)
     return x, y, fw, fh
 
-def grade(rgba, fbox, enhance=False):
+def grade(rgba, fbox, enhance=False, natural=False):
     """Even out exposure (face brightness) and give everyone the same mild,
     warm, slightly punchy look."""
     rgb = rgba.convert('RGB'); a = rgba.getchannel('A')
@@ -104,12 +105,17 @@ def grade(rgba, fbox, enhance=False):
         fbox = [v * 2 for v in fbox]
         # gentle denoise + local contrast (CLAHE on L) + unsharp
         bgr = cv2.cvtColor(np.array(rgb), cv2.COLOR_RGB2BGR)
-        bgr = cv2.bilateralFilter(bgr, 7, 30, 7)
-        lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
-        l, aa, bb = cv2.split(lab)
-        l = cv2.createCLAHE(clipLimit=1.1, tileGridSize=(8, 8)).apply(l)
-        bgr = cv2.cvtColor(cv2.merge((l, aa, bb)), cv2.COLOR_LAB2BGR)
-        rgb = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)).filter(ImageFilter.UnsharpMask(2.2, 90, 2))
+        if not natural:
+            bgr = cv2.bilateralFilter(bgr, 7, 30, 7)
+            lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
+            l, aa, bb = cv2.split(lab)
+            l = cv2.createCLAHE(clipLimit=1.1, tileGridSize=(8, 8)).apply(l)
+            bgr = cv2.cvtColor(cv2.merge((l, aa, bb)), cv2.COLOR_LAB2BGR)
+        rgb = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)).filter(
+            ImageFilter.UnsharpMask(1.2, 35, 3) if natural else ImageFilter.UnsharpMask(2.2, 90, 2))
+    if natural:  # keep the photo's own skin tone and exposure
+        out = rgb.convert('RGBA'); out.putalpha(a)
+        return out, fbox
     x, y, fw, fh = fbox
     region = np.array(rgb.crop((int(x + fw * .2), int(y + fh * .3), int(x + fw * .8), int(y + fh * .8)))).astype(np.float32) / 255
     lum = (region @ [0.299, 0.587, 0.114]).mean()
@@ -151,7 +157,7 @@ for p in people:
     if p.get('fill_top'): im = fill_top(im, p['fill_top'])
     im = im.crop(im.getbbox())
     fb = face(im)
-    im, fb = grade(im, fb, p.get('enhance', False))
+    im, fb = grade(im, fb, p.get('enhance', False), p.get('natural', False))
     # tiles: coaches 684x600, founders 918x600 (face 34% of height, top at 17%)
     # grid tiles: coaches 684x600 (face 36% of the height, its top at 22%, so
     # there is headroom above the hair); first-row tiles 918x600 show the
