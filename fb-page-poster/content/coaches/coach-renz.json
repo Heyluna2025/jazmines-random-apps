@@ -8,11 +8,11 @@
   "caption": "Coach Spotlight: meet Coach Renz (Renz Castillo)! 💜\n\n🪄 The Automation Wizard · Automation Specialist. A reports designer and data analyst who turns raw data into clear reports people can act on.\n\nKnown for: Automates the repetitive work behind reports and data.\n\nBuilt with AI: an automated workflow that files emailed reports and refreshes Power BI on its own: less manual work, fewer errors.\n\nWant to learn with Coach Renz? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
-      "layout": "spotlight",
+      "layout": "hero",
       "tag": "Coach Spotlight",
       "name": "Coach Renz",
       "role": "The Automation Wizard",
-      "tagline": "Automates the repetitive work behind reports and data.",
+      "cutout": "brand/people/cutouts/renz-hero.png",
       "photo": "brand/people/coach-renz.jpg"
     },
     {

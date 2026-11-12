@@ -8,11 +8,11 @@
   "caption": "Coach Spotlight: meet Coach Joshua (Joshua Ladero)! 💜\n\n🏗️ The AI Systems Architect · AI Specialist & System Architect. Focused on building AI-powered solutions and digital products.\n\nKnown for: Builds AI agents, workflow automations and AI-powered apps with no-code and AI development tools.\n\nBuilt with AI: Kasya, a gait analyzer that reads how a person walks, and Cuely, a teleprompter app that keeps your script on screen while you record.\n\nWant to learn with Coach Joshua? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
-      "layout": "spotlight",
+      "layout": "hero",
       "tag": "Coach Spotlight",
       "name": "Coach Joshua",
       "role": "The AI Systems Architect",
-      "tagline": "Builds AI agents, workflow automations and AI-powered apps with no-code and AI development tools.",
+      "cutout": "brand/people/cutouts/joshua-hero.png",
       "photo": "brand/people/coach-joshua.jpg"
     },
     {

@@ -8,11 +8,11 @@
   "caption": "Coach Spotlight: meet Coach Arv! 💜\n\n🛠️ The No-Code Maker · Full-Stack No-Code Dev. An entrepreneur and AI content creator, proof you don't need to code to build with AI.\n\nKnown for: Builds no-code apps and creates content around AI.\n\nBuilt with AI: Vera (formerly AffiliateFlow), a ChatGPT plugin that does the heavy lifting on affiliate marketing content, so you start with a draft instead of a blank page.\n\nWant to learn with Coach Arv? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
-      "layout": "spotlight",
+      "layout": "hero",
       "tag": "Coach Spotlight",
       "name": "Coach Arv",
       "role": "The No-Code Maker",
-      "tagline": "Builds no-code apps and creates content around AI.",
+      "cutout": "brand/people/cutouts/arvin-hero.png",
       "photo": "brand/people/coach-arvin.jpg"
     },
     {

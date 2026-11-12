@@ -8,11 +8,11 @@
   "caption": "Coach Spotlight: meet Coach Clark (Clark Lopez)! 💜\n\n📈 The ROAS Whisperer · Performance Marketer. Helps businesses grow through marketing systems and performance-focused digital strategies.\n\nKnown for: Builds AI tools that help analyze Meta Ads and improve creative strategy.\n\nBuilt with AI: ROAS Squad Bots, AI-powered bots that analyze Meta Ads performance and improve creatives from campaign insights.\n\nWant to learn with Coach Clark? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
-      "layout": "spotlight",
+      "layout": "hero",
       "tag": "Coach Spotlight",
       "name": "Coach Clark",
       "role": "The ROAS Whisperer",
-      "tagline": "Builds AI tools that help analyze Meta Ads and improve creative strategy.",
+      "cutout": "brand/people/cutouts/clark-hero.png",
       "photo": "brand/people/coach-clark.jpg"
     },
     {

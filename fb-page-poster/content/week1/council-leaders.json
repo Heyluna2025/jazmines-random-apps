@@ -5,18 +5,66 @@
     "facebook",
     "instagram"
   ],
-  "caption": "Nobody builds alone inside AI Builder's Camp. 💜\n\nEvery builder learns with a coach in their corner, guiding them as they discover their purpose, build their product and learn to sell it.\n\nOver the coming weeks, we're putting the spotlight on each of our coaches: who they are, what they've built, and how they help builders move forward. Abangan! 👀\n\nBatch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "caption": "Nobody builds alone inside AI Builder's Camp. 💜\n\nLed by our founders, Coach Jazmine and Coach Lloyd, every builder learns with a coach in their corner, guiding them as they discover their purpose, build their product and learn to sell it.\n\nOver the coming weeks, we're putting the spotlight on each of our coaches: who they are, what they've built, and how they help builders move forward. Abangan! 👀\n\nBatch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
-      "layout": "cover",
-      "tag": "Meet the coaches",
-      "title": "The coaches who guide *our builders*",
-      "subtitle": "Every builder in AI Builder's Camp learns with a coach in their corner."
+      "layout": "roster",
+      "kicker": "AI BUILDER'S CAMP",
+      "title": "Meet the\ncoaches",
+      "people": [
+        {
+          "name": "Coach Jazmine",
+          "badge": "Founder",
+          "cutout": "brand/people/cutouts/jazmine-bust.png"
+        },
+        {
+          "name": "Coach Lloyd",
+          "badge": "Founder",
+          "cutout": "brand/people/cutouts/lloyd-bust.png"
+        },
+        {
+          "name": "Coach Ann",
+          "cutout": "brand/people/cutouts/ann-bust.png",
+          "zoom": 112
+        },
+        {
+          "name": "Coach Maron",
+          "cutout": "brand/people/cutouts/maron-bust.png"
+        },
+        {
+          "name": "Coach Clark",
+          "cutout": "brand/people/cutouts/clark-bust.png"
+        },
+        {
+          "name": "Coach Renz",
+          "cutout": "brand/people/cutouts/renz-bust.png",
+          "zoom": 108
+        },
+        {
+          "name": "Coach David",
+          "cutout": "brand/people/cutouts/david-bust.png",
+          "zoom": 84
+        },
+        {
+          "name": "Coach Gab",
+          "cutout": "brand/people/cutouts/gab-bust.png",
+          "zoom": 118
+        },
+        {
+          "name": "Coach Joshua",
+          "cutout": "brand/people/cutouts/joshua-bust.png",
+          "zoom": 125
+        },
+        {
+          "name": "Coach Arv",
+          "cutout": "brand/people/cutouts/arvin-bust.png"
+        }
+      ]
     },
     {
       "layout": "statement",
       "kicker": "Coach Spotlight",
-      "title": "8 coaches.\n*One spotlight each.*",
+      "title": "Our founders and\n*8 coaches.*",
       "body": "Over the coming weeks, meet each of our coaches: who they are, what they've built, and how they help builders move forward."
     },
     {

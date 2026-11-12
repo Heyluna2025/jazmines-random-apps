@@ -9,7 +9,8 @@
 //
 // Writes <out>-01.png, <out>-02.png, ... and with --sheet a <out>-sheet.png
 // overview for review. Spec: { "slides": [ { "layout": "...", ... } ] } with
-// layouts cover, statement ("logo": true adds the ABC logo), spotlight (a
+// layouts hero (sports-poster coach cover) and roster (team grid), which
+// draw their own background, plus cover, statement ("logo": true adds the ABC logo), spotlight (a
 // person: photo, tag, name, role, tagline), quote (text, by), bullets, steps, hub, people, qa and cta (see the
 // render functions below). In any text, *word* gets the accent colour and
 // [[note]] renders a dashed "to confirm" box, so drafts can't be mistaken for
@@ -193,11 +194,140 @@ function quote(s) {
 
 const LAYOUTS = { cover, statement, bullets, steps, hub, people, qa, cta, spotlight, quote };
 
+// ---- full-bleed poster layouts (their own background and chrome) ----
+
+const font = (file) => `data:font/woff2;base64,${fs.readFileSync(path.join(__dirname, 'brand', 'fonts', file)).toString('base64')}`;
+let fontCss;
+const posterFonts = () => (fontCss ||= `
+@font-face{font-family:'Anton';src:url(${font('anton-latin-400-normal.woff2')}) format('woff2')}
+@font-face{font-family:'Archivo Black';src:url(${font('archivo-black-latin-400-normal.woff2')}) format('woff2')}
+@font-face{font-family:'Caveat';font-weight:700;src:url(${font('caveat-latin-700-normal.woff2')}) format('woff2')}`);
+
+const pager = (index, total, color) => `<div class="pfoot" style="color:${color}"><span><b>${String(index + 1).padStart(2, '0')}</b> / ${String(total).padStart(2, '0')}</span>${index === total - 1 ? '' : '<span>Swipe →</span>'}</div>`;
+const firstName = (name) => String(name).replace(/^Coach\s+/i, '');
+
+// Sports-poster cover for one coach: giant name behind a cut-out photo (a
+// transparent PNG in "cutout"), a duotone tile of their regular photo, the
+// title in a block and a signature. Fields: name, role, cutout, photo, tag.
+function hero(s, index, total) {
+  const first = firstName(s.name).toUpperCase();
+  const words = String(s.role || '').toUpperCase().split(' ');
+  const half = Math.ceil(words.length / 2);
+  return `<style>
+body{background:linear-gradient(165deg,#6A4DF5 0%,#4B2FD6 45%,#2A1690 100%)}
+.lines{position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 140px,rgba(255,255,255,.06) 140px 142px);}
+.grain{position:absolute;inset:0;opacity:.18;background-image:radial-gradient(rgba(255,255,255,.5) .6px,transparent .8px);background-size:5px 5px}
+.ptop{position:absolute;top:50px;left:60px;display:flex;align-items:center;gap:18px;z-index:9}
+.ptop .mark{height:40px;width:80px;background:#fff;-webkit-mask:url(${logoUri}) center/contain no-repeat}
+.ptop .amark{height:34px;width:42px;background:#fff;-webkit-mask:url(${aecMarkUri}) center/contain no-repeat}
+.ptop .sep{width:2px;height:30px;background:rgba(255,255,255,.5)}
+.ptop .org{font-family:'Inter Display';font-weight:700;font-size:22px;letter-spacing:4px;color:#fff}
+.tile{position:absolute;left:96px;top:150px;width:300px;height:330px;overflow:hidden;z-index:1}
+.tile img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.15) brightness(1.05)}
+.tile::after{content:'';position:absolute;inset:0;background:#3B23B5;mix-blend-mode:multiply}
+.tile::before{content:'';position:absolute;inset:0;background:${BRAND.gold};mix-blend-mode:screen;opacity:.18;z-index:1}
+.label{position:absolute;right:60px;top:190px;z-index:6;display:flex;align-items:center;gap:18px;color:${BRAND.gold};font-family:'Archivo Black';font-size:34px;line-height:.95;text-align:right;text-transform:uppercase}
+.label svg{flex:none}
+.big{position:absolute;left:0;right:0;top:${s.nameTop || 330}px;z-index:2;text-align:center;font-family:'Anton';color:#F6F3FF;line-height:.9;white-space:nowrap;letter-spacing:4px;text-shadow:0 10px 40px rgba(20,8,60,.35)}
+.person{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:${s.height || 930}px;max-width:980px;z-index:4;filter:drop-shadow(0 30px 40px rgba(15,5,50,.55))}
+.person.wide{height:auto;width:900px}
+.panel{position:absolute;right:40px;bottom:96px;z-index:5;width:520px;padding:30px 34px 26px;background:#4B2FD6;box-shadow:0 20px 50px rgba(15,5,50,.45)}
+.panel h2{margin:0;font-family:'Archivo Black';font-weight:400;font-size:52px;line-height:.98;color:#fff;letter-spacing:-.5px}
+.sig{display:flex;align-items:flex-end;gap:12px;margin-top:22px;border-bottom:2px solid rgba(255,255,255,.8);padding-bottom:4px}
+.sig i{font-style:normal;color:#fff;font-size:26px;font-weight:700}
+.sig b{font-family:'Caveat';font-weight:700;font-size:70px;line-height:.8;color:${BRAND.gold};transform:rotate(-4deg);transform-origin:left bottom}
+.sigl{font-family:'Inter Display';font-weight:700;font-size:20px;letter-spacing:3px;color:#fff;margin-top:8px}
+.pfoot{position:absolute;bottom:34px;left:60px;right:60px;z-index:8;display:flex;justify-content:space-between;font-size:24px;font-weight:600;letter-spacing:1px;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+</style>
+<div class="lines"></div><div class="grain"></div>
+<div class="ptop"><div class="mark"></div><div class="sep"></div><div class="amark"></div><div class="org">AI EMPOWERED CLUB</div></div>
+${s.photo ? `<div class="tile"><img src="${photoSrc(s.photo)}"></div>` : ''}
+<div class="label"><span>${escape(s.tag || 'Coach Spotlight').replace(/ /, '<br>')}</span><svg width="60" height="24" viewBox="0 0 60 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M58 12H4M14 2 4 12l10 10"/></svg></div>
+<div class="big"><span id="big">${escape(first)}</span></div>
+<img class="person" id="person" src="${photoSrc(s.cutout)}">
+<div class="panel"><h2>${escape(words.slice(0, half).join(' '))}<br>${escape(words.slice(half).join(' '))}</h2>
+<div class="sig"><i>x</i><b>${escape(s.name)}</b></div><div class="sigl">AI BUILDER'S CAMP COACH</div></div>
+${pager(index, total, '#fff')}
+<script>
+window.fitPoster=()=>{const big=document.getElementById('big');if(!big)return;let fs=500;big.style.fontSize=fs+'px';
+while(big.offsetWidth>1000&&fs>160){fs-=4;big.style.fontSize=fs+'px'}
+if(big.offsetWidth<980)big.style.letterSpacing=Math.min(36,(1000-big.offsetWidth)/big.textContent.length)+'px';
+const p=document.getElementById('person');if(p.naturalWidth/p.naturalHeight*${s.height || 930}>980)p.classList.add('wide')};
+
+</script>`;
+}
+
+// Team roster: torn-paper header and a grid of cut-out photos with name bars.
+// Fields: kicker, title, people: [{ name, cutout, badge }]; people with a
+// badge (e.g. "Founder") go in a larger first row.
+function roster(s, index, total) {
+  const leads = s.people.filter((p) => p.badge);
+  const rest = s.people.filter((p) => !p.badge);
+  const tile = (p, big) => `<div class="rt${big ? ' big' : ''}"><div class="rph"><img src="${photoSrc(p.cutout)}"${p.zoom ? ` style="height:${p.zoom}%"` : ''}></div>
+    <div class="bar">${escape(firstName(p.name).toUpperCase())}${p.badge ? `<small>${escape(p.badge)}</small>` : ''}</div></div>`;
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const edge = (base, amp) => Array.from({ length: 136 }, (_, i) => `${Math.min(1080, i * 8 + rnd() * 6).toFixed(1)},${(base + (rnd() - 0.5) * amp + Math.sin(i / 6) * 4).toFixed(1)}`).join(' ');
+  const torn = edge(16, 16);
+  const fibre = edge(22, 14);
+  return `<style>
+body{background:#2A1690}
+.fabric{position:absolute;inset:0;background:
+  radial-gradient(ellipse at 50% 60%,transparent 30%,rgba(10,3,30,.55) 100%),
+  repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),
+  repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 2px,transparent 2px 5px),
+  linear-gradient(170deg,#4B2FD6 0%,#2E1A9E 55%,#1A0B5E 100%)}
+.paper{position:absolute;left:0;right:0;top:0;height:372px;background:
+  radial-gradient(rgba(60,40,120,.10) .7px,transparent .9px) 0 0/4px 4px,
+  linear-gradient(180deg,#F6F3FF,#E4DDF5)}
+.tear{position:absolute;left:0;top:360px;z-index:2;filter:drop-shadow(0 8px 10px rgba(10,3,40,.45))}
+.rhead{position:absolute;top:44px;left:60px;right:60px;z-index:3;text-align:center}
+.rk{font-family:'Inter Display';font-weight:700;font-size:26px;letter-spacing:10px;color:#2A1690;margin-bottom:10px}
+.rh{font-family:'Archivo Black';font-size:128px;line-height:.9;color:#3B23B5;letter-spacing:-2px;text-transform:uppercase}
+.rh em{font-style:normal;color:${BRAND.gold};-webkit-text-stroke:0}
+.rlogos{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:20px}
+.rlogos .mark{height:34px;width:70px;background:#2A1690;-webkit-mask:url(${logoUri}) center/contain no-repeat}
+.rlogos .amark{height:30px;width:37px;background:#2A1690;-webkit-mask:url(${aecMarkUri}) center/contain no-repeat}
+.rlogos .sep{width:2px;height:28px;background:rgba(42,22,144,.4)}
+.rlogos .org{font-family:'Inter Display';font-weight:700;font-size:20px;letter-spacing:4px;color:#2A1690}
+.grid{position:absolute;left:56px;right:56px;top:420px;z-index:3;display:flex;flex-direction:column;gap:18px}
+.row{display:flex;gap:18px;justify-content:center}
+.rt{width:228px;display:flex;flex-direction:column;box-shadow:0 14px 30px rgba(8,2,30,.5)}
+.rt.big{width:360px}
+.rph{position:relative;height:200px;overflow:hidden;background:
+  radial-gradient(circle at 50% 35%,rgba(140,110,255,.55) 0,transparent 60%),
+  radial-gradient(rgba(0,0,0,.35) 1px,transparent 1.3px) 0 0/6px 6px,#1A0B2E}
+.rt.big .rph{height:236px}
+.rph img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:96%;max-width:none;filter:contrast(1.06) saturate(.92)}
+.bar{background:#7055FA;color:#fff;font-family:'Archivo Black';font-size:30px;text-align:center;padding:9px 6px 8px;letter-spacing:.5px;line-height:1}
+.rt.big .bar{background:${BRAND.gold};color:#1A0B2E;font-size:36px}
+.bar small{display:block;font-family:'Inter Display';font-weight:800;font-size:18px;letter-spacing:5px;margin-top:6px;text-transform:uppercase}
+.pfoot{position:absolute;bottom:26px;left:60px;right:60px;z-index:8;display:flex;justify-content:space-between;font-size:24px;font-weight:600;letter-spacing:1px}
+</style>
+<div class="fabric"></div><div class="paper"></div>
+<svg class="tear" width="1080" height="46" viewBox="0 0 1080 46" preserveAspectRatio="none"><polygon fill="#FFFFFF" points="0,0 1080,0 1080,22 ${fibre} 0,24"/><polygon fill="#E4DDF5" points="0,0 1080,0 1080,16 ${torn} 0,16"/></svg>
+<div class="rhead"><div class="rk">${escape(s.kicker || "AI BUILDER'S CAMP")}</div><div class="rh">${rich(s.title).replace(/class="hl"/g, '')}</div>
+<div class="rlogos"><div class="mark"></div><div class="sep"></div><div class="amark"></div><div class="org">AI EMPOWERED CLUB</div></div></div>
+<div class="grid">
+${leads.length ? `<div class="row">${leads.map((p) => tile(p, true)).join('')}</div>` : ''}
+${Array.from({ length: Math.ceil(rest.length / 4) }, (_, r) => `<div class="row">${rest.slice(r * 4, r * 4 + 4).map((p) => tile(p)).join('')}</div>`).join('')}
+</div>
+${pager(index, total, '#C7BEDA')}`;
+}
+
+const POSTERS = { hero, roster };
+
 function page(slide, index, total, brand = 'abc') {
   slide = { ...slide, brand };
+  if (POSTERS[slide.layout]) {
+    return `<!doctype html><html><head><meta charset="utf-8"><style>${posterFonts()}
+*{box-sizing:border-box}html,body{margin:0}
+body{width:1080px;height:1350px;overflow:hidden;position:relative;font-family:'Inter',sans-serif;color:#fff}
+.pfoot b{color:#fff}</style></head><body>${POSTERS[slide.layout](slide, index, total)}</body></html>`;
+  }
   const aec = brand === 'aec';
   const render = LAYOUTS[slide.layout];
-  if (!render) throw new Error(`Slide ${index + 1}: unknown layout "${slide.layout}". Use ${Object.keys(LAYOUTS).join(', ')}.`);
+  if (!render) throw new Error(`Slide ${index + 1}: unknown layout "${slide.layout}". Use ${[...Object.keys(LAYOUTS), ...Object.keys(POSTERS)].join(', ')}.`);
   const light = slide.theme === 'light';
   const c = light
     ? { bg: BRAND.mist, fg: BRAND.plum, sub: '#4a3b66', accent: BRAND.violet, soft: 'rgba(112,85,250,.10)', line: 'rgba(112,85,250,.35)', glow: 'rgba(112,85,250,.18)' }
@@ -311,6 +441,7 @@ async function main() {
     for (let i = 0; i < slides.length; i++) {
       await pg.setContent(page(slides[i], i, slides.length, brand), { waitUntil: 'load' });
       await pg.evaluate(() => document.fonts.ready);
+      await pg.evaluate(() => { if (window.fitPoster) window.fitPoster(); window.fitPoster = null; }); // poster layouts size their big name
       const file = `${out}-${String(i + 1).padStart(2, '0')}.png`;
       await pg.screenshot({ path: file });
       files.push(file);
