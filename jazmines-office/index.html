@@ -672,7 +672,8 @@ const DEPTS = [
   {id:'smm', name:'Social Media Team', col:1,row:0, color:'#E8799C', cal:true, covers:'Designs static posts, writes captions, and schedules everything on your accounts, including the videos the Content Team hands over. They share one open office with Content. Leila runs the @jazminedeluna_ Instagram.', ph:'Schedule Friday’s reel for 6 PM'},
   {id:'mkt', name:'Marketing', col:2,row:0, color:'#F08A5A', covers:'Newsletters, emails, and the one master list of leads.', ph:'Draft this week’s newsletter'},
   {id:'rnd', name:'R&D', col:3,row:0, color:'#3DB48C', covers:'Competitor analysis, market trends, and Reddit research.', ph:'Find 5 new competitor hooks'},
-  {id:'acq', name:'LUNA AI Systems LLC', sub:'Client acquisition', col:4,row:0, color:'#8A7BE8', covers:'Finds leads, sends outreach, and books calls for LUNA AI Systems.', ph:'Find 20 clinics that need AI systems'},
+  {id:'acq', name:'LUNA Client Acquisition', sub:'Client acquisition', col:3,row:0, floor:3, color:'#8A7BE8', covers:'Harry finds the clinics, Natalia writes the outreach, Ron answers replies and books the discovery calls. LUNA AI Systems, Floor 3.', ph:'Find 20 clinics that need AI systems'},
+  {id:'f2meet', name:'Meeting room', color:'#4F95E0', space:true, floor:2, x0:40, z0:0, w:10, dp:10, covers:'A small meeting room for the Floor 2 teams.'},
   {id:'it',  name:'IT', col:0,row:1, color:'#4F95E0', covers:'Bug checks on all websites, AEC tools, sales pages, and landing pages.', ph:'Test the checkout on mobile'},
   {id:'fin', name:'Finance', col:1,row:1, color:'#7DB643', covers:'Actual revenue for ABC, AEC, AIBS, APS, AI Build Day, Breakfast Club, and upcoming offers. Also collects official receipts for tax payments, and tracks your subscriptions and expenses.', ph:'Total this week’s APS sales'},
   {id:'aec', name:'AI Empowered Club', col:2,row:1, color:'#F0A23A', covers:'Schedules your Zoom classes, uploads replays to Circle, and makes sure members stay active in Show & Tell and keep watching the classes. Shares one open office with AI Builders Camp.', ph:'Schedule a Q&A for Thursday'},
@@ -693,10 +694,10 @@ const DEPTS = [
   {id:'targets', name:'Target wall', color:'#E2B23C', space:true, wall:true, floor:4, x0:0, z0:14, w:12, dp:10, covers:'This month’s big goals and how far along each one is. Mary checks it on her rounds.'},
   {id:'archive', name:'Archives and assets', color:'#3D9A9A', space:true, wall:true, floor:4, x0:33, z0:14, w:17, dp:10, covers:'Where your Google Drive and laptop files are kept in order. The Archivist is in charge.', ph:'Find last month’s class recordings'},
   // Floor 3 belongs to LUNA AI Systems alone: LUNA’s office, her Operations and Client Success teams, a client meeting room, the build lab and a client lounge
-  {id:'lcoo', name:'LUNA’s office', col:0,row:0, floor:3, color:'#7B5BD6', covers:'LUNA, Chief Operating Officer of LUNA AI Systems, runs this floor and the client acquisition team on Floor 2 (Harry, Natalia, Ron). She reports to you.', ph:'Ask LUNA where the clinic pilot stands'},
+  {id:'lcoo', name:'LUNA’s office', col:0,row:0, floor:3, color:'#7B5BD6', covers:'LUNA, Chief Operating Officer of LUNA AI Systems, runs this whole floor: client acquisition, operations and client success. She reports to you.', ph:'Ask LUNA where the clinic pilot stands'},
   {id:'lops', name:'LUNA Operations', col:1,row:0, floor:3, color:'#5B6BC0', covers:'Theo scopes each clinic’s AI system, Max builds and tests it, Sofia runs the delivery plan through go-live.', ph:'Scope a receptionist system for a dental clinic'},
   {id:'lcs', name:'LUNA Client Success', col:2,row:0, floor:3, color:'#3D9A9A', covers:'Victor writes the proposals and agreements, Grace onboards every clinic and keeps them renewing, Nina runs the support desk.', ph:'Draft a proposal for a three-clinic group'},
-  {id:'lmeet', name:'Client meeting room', color:'#4F95E0', space:true, floor:3, x0:30, z0:0, w:20, dp:10, covers:'Discovery calls, demos and pilot reviews with clinic owners.'},
+  {id:'lmeet', name:'Client meeting room', color:'#4F95E0', space:true, floor:3, x0:40, z0:0, w:10, dp:10, covers:'Discovery calls, demos and pilot reviews with clinic owners.'},
   {id:'llab', name:'Build lab', color:'#E2B23C', space:true, floor:3, x0:0, z0:14, w:25, dp:10, covers:'Where each clinic’s system is assembled and tested before go-live: the phone agent, booking flow, reminders and follow-ups.'},
   {id:'llounge', name:'Client lounge', color:'#6FBF73', space:true, floor:3, x0:25, z0:14, w:25, dp:10, covers:'A quiet corner for clinic owners visiting the office.'}
 ];
@@ -721,11 +722,11 @@ const AG = [
    tasks:['Round up this week’s AI trends','Track rising hooks','Watch new AI tools'], steps:['Analyzing results','Reading headlines','Ranking topics']},
   {id:'rd', name:'Daenerys', role:'Reddit researcher', dept:'rnd', kind:'shiba', fur:'#EBA25A', dark:'#D98A3F', shirt:'#2F6B3F', to:['mkt','acq'],
    tasks:['Read r/Entrepreneur pain points','Collect beginner AI questions','Save buyer quotes'], steps:['Reading threads','Processing data','Saving buyer quotes']},
-  {id:'lf', name:'Harry', role:'Lead finder', dept:'acq', kind:'dog', fur:'#E9E1D2', dark:'#6F6A8C', shirt:'#6A5BD0', to:['cos','you'],
+  {id:'lf', name:'Harry', role:'Lead finder', dept:'acq', homeF:3, kind:'dog', fur:'#E9E1D2', dark:'#6F6A8C', shirt:'#6A5BD0', to:['cos','you'],
    tasks:['Build a list of 50 prospects','Check prospect websites','Score new leads'], steps:['Searching companies','Checking websites','Scoring leads']},
-  {id:'ou', name:'Natalia', role:'Outreach writer', dept:'acq', kind:'cat', fur:'#C9CBE0', dark:'#7B7EA6', shirt:'#8A7BE8', to:['you','cos'],
+  {id:'ou', name:'Natalia', role:'Outreach writer', dept:'acq', homeF:3, kind:'cat', fur:'#C9CBE0', dark:'#7B7EA6', shirt:'#8A7BE8', to:['you','cos'],
    tasks:['Send today’s cold emails','Personalize first lines','Warm up the new inbox'], steps:['Personalizing emails','Sending today’s batch','Checking replies']},
-  {id:'fu', name:'Ron', role:'Follow-ups and bookings', dept:'acq', kind:'duck', fur:'#F9DC6B', dark:'#F2CE4A', shirt:'#7A5BC0', to:['you'],
+  {id:'fu', name:'Ron', role:'Follow-ups and bookings', dept:'acq', homeF:3, kind:'duck', fur:'#F9DC6B', dark:'#F2CE4A', shirt:'#7A5BC0', to:['you'],
    tasks:['Reply to interested leads','Book discovery calls','Nudge quiet leads'], steps:['Drafting replies','Checking the calendar','Sending follow-ups']},
   {id:'sa', name:'Theo', role:'Solutions architect', dept:'lops', homeF:3, kind:'owl', fur:'#8C7B6B', dark:'#5A4B3F', shirt:'#3B3F8C', to:['lcoo','you'],
    tasks:['Scope the dental clinic’s receptionist system','Map a clinic’s booking flow','Price the three-clinic pilot'], steps:['Reading the discovery notes','Drawing the system map','Listing the tools and costs']},
@@ -1049,7 +1050,7 @@ function buildShell(kind){
   box(FW,.1,.1,'#96643C',FW/2,1.15,.05,ROOT,false); box(.1,.1,24,'#96643C',.05,1.15,12,ROOT,false);
   box(FW,.26,.07,WOOD_D,FW/2,.13,.035,ROOT,false); box(.07,.26,24,WOOD_D,.035,.13,12,ROOT,false);
   if(work){
-    if(kind === 'luna'){ [10,20,30].forEach(x => low(x,.1,x,10,.9)); low(25,14,25,24,.9); }
+    if(kind === 'luna'){ [10,20,30,40].forEach(x => low(x,.1,x,10,.9)); low(25,14,25,24,.9); }
     else for(let x = 10; x < FW; x += 10){ if(x !== 10) low(x,.1,x,10,.9); if(x !== 30) low(x,14,x,24,.9); }
     DEPTS.forEach(d => { if(d.space || d.floor !== BF) return; const z = d.row ? 14 : 10; low(d.x0+(d.col?0:.1),z,d.x0+7.7,z,.9); low(d.x0+9.3,z,d.x0+10,z,.9); });
     plant(12.2,10.75,.8); plant(27.8,13.25,.8); plant(38.9,10.8,.8); plant(48.9,10.8,.8);
@@ -1214,14 +1215,15 @@ function buildRooms(fl){
   cyl(.03,.03,1.5,'#3A3A44',1.3,.75,8.7); box(.8,.8,.14,'#FFFDF6',1.3,1.75,8.7,ROOT,false); cyl(.03,.03,1.1,'#3A3A44',2.7,.55,8.9); box(.34,.24,.24,'#2A2C3A',2.7,1.2,8.9);
   windowAt(0,2.6,true); windowAt(0,5.8,true); windowAt(0,16.4,true); shelf(.28,19.6,true); windowAt(0,22.4,true);
 }
+function smallMeeting(cx, color){ // a meeting room one grid cell wide (x cx-5 to cx+5, z 0 to 10): a table for four, two boards, plants
+  zoneRug(color,[cx,5.2],[3.6,3.2]); roomLight(cx,5.2); box(3.8,.12,1.6,WOOD_L,cx,.8,5.2); box(3.0,.7,.9,WOOD_D,cx,.38,5.2);
+  [cx-.9,cx+.9].forEach(x => { box(.5,.03,.36,'#C9CCD4',x,.875,4.75,ROOT,false); box(.5,.03,.36,'#C9CCD4',x,.875,5.65,ROOT,false); chair(x,3.7,0,'#A9C4A1'); chair(x,6.7,Math.PI,'#A9C4A1'); });
+  cyl(.1,.08,.3,'#7B5BD6',cx,1.0,5.2); sph(.12,'#E8799C',cx,1.24,5.2,ROOT); board(cx-2.4,'pipeline'); board(cx+2.4,'chart'); plant(cx-4.1,.9,.85); plant(cx+4.1,.9,.85);
+}
 function buildLunaFloor(){ // Floor 3: LUNA AI Systems. LUNA's desk, her team's desks, the client meeting room, the build lab and the client lounge
   const lu = byId.lu; if(lu) deskSet(lu.seatW[0], lu.seatW[1], lu.seatA, {exec:true, tray:true});
   AG.forEach(a => { if(!a.staff && a.homeF === 3) deskSet(a.seatW[0], a.seatW[1], a.seatA, {}); });
-  // client meeting room (x 30 to 50): a long table, eight chairs, two boards and a window
-  zoneRug(byDept.lmeet.color,[40,5.2],[6.6,3.6]); roomLight(40,5.2); box(7.0,.12,2.0,WOOD_L,40,.8,5.2); box(6.2,.7,1.1,WOOD_D,40,.38,5.2);
-  [37.3,39.1,40.9,42.7].forEach(x => { box(.5,.03,.36,'#C9CCD4',x,.875,4.65,ROOT,false); box(.5,.03,.36,'#C9CCD4',x,.875,5.75,ROOT,false); chair(x,3.7,0,'#A9C4A1'); chair(x,6.7,Math.PI,'#A9C4A1'); });
-  cyl(.1,.08,.3,'#7B5BD6',40,1.0,5.2); sph(.12,'#E8799C',40,1.24,5.2,ROOT); board(35.2,'pipeline'); board(44.8,'chart'); windowAt(40,0); plant(30.9,.9,.85); plant(49.1,.9,.85);
-  byDept.lmeet.spots = [37.3,39.1,40.9,42.7].map(x => seatSpot([x,3.7],[0,1],[[46.5,12],[46.5,2.3],[x,2.3]])).concat([37.3,39.1,40.9,42.7].map(x => seatSpot([x,6.7],[0,-1],[[x,12],[x,8.5]])));
+  smallMeeting(45, byDept.lmeet.color); byDept.lmeet.spots = [44.1,45.9].map(x => seatSpot([x,3.7],[0,1],[[48.6,12],[48.6,2.3],[x,2.3]])).concat([44.1,45.9].map(x => seatSpot([x,6.7],[0,-1],[[x,12],[x,8.5]])));
   // build lab (x 0 to 25): shelves, a server rack, two test benches, cabinets
   zoneRug(byDept.llab.color,[12.5,19.4],[6.8,3.9],true); roomLight(12.5,19.4); shelf(3.0,14.9); shelf(5.2,14.9);
   box(.9,1.4,.8,'#3A3D66',7.6,.7,15.1); [[.25,'#3DB48C'],[.55,'#7B5BD6'],[.85,'#3DB48C'],[1.15,'#F0A23A']].forEach(q => box(.5,.06,.04,q[1],7.6,q[0],15.52,ROOT,false));
@@ -1475,7 +1477,7 @@ function applyMode(k){
   mixC(winMat.color,DAY.win,NIGHT.win,k); mixC(lampMat.color,DAY.lamp,NIGHT.lamp,k);
   shaftMat.opacity = mixN(DAY.shaft,NIGHT.shaft,k); glowMat.opacity = mixN(DAY.glow,NIGHT.glow,k);
 }
-ROOT = F2; BF = 2; buildShell('work'); buildRooms(2);
+ROOT = F2; BF = 2; buildShell('work'); buildRooms(2); smallMeeting(45, byDept.f2meet.color);
 AG.forEach(a => { if(!a.staff && !a.homeF) deskSet(a.seatW[0], a.seatW[1], a.seatA, {exec:a.id === 'cos'}); makeCritter(a); });
 // real 3D character models (made from the character sheets) replace the simple shapes where one exists
 const MODEL_BASE = 'models/'; let MODEL_LIST = [], MODEL_VER = {}, modelsBad = 0;
@@ -1855,7 +1857,7 @@ const vipDown = a => VIP_OUT(a).concat([[2.6,12+a.lane*.4], EL]); // the hall to
 const vipUp = a => [[2.6,12+a.lane*.4], EL, ['F',a.home || 4], [2.6,12]].concat(VIP_IN(a));
 const vipSay = (a, k) => pick(execLike(a) ? ({hi:EXEC_HI, cheer:EXEC_CHEER})[k] || EXEC_HI : a.id === 'jaz' ? ({hi:JAZ_HI, cheer:JAZ_CHEER, cook:JAZ_COOK, cafe:JAZ_CAFE, dance:JAZ_DANCE})[k] : ({hi:LLOYD_HI, cheer:LLOYD_CHEER, cook:LLOYD_COOK, cafe:LLOYD_CAFE, dance:LLOYD_DANCE})[k]);
 function vipRounds(a){ // walks into two or three team rooms, says hi, asks how they are, cheers them on
-  const fl = a.id === 'lu' && Math.random() < .55 ? 3 : 2, same = fl === (a.home || 4); // LUNA walks her own floor as often as the acquisition team downstairs
+  const fl = a.id === 'lu' ? 3 : 2, same = fl === (a.home || 4); // LUNA's whole company is on Floor 3
   const ds = DEPTS.filter(d => d.agents.length && d.floor === fl && d.id !== 'cos' && (!a.over || a.over.indexOf(d.id) >= 0)).sort(() => Math.random()-.5).slice(0, 2 + (Math.random() < .5 ? 1 : 0));
   if(!ds.length) return false;
   const legs = []; let first = same ? VIP_OUT(a).concat([[2.6,12+a.lane*.4]]) : vipDown(a).concat([['F',fl], [2.6,12+a.lane*.4]]), prevOut = null;
