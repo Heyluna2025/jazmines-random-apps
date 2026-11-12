@@ -672,7 +672,7 @@ const DEPTS = [
   {id:'smm', name:'Social Media Team', col:1,row:0, color:'#E8799C', cal:true, covers:'Designs static posts, writes captions, and schedules everything on your accounts, including the videos the Content Team hands over. They share one open office with Content. Leila runs the @jazminedeluna_ Instagram.', ph:'Schedule Friday’s reel for 6 PM'},
   {id:'mkt', name:'Marketing', col:2,row:0, color:'#F08A5A', covers:'Newsletters, emails, and the one master list of leads.', ph:'Draft this week’s newsletter'},
   {id:'rnd', name:'R&D', col:3,row:0, color:'#3DB48C', covers:'Competitor analysis, market trends, and Reddit research.', ph:'Find 5 new competitor hooks'},
-  {id:'acq', name:'LUNA Client Acquisition', sub:'Client acquisition', col:3,row:0, floor:3, color:'#8A7BE8', covers:'Harry finds the clinics, Natalia writes the outreach, Ron answers replies and books the discovery calls. LUNA AI Systems, Floor 3.', ph:'Find 20 clinics that need AI systems'},
+  {id:'acq', name:'LUNA Client Acquisition', sub:'Client acquisition', col:1,row:0, floor:3, color:'#8A7BE8', covers:'Harry finds the clinics, Natalia writes the outreach, Ron answers replies and books the discovery calls. LUNA AI Systems, Floor 3.', ph:'Find 20 clinics that need AI systems'},
   {id:'f2meet', name:'Meeting room', color:'#4F95E0', space:true, floor:2, x0:40, z0:0, w:10, dp:10, covers:'A small meeting room for the Floor 2 teams.'},
   {id:'it',  name:'IT', col:0,row:1, color:'#4F95E0', covers:'Bug checks on all websites, AEC tools, sales pages, and landing pages.', ph:'Test the checkout on mobile'},
   {id:'fin', name:'Finance', col:1,row:1, color:'#7DB643', covers:'Actual revenue for ABC, AEC, AIBS, APS, AI Build Day, Breakfast Club, and upcoming offers. Also collects official receipts for tax payments, and tracks your subscriptions and expenses.', ph:'Total this week’s APS sales'},
@@ -694,12 +694,10 @@ const DEPTS = [
   {id:'targets', name:'Target wall', color:'#E2B23C', space:true, wall:true, floor:4, x0:0, z0:14, w:12, dp:10, covers:'This month’s big goals and how far along each one is. Mary checks it on her rounds.'},
   {id:'archive', name:'Archives and assets', color:'#3D9A9A', space:true, wall:true, floor:4, x0:33, z0:14, w:17, dp:10, covers:'Where your Google Drive and laptop files are kept in order. The Archivist is in charge.', ph:'Find last month’s class recordings'},
   // Floor 3 belongs to LUNA AI Systems alone: LUNA’s office, her Operations and Client Success teams, a client meeting room, the build lab and a client lounge
-  {id:'lcoo', name:'LUNA’s office', col:0,row:0, floor:3, color:'#7B5BD6', covers:'LUNA, Chief Operating Officer of LUNA AI Systems, runs this whole floor: client acquisition, operations and client success. She reports to you.', ph:'Ask LUNA where the clinic pilot stands'},
-  {id:'lops', name:'LUNA Operations', col:1,row:0, floor:3, color:'#5B6BC0', covers:'Theo scopes each clinic’s AI system, Max builds and tests it, Sofia runs the delivery plan through go-live.', ph:'Scope a receptionist system for a dental clinic'},
-  {id:'lcs', name:'LUNA Client Success', col:2,row:0, floor:3, color:'#3D9A9A', covers:'Victor writes the proposals and agreements, Grace onboards every clinic and keeps them renewing, Nina runs the support desk.', ph:'Draft a proposal for a three-clinic group'},
-  {id:'lmeet', name:'Client meeting room', color:'#4F95E0', space:true, floor:3, x0:40, z0:0, w:10, dp:10, covers:'Discovery calls, demos and pilot reviews with clinic owners.'},
-  {id:'llab', name:'Build lab', color:'#E2B23C', space:true, floor:3, x0:0, z0:14, w:25, dp:10, covers:'Where each clinic’s system is assembled and tested before go-live: the phone agent, booking flow, reminders and follow-ups.'},
-  {id:'llounge', name:'Client lounge', color:'#6FBF73', space:true, floor:3, x0:25, z0:14, w:25, dp:10, covers:'A quiet corner for clinic owners visiting the office.'}
+  {id:'lcoo', name:'LUNA’s office', col:0,row:0, floor:3, color:'#7B5BD6', covers:'LUNA, Chief Operating Officer of LUNA AI Systems, runs this floor: Harry, Natalia and Ron next door find the clinics, write the outreach and book the calls. She reports to you.', ph:'Ask LUNA where the clinic pilot stands'},
+  {id:'lmeet', name:'Client meeting room', color:'#4F95E0', space:true, floor:3, x0:20, z0:0, w:10, dp:10, covers:'Discovery calls, demos and pilot reviews with clinic owners.'},
+  {id:'llab', name:'Build lab', color:'#E2B23C', space:true, floor:3, x0:30, z0:0, w:20, dp:10, covers:'Where each clinic’s system is assembled and tested before go-live: the phone agent, booking flow, reminders and follow-ups.'},
+  {id:'llounge', name:'Client lounge', color:'#6FBF73', space:true, floor:3, x0:0, z0:14, w:50, dp:10, covers:'A quiet corner for clinic owners visiting the office.'}
 ];
 const AG = [
   {id:'nl', name:'Anita', role:'Newsletter writer', dept:'mkt', kind:'cat', fur:'#F3C9A8', dark:'#C9784A', shirt:'#D8527E', to:['you','you','cos'],
@@ -728,18 +726,6 @@ const AG = [
    tasks:['Send today’s cold emails','Personalize first lines','Warm up the new inbox'], steps:['Personalizing emails','Sending today’s batch','Checking replies']},
   {id:'fu', name:'Ron', role:'Follow-ups and bookings', dept:'acq', homeF:3, kind:'duck', fur:'#F9DC6B', dark:'#F2CE4A', shirt:'#7A5BC0', to:['you'],
    tasks:['Reply to interested leads','Book discovery calls','Nudge quiet leads'], steps:['Drafting replies','Checking the calendar','Sending follow-ups']},
-  {id:'sa', name:'Theo', role:'Solutions architect', dept:'lops', homeF:3, kind:'owl', fur:'#8C7B6B', dark:'#5A4B3F', shirt:'#3B3F8C', to:['lcoo','you'],
-   tasks:['Scope the dental clinic’s receptionist system','Map a clinic’s booking flow','Price the three-clinic pilot'], steps:['Reading the discovery notes','Drawing the system map','Listing the tools and costs']},
-  {id:'sb', name:'Max', role:'Systems builder', dept:'lops', homeF:3, kind:'dog', fur:'#C9A27A', dark:'#7A5A3A', shirt:'#2F8F8F', to:['lcoo'],
-   tasks:['Build the after-hours phone agent','Wire the booking reminders','Test the pilot end to end'], steps:['Building the flow','Connecting the calendar','Running test calls']},
-  {id:'dl', name:'Sofia', role:'Delivery manager', dept:'lops', homeF:3, kind:'cat', fur:'#F2D4B8', dark:'#8A5A3A', shirt:'#C8553D', to:['lcoo','you'],
-   tasks:['Plan the clinic’s go-live week','Check every open project against its date','Write the onboarding checklist'], steps:['Checking the milestones','Updating the plan','Writing the checklist']},
-  {id:'pr', name:'Victor', role:'Proposals and contracts', dept:'lcs', homeF:3, kind:'bird', fur:'#3A4A6A', dark:'#2A3550', shirt:'#1E2233', face:'#F3EBDD', beak:'#E0A030', feet:'#E0A030', wing:'#3A4A6A', tie:true, to:['lcoo','you'],
-   tasks:['Write the proposal for the dental group','Prepare the pilot agreement','Send the signed contract to Finance'], steps:['Pricing the scope','Drafting the proposal','Preparing the agreement']},
-  {id:'cm', name:'Grace', role:'Client success', dept:'lcs', homeF:3, kind:'cat', fur:'#E9C4A4', dark:'#6B4A2A', shirt:'#7B5BD6', to:['lcoo'],
-   tasks:['Onboard the new clinic','Run this week’s client check-ins','Prepare the renewal review'], steps:['Setting up the client','Writing the check-in notes','Reviewing the results']},
-  {id:'sd', name:'Nina', role:'Support desk', dept:'lcs', homeF:3, kind:'duck', fur:'#F9E27A', dark:'#E8C94A', shirt:'#3D9A9A', to:['lcoo','lops'],
-   tasks:['Answer today’s client tickets','Check every live system is up','Report the week’s fixes'], steps:['Reading the tickets','Checking the systems','Writing the status note']},
   {id:'cs', name:'Emily', role:'Class scheduler', dept:'aec', kind:'bear', fur:'#F2E6D0', dark:'#B58A52', shirt:'#D98718', to:['you','mkt'],
    tasks:['Schedule next week’s Zoom classes','Send class reminders','Check the calendar for clashes'], steps:['Creating Zoom links','Checking the calendar','Writing reminders']},
   {id:'cu', name:'Jinny', role:'Circle uploader', dept:'aec', kind:'bird', fur:'#F5DC55', dark:'#4C8FD0', shirt:'#F08A2A', beak:'#F29A4A', feet:'#F2A0A0', wing:'#7FC24A', to:['you','cos'],
@@ -794,7 +780,7 @@ const AG = [
    tasks:['Read today’s revenue and expenses','Check every subscription against its value','Prepare the month-end summary'], steps:['Reading the numbers','Checking the expenses','Writing the summary']},
   {id:'clo', name:'Raja', role:'Chief Learning Officer', dept:'exec', staff:true, home:4, desk:true, post:[6.2,7.6], kind:'cat', fur:'#E8912E', dark:'#2A1A12', shirt:'#1E2A3A', tie:true, over:['aec','abc'], to:['you'],
    tasks:['Review the club and camp lesson plans','Check student progress with the heads','Plan the next cohort'], steps:['Reading the lesson plans','Checking progress','Planning the cohort']},
-  {id:'lu', name:'LUNA', role:'Chief Operating Officer, LUNA AI Systems', dept:'lcoo', staff:true, home:3, desk:true, post:[4.4,4.2], kind:'cat', fur:'#EEE8F8', dark:'#5B4A8A', shirt:'#2A1F4D', tie:true, eye:'#8A5BD6', over:['acq','lops','lcs'], to:['you'],
+  {id:'lu', name:'LUNA', role:'Chief Operating Officer, LUNA AI Systems', dept:'lcoo', staff:true, home:3, desk:true, post:[4.4,4.2], kind:'cat', fur:'#EEE8F8', dark:'#5B4A8A', shirt:'#2A1F4D', tie:true, eye:'#8A5BD6', over:['acq'], to:['you'],
    tasks:['Walk the LUNA AI Systems floor','Check the clinic pipeline and every live project','Clear the slowest step in delivery'], steps:['Reading the pipeline','Checking each client project','Setting today’s fix']},
   {id:'lloyd', name:'Lloyd', role:'Co-Founder and Partner', dept:'you', staff:true, home:4, desk:true, post:[7.9,4.0], kind:'cat', fur:'#E9C4A4', dark:'#1F1A18', shirt:'#2A2A30', eye:'#3B2A22', to:[],
    tasks:['Building the business with Jazmine'], steps:['Checking on the teams','Planning the next date','Picking a song','Making coffee']},
@@ -822,10 +808,7 @@ const JOBS = {
   cx:['Answers Facebook and Instagram messages through ManyChat, using only answers you approved. Everything else goes to you.','Messages answered this week',30,''], adm:['Keeps your three email inboxes clean, passes invoices to Finance, and manages your calendars.','Inboxes cleaned this week',3,''], opa:['Maps how work flows between teams and removes slow steps.','Workflow fixes shipped this month',4,''], qa:['Checks every deliverable before it reaches Jazmine: facts, links, brand, duplicates, and the done checklist.','Deliverables checked before approval',100,'%'], cos:['Collects updates, runs meetings, and reports to you at 7:00 PM.','Daily reports delivered on time',100,'%'], cmo:['Runs marketing, content and social: the message, the calendar and the numbers behind them.','Marketing goals on track',100,'%'], coo:['Runs operations, IT, quality and LUNA: fewer slow steps, nothing broken.','Operations running smoothly',100,'%'], cfo:['Runs finance: revenue, expenses, subscriptions and the month-end picture.','Finance reviewed on time',100,'%'], clo:['Runs the club, the camp and Build Day: lessons, progress and the next cohort.','Learning programs on plan',100,'%'],
   gt:['Tracks every goal and KPI, keeps the scoreboard current, and reminds teams before deadlines.','Goals on track',100,'%'], pm:['Keeps everyone accountable: sends deadline reminders, checks who is behind, and walks the performance, scoreboard, and target walls.','Check-ins done today',12,''], arc:['Keeps your Google Drive and laptop files in order.','Files sorted this week',100,''],
   chunky:['Runs the café for everyone on a break.','Drinks served today',20,''], luna:['Runs the Sunday House kitchen.','Meals served today',12,''],
-  lu:['Runs LUNA AI Systems day to day: client acquisition, operations and client success. Reports to you.','Clinics live on a LUNA system',10,''],
-  sa:['Turns each discovery call into a system blueprint: scope, tools, integrations and price.','Blueprints ready this week',3,''], sb:['Builds and tests every clinic’s AI system before it goes live.','Systems built this month',4,''],
-  dl:['Runs each client project from signed contract to go-live, on time.','Projects live on schedule',100,'%'], pr:['Writes the proposals, pricing and agreements, and hands signed contracts to Finance.','Proposals sent this week',5,''],
-  cm:['Onboards every clinic, runs the check-ins, and keeps them renewing.','Clients renewing',95,'%'], sd:['Runs the client support desk and keeps every live system healthy.','Tickets closed within a day',100,'%']
+  lu:['Runs LUNA AI Systems day to day: the clinic pipeline and every client. Reports to you.','Clinics live on a LUNA system',10,'']
 };
 // portraits are rendered from each character's own 3D model (tools/portraits.html -> characters/portraits/); the build fills BUILD and PORTRAIT_IDS
 const BUILD = '20261111151736', PORTRAIT_IDS = ["adm", "ads", "arc", "cap", "ce", "cfo", "chunky", "clo", "cmo", "coo", "cos", "cp", "cs", "cu", "cx", "em", "fl", "fu", "ga", "gt", "ig", "jaz", "lf", "lk", "lloyd", "luna", "mn", "nl", "nv", "of", "opa", "ou", "pe", "pm", "qa", "rc", "rd", "re", "rv", "sam", "sc", "so", "tl", "tr"];
@@ -854,13 +837,7 @@ if(!isLive()){
     cp:['Competitor analyst','Keeps a curious eye on what everyone else is doing.','Reports this week',['Compare three rival offers','Spot a gap nobody is filling','Summarize the price changes'],['Reading rival pages','Taking notes','Writing the summary']],
     tr:['Trend analyst','Sniffs out trends before they are everywhere.','Trend reports this week',['Spot three trends before lunch','Check what is going viral','Write the “what’s next” memo'],['Scanning the news','Connecting the dots','Writing the memo']],
     rd:['Community researcher','Listens to what people are really asking for online.','Insights saved this week',['Collect ten real customer questions','Find the most-loved thread','Save the best quotes'],['Reading threads','Saving quotes','Sorting by theme']],
-    lu:['Chief Operating Officer, LUNA AI Systems','Runs LUNA AI Systems for you: the clinic pipeline, the builds and every client.','Clinics live on a LUNA system',['Review the clinic pipeline','Check every live project','Set the team’s priorities'],['Reading the pipeline','Checking the projects','Setting priorities']],
-    sa:['Solutions architect','Designs each clinic’s AI system before anyone builds it.','Blueprints ready this week',['Scope the receptionist system','Map the booking flow','Price the pilot'],['Reading the notes','Drawing the map','Listing the costs']],
-    sb:['Systems builder','Builds and tests the systems the clinics run on.','Systems built this month',['Build the phone agent','Wire the reminders','Test end to end'],['Building','Connecting','Testing']],
-    dl:['Delivery manager','Keeps every client project on its dates through go-live.','Projects live on schedule',['Plan the go-live week','Check the milestones','Write the onboarding checklist'],['Checking dates','Updating the plan','Writing the checklist']],
-    pr:['Proposals and contracts','Writes the proposals and agreements that bring clinics on board.','Proposals sent this week',['Write the dental group proposal','Prepare the pilot agreement','Hand the contract to Finance'],['Pricing','Drafting','Preparing the agreement']],
-    cm:['Client success','Keeps every clinic happy, trained and renewing.','Clients renewing',['Onboard the new clinic','Run the check-ins','Prepare the renewal review'],['Setting up','Writing notes','Reviewing results']],
-    sd:['Support desk','Answers client tickets and keeps every live system healthy.','Tickets closed within a day',['Answer today’s tickets','Check the systems','Report the fixes'],['Reading tickets','Checking systems','Writing the note']],
+    lu:['Chief Operating Officer, LUNA AI Systems','Runs LUNA AI Systems for you: the clinic pipeline and every client.','Clinics live on a LUNA system',['Review the clinic pipeline','Check every live project','Set the team’s priorities'],['Reading the pipeline','Checking the projects','Setting priorities']],
     lf:['Lead finder','Finds people who would love what you offer.','New leads this week',['Find twenty dream customers','Check who is a great fit','Rank the warmest leads'],['Searching','Checking fit','Ranking leads']],
     ou:['Outreach writer','Writes first hellos that do not sound like spam.','Hellos sent this week',['Write ten friendly first hellos','Personalize every opening line','Polish the follow-up note'],['Personalizing','Writing','Double-checking names']],
     fu:['Follow-ups and bookings','Follows up kindly and gets meetings on the calendar.','Calls booked this week',['Reply to curious leads','Book three intro calls','Nudge the quiet ones gently'],['Drafting replies','Checking the calendar','Sending nudges']],
@@ -1050,7 +1027,7 @@ function buildShell(kind){
   box(FW,.1,.1,'#96643C',FW/2,1.15,.05,ROOT,false); box(.1,.1,24,'#96643C',.05,1.15,12,ROOT,false);
   box(FW,.26,.07,WOOD_D,FW/2,.13,.035,ROOT,false); box(.07,.26,24,WOOD_D,.035,.13,12,ROOT,false);
   if(work){
-    if(kind === 'luna'){ [10,20,30,40].forEach(x => low(x,.1,x,10,.9)); low(25,14,25,24,.9); }
+    if(kind === 'luna'){ [10,20,30].forEach(x => low(x,.1,x,10,.9)); }
     else for(let x = 10; x < FW; x += 10){ if(x !== 10) low(x,.1,x,10,.9); if(x !== 30) low(x,14,x,24,.9); }
     DEPTS.forEach(d => { if(d.space || d.floor !== BF) return; const z = d.row ? 14 : 10; low(d.x0+(d.col?0:.1),z,d.x0+7.7,z,.9); low(d.x0+9.3,z,d.x0+10,z,.9); });
     plant(12.2,10.75,.8); plant(27.8,13.25,.8); plant(38.9,10.8,.8); plant(48.9,10.8,.8);
@@ -1204,7 +1181,7 @@ function buildRooms(fl){
     if(d.office){ deskSet(d.x0+4.4, d.z0+4.2, 0, {exec:true, tray:true}); }
     if(!d.row){
       shelf(d.x0+1.5,.28); windowAt(d.x0+4.4,0);
-      if(d.id === 'mkt') windowAt(d.x0+7.2,0); else board(d.x0+7.3, d.id === 'rnd' || d.id === 'lops' ? 'chart' : d.id === 'acq' || d.id === 'lcs' ? 'pipeline' : d.id === 'content' ? 'timeline' : 'calendar');
+      if(d.id === 'mkt') windowAt(d.x0+7.2,0); else board(d.x0+7.3, d.id === 'rnd' ? 'chart' : d.id === 'acq' ? 'pipeline' : d.id === 'content' ? 'timeline' : 'calendar');
       plant(d.x0+9.3,.8,.85);
     } else {
       plant(d.x0+.9, d.z0+9.1, .85);
@@ -1223,18 +1200,19 @@ function smallMeeting(cx, color){ // a meeting room one grid cell wide (x cx-5 t
 function buildLunaFloor(){ // Floor 3: LUNA AI Systems. LUNA's desk, her team's desks, the client meeting room, the build lab and the client lounge
   const lu = byId.lu; if(lu) deskSet(lu.seatW[0], lu.seatW[1], lu.seatA, {exec:true, tray:true});
   AG.forEach(a => { if(!a.staff && a.homeF === 3) deskSet(a.seatW[0], a.seatW[1], a.seatA, {}); });
-  smallMeeting(45, byDept.lmeet.color); byDept.lmeet.spots = [44.1,45.9].map(x => seatSpot([x,3.7],[0,1],[[48.6,12],[48.6,2.3],[x,2.3]])).concat([44.1,45.9].map(x => seatSpot([x,6.7],[0,-1],[[x,12],[x,8.5]])));
-  // build lab (x 0 to 25): shelves, a server rack, two test benches, cabinets
-  zoneRug(byDept.llab.color,[12.5,19.4],[6.8,3.9],true); roomLight(12.5,19.4); shelf(3.0,14.9); shelf(5.2,14.9);
-  box(.9,1.4,.8,'#3A3D66',7.6,.7,15.1); [[.25,'#3DB48C'],[.55,'#7B5BD6'],[.85,'#3DB48C'],[1.15,'#F0A23A']].forEach(q => box(.5,.06,.04,q[1],7.6,q[0],15.52,ROOT,false));
-  deskSet(11.0,18.6,0,{dual:true}); deskSet(14.6,18.6,0,{dual:true}); box(1.8,.9,.5,WOOD,20.2,.45,22.9); [['#7B5BD6',19.5],['#3D9A9A',19.95],['#E0A63A',20.4],['#5B6BC0',20.85]].forEach(q => box(.3,.5,.36,q[0],q[1],1.15,22.9));
-  [17.6,19.5].forEach(z => { box(.7,1.1,1.6,'#8E93A8',24.0,.55,z); [.3,.62,.94].forEach(y => box(.04,.03,1.2,'#6F748A',23.64,y,z,ROOT,false)); }); plant(1.0,23.2,.9); plant(23.8,15.4,.9);
-  // client lounge (x 25 to 50): two sofas, a low table, two armchairs, plants
-  zoneRug(byDept.llounge.color,[37.5,19.5],[6.0,3.6]); roomLight(37.5,19.5); sofa(37.5,17.3,0,3.2,'#6B5BD0'); sofa(37.5,21.7,Math.PI,3.2,'#6B5BD0');
-  rbox(1.7,.4,.9,.08,WOOD_L,37.5,.2,19.5,ROOT); box(.9,.04,.5,'#C9CCD4',37.3,.42,19.4,ROOT,false); cyl(.08,.06,.16,'#FFFDF6',38.0,.5,19.7); chair(33.6,19.5,Math.PI/2,'#C98A5A'); chair(41.4,19.5,-Math.PI/2,'#C98A5A');
+  smallMeeting(25, byDept.lmeet.color); byDept.lmeet.spots = [24.1,25.9].map(x => seatSpot([x,3.7],[0,1],[[28.6,12],[28.6,2.3],[x,2.3]])).concat([24.1,25.9].map(x => seatSpot([x,6.7],[0,-1],[[x,12],[x,8.5]])));
+  // build lab (x 30 to 50): shelves, a server rack, two test benches, cabinets
+  zoneRug(byDept.llab.color,[42.5,5.4],[6.8,3.9],true); roomLight(42.5,5.4); shelf(33.0,.9); shelf(35.2,.9);
+  box(.9,1.4,.8,'#3A3D66',37.6,.7,1.1); [[.25,'#3DB48C'],[.55,'#7B5BD6'],[.85,'#3DB48C'],[1.15,'#F0A23A']].forEach(q => box(.5,.06,.04,q[1],37.6,q[0],1.52,ROOT,false));
+  deskSet(41.0,4.6,0,{dual:true}); deskSet(44.6,4.6,0,{dual:true}); box(1.8,.9,.5,WOOD,47.8,.45,8.9); [['#7B5BD6',47.1],['#3D9A9A',47.55],['#E0A63A',48.0],['#5B6BC0',48.45]].forEach(q => box(.3,.5,.36,q[0],q[1],1.15,8.9));
+  [3.6,5.5].forEach(z => { box(.7,1.1,1.6,'#8E93A8',49.2,.55,z); [.3,.62,.94].forEach(y => box(.04,.03,1.2,'#6F748A',48.84,y,z,ROOT,false)); }); plant(31.0,9.2,.9); plant(49.0,1.2,.9); windowAt(42,0);
+  // client lounge (the whole bottom row): two sofas, a low table, two armchairs, a coffee station, plants
+  zoneRug(byDept.llounge.color,[25,19.5],[6.0,3.6]); roomLight(25,19.5); roomLight(10,19.5); roomLight(40,19.5); sofa(25,17.3,0,3.2,'#6B5BD0'); sofa(25,21.7,Math.PI,3.2,'#6B5BD0');
+  rbox(1.7,.4,.9,.08,WOOD_L,25,.2,19.5,ROOT); box(.9,.04,.5,'#C9CCD4',24.8,.42,19.4,ROOT,false); cyl(.08,.06,.16,'#FFFDF6',25.5,.5,19.7); chair(21.1,19.5,Math.PI/2,'#C98A5A'); chair(28.9,19.5,-Math.PI/2,'#C98A5A');
   box(1.6,.95,.6,'#8E93A8',47.8,.475,23.4); box(1.5,.04,.5,'#6F748A',47.8,.5,23.08,ROOT,false); cyl(.08,.06,.16,'#FFFDF6',47.4,1.03,23.4); cyl(.08,.06,.16,'#FFFDF6',48.1,1.03,23.4);
-  [[26.0,15.4],[26.0,23.2],[48.9,15.4],[44.5,23.2]].forEach(q => plant(q[0],q[1],.9));
-  byDept.llounge.spots = [seatSpot([36.5,17.3],[0,1],[[36.5,12],[36.5,17.3]]), seatSpot([38.5,17.3],[0,1],[[38.5,12],[38.5,17.3]]), seatSpot([33.6,19.5],[1,0],[[33.6,12],[33.6,19.5]]), seatSpot([41.4,19.5],[-1,0],[[41.4,12],[41.4,19.5]])];
+  sofa(9.5,19.5,Math.PI/2,2.6,'#C8845A'); rbox(1.2,.4,.9,.08,WOOD_L,11.6,.2,19.5,ROOT); sofa(40.5,19.5,-Math.PI/2,2.6,'#C8845A'); rbox(1.2,.4,.9,.08,WOOD_L,38.4,.2,19.5,ROOT);
+  [[1,15.4],[1,23.2],[48.9,15.4],[44.5,23.2],[16.5,23.2],[33.5,23.2]].forEach(q => plant(q[0],q[1],.9));
+  byDept.llounge.spots = [seatSpot([24,17.3],[0,1],[[24,12],[24,17.3]]), seatSpot([26,17.3],[0,1],[[26,12],[26,17.3]]), seatSpot([21.1,19.5],[1,0],[[21.1,12],[21.1,19.5]]), seatSpot([28.9,19.5],[-1,0],[[28.9,12],[28.9,19.5]])];
 }
 const PONG = {ball:null, top:.875};
 function mealOn(g){ // a plate's worth of food: pancakes in the morning, the day's special after
@@ -1553,12 +1531,6 @@ const PERSONA = {
   fl:['Gentle encourager. Lily answers the shy questions too.', ['Hi Jazmine 😊 campers are asking good questions','You’ve got this. I’ll help.','Small steps, big builders.']],
   chunky:['Chill café cat who remembers everyone’s order.', ['Hi boss! The usual? ☕','Order up!','Fresh pot, fresh ideas.']],
   lu:['Calm, exact and quietly ambitious. LUNA runs LUNA AI Systems like a clinic runs on time: every client, every build, every date.', ['Boss. The pipeline is moving and every build is on its date. 🟣','Give me the goal, I bring the system.','LUNA AI Systems reports to you by noon.']],
-  sa:['Thoughtful owl who draws the whole system before anyone builds it.', ['Hi Jazmine. Blueprint is ready for review 📐','Scope first, then build.','One map, no surprises.']],
-  sb:['Hands-on builder who tests everything twice.', ['Hi boss! Test calls passed ✅','Building it now.','Ship it clean.']],
-  dl:['Organized and warm. Sofia keeps every clinic on its go-live date.', ['Hi Jazmine! Go-live is on track 📅','Dates are promises.','Checklist done, client happy.']],
-  pr:['Polished and precise. Victor makes the proposal easy to sign.', ['Hi Jazmine. Proposal ready for your OK 📝','Clear scope, clear price.','Signed and sent to Finance.']],
-  cm:['Warm and attentive. Grace knows every clinic by name.', ['Hi Jazmine! The clinic loved onboarding 💜','Happy clients renew.','Check-ins done for the week.']],
-  sd:['Quick and cheerful. Nina closes tickets before lunch.', ['Hi boss! All systems up ✅','Ticket closed!','Fixed and noted.']],
   luna:['Cheerful chef who feeds the whole office on Sundays.', ['Hi Jazmine! Lunch is ready 🍽️','Eat first, then conquer.','Sunday House is open!']],
   gt:['Enthusiastic puppy who celebrates every goal.', ['Hi boss! We hit a number today 🎯','Goals, goals, goals!','Scoreboard says: amazing.']],
   pm:['Organized, kind and gently firm. Mary keeps everyone on track.', ['Hi Jazmine! Checking in on the team 📋','On track, on time, on it.','Let’s get this done together.']]
@@ -2141,7 +2113,7 @@ function moreHTML(a){
 }
 let rosterOpen = null, navView = 'office', listHold = false;
 /* ---- Org chart. Her words (11 Nov): "In MY AGENTS, I want an org chart and when clicked.. their top daily priorities + weekly and monthly responsibilities if they have". Jazmine on top, Mimi beside her, the C-level under her, each with their teams; clicking anyone opens the profile with the Priorities section. */
-const ORG_UNDER = {cmo:['mkt','content','smm','rnd'], coo:['ops','it'], cfo:['fin'], clo:['aec','abc'], lu:['acq','lops','lcs']};
+const ORG_UNDER = {cmo:['mkt','content','smm','rnd'], coo:['ops','it'], cfo:['fin'], clo:['aec','abc'], lu:['acq']};
 /* Her words (11 Nov): "I want only my executives and Mimi reporting to me." Everyone else hands finished work to the exec over their team (or to Mimi when no exec covers them); the exec or Mimi carries it to Jazmine. */
 const EXEC_OF = {}; Object.keys(ORG_UNDER).forEach(e => ORG_UNDER[e].forEach(d => { EXEC_OF[d] = e; }));
 const reportsDirect = a => !a || a.id === 'cos' || execLike(a) || a.dept === 'you';
