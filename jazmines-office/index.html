@@ -362,6 +362,8 @@ button.pill{cursor:pointer}
 .rmore{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 20px;padding:4px 2px 14px 42px;font-size:13px}
 .rmore ul,.rmore ol{margin:2px 0 0;padding-left:18px;color:var(--muted)}
 .rmore p{color:var(--muted);margin:2px 0 8px}
+.rhy{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 18px;padding:8px 10px 2px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+@media (max-width:760px){.rhy{grid-template-columns:1fr 1fr;gap:2px 12px}}
 .rmore .label{display:block}
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:11px 2px}
 .set-row>div{min-width:0}
@@ -1489,6 +1491,51 @@ function restPose(a){ if(!a.bones) return; Object.keys(a.bones).forEach(n => a.b
 // Pose bones in the model's own space: legs forward to sit, arms forward to type, read, or serve.
 const GREETS = ['Hi Jazmine. Howdy? 😊','hehe hi 😊','hiiiiiiiii how are you 👋','hi boss 😊','Need me boss? 🙋','I miss you boss. 💛','Oh, hi! 😄','Yay, you came by ✨','So happy to see you 💛'];
 // Each character's personality and the lines they say when Jazmine clicks them.
+// Her ask (12 Nov): on the agents page, each one's daily, weekly and monthly work with their KPI and goal, short and simple.
+const RHYTHM = {
+  cos:["Collect every team’s updates, chase open approvals, deliver your 7:00 PM report.", "Run Monday’s planning meeting and set one priority per team.", "Month-end summary: what shipped, what slipped, what to change.", "Daily reports delivered on time, 100%", "You never have to ask what happened today."],
+  nl:["Watch replies and clicks on the last letter.", "One newsletter drafted by Tuesday 9:00 AM.", "Review opens and clicks; retire what nobody reads.", "Newsletter click rate", "A letter your fans look forward to."],
+  em:["8:00 AM event check: invitations and reminders drafted on schedule.", "Launch, welcome and reminder emails for the week’s offers.", "Clean the list; report opens, clicks and unsubscribes.", "Emails ready 3 days before they are due, 100%", "No email is ever written the night before."],
+  ads:["Read yesterday’s ad numbers; flag anything burning money.", "Monday one-page ads plan for the week.", "Spend against results per platform: scale, fix or stop.", "Ad plans ready before the launch window, 100%", "Every peso in ads earns more than it costs."],
+  so:["Schedule the day’s approved posts and reels on every platform.", "Fill next week’s calendar with Didi, Guppy and Edith.", "Report posts that went out on time, per platform.", "Planned posts out on time, 100%", "Something good goes out every single day."],
+  cap:["Captions for every approved script or clip the same day.", "Refresh hooks and hashtags from Trevor’s trend brief.", "Which captions earned saves and shares.", "Captions approved without changes", "Captions that stop the scroll."],
+  ig:["Grid, Reels timing, comments and DMs on @jazminedeluna_.", "Monday 9:00 AM Instagram plan for the week.", "Follower growth and the month’s best posts.", "Instagram posts out this week, 7", "A growing, engaged Instagram."],
+  ce:["Edit new class recordings within 2 days.", "Monday camp highlights recap, 2 to 3 minutes.", "Archive the month’s class edits with Mark.", "Class edits within 2 days, 100%", "Every class is watchable two days after it happens."],
+  re:["Edit reels from the retouched exports in the JDL house style.", "A batch of reels approved for Alicia’s calendar.", "Which reels pulled the most views.", "Reels approved each week", "Reels every day on every platform."],
+  ga:["Design the approved carousel briefs.", "One designed set per approved brief; templates kept current.", "Refresh the brand templates.", "Designed sets approved each week", "Every post looks unmistakably Jazmine."],
+  sam:["Three high-viral talking-head scripts as a PDF.", "Monday and Thursday batches after the trend brief.", "Which scripts became the best-performing videos.", "Scripts approved without changes", "Scripts Jazmine can shoot the same day."],
+  cp:["Note competitor launches and offers as they appear.", "Monday 5:00 AM competitor brief.", "Positioning map: where Jazmine wins, where she is behind.", "Weekly brief delivered on time, 100%", "No competitor move is a surprise."],
+  tr:["Scan TikTok, Shorts and AI news for rising hooks.", "Monday 5:00 AM trend brief for Sam, Didi and Leila.", "Which trends paid off and which were noise.", "Trend ideas used in a script, post or class", "Jazmine is early on every trend that matters."],
+  rd:["Save buyer quotes from Reddit threads.", "Wednesday 5:00 AM research note.", "Top objections and desires per offer.", "Buyer quotes saved each week", "The offers speak the buyer’s own words."],
+  lf:["Weekday 5:30 AM lead batch per active campaign, graded A, B, C.", "Pipeline count by grade and segment.", "Which sources produced replies and calls.", "Qualified leads per campaign, 300 a week", "The pipeline never runs dry."],
+  ou:["Weekday 7:00 AM outreach batch, one honest first line per lead.", "Reply rate per subject line and segment.", "Rewrite what did not get replies.", "Reply rate on her messages; 300 emails a day", "Outreach people actually answer."],
+  fu:["Answer replies within 4 working hours; book discovery calls.", "Nudge quiet leads; count the calls booked.", "Booked to showed to won.", "Replies answered within 4 hours; 3% booked", "Every warm reply becomes a call."],
+  cs:["Check the next 7 days of classes are fully set up.", "Monday 9:30 AM: the coming two weeks on Zoom and Circle.", "Propose next month’s class calendar.", "Classes set up 7 days ahead, 100%", "No class is ever set up at the last minute."],
+  cu:["Replay drafts uploaded to Circle within a day.", "Every class of the week has its replay and notes.", "Replay library tidy and searchable.", "Replays ready within a day, 100%", "Members find every replay the next day."],
+  mn:["Watch member activity, Show and Tell and questions.", "Monday 8:00 AM member activity note; AI News Monday, Wednesday, Friday.", "Retention, who went quiet, topics to propose.", "Proposed topics put on the calendar", "An active club that renews."],
+  nv:["Camper questions and session setup.", "Monday camp highlights post after Edith’s video.", "Cohort progress and the next cohort plan.", "Camp sessions set up on time, 100%", "Every camper finishes with a project."],
+  fl:["A drafted answer to every camper question within a day.", "Saturday 9:00 AM comments on the week’s camp wins.", "The questions that keep coming back, turned into lesson fixes.", "Camper questions answered within a day, 100%", "No camper waits more than a day."],
+  lk:["Add new leads and members to the one list; remove duplicates.", "Refresh the CRM from every source.", "List health: contacts, tags, dead records removed.", "People added this week", "One clean list of everyone who matters."],
+  rv:["6:00 PM sales note before Mimi’s report.", "Revenue by offer against target.", "Month-end revenue summary for Diana.", "Sales note delivered on time, 100%", "Jazmine knows the day’s revenue before dinner."],
+  of:["6:30 AM offer check; payment proofs matched hourly.", "Offer performance against target.", "Offers to push, pause or retire.", "Payment proofs matched within a day, 100%", "Every payment is matched to a person."],
+  rc:["Receipts filed for new charges.", "Monday 7:00 AM receipts check.", "Month-end summary on the 1st for the accountant.", "Charges with a receipt on file, 100%", "Tax time has no missing receipts."],
+  pe:["8:00 AM renewal check.", "Monday 7:30 AM subscription review after Hermione.", "Subscriptions and expenses summary; what to cancel.", "Subscriptions reviewed this month, 100%", "No subscription is paid for nothing."],
+  opa:["Spot slow or duplicate steps as work moves between teams.", "Friday 3:00 PM: one workflow fix proposed.", "Fixes approved and time saved.", "Workflow fixes approved this month", "Work moves with fewer steps every month."],
+  arc:["9:15 AM filing of agent-made files; Drive and laptop in order.", "Friday clean-up proposal.", "Storage report and the month’s assets archived.", "Files filed within a day, 100%", "Anything can be found in under a minute."],
+  adm:["5:00 AM inbox tidy, 7:00 AM morning note; invoices to Finance the same day.", "Calendar check for the week ahead.", "Inbox and calendar hygiene report.", "Invoices to Finance within a day, 100%", "Three inboxes, zero clutter."],
+  cx:["Answer page messages with approved answers.", "New questions that need a new approved answer.", "Response time and the most asked questions.", "Page messages answered within an hour", "Nobody who messages the page is left waiting."],
+  pm:["Walls updated; 6:30 PM round-up of late or failed jobs.", "Deadline reminders to every team.", "On-time rate per team.", "Late or failed jobs explained the same day, 100%", "Every team on deadline, every week."],
+  qa:["Check every deliverable before approval; 6:00 PM QA note.", "Patterns in what gets sent back.", "QA checklist updates.", "Deliverables checked before approval, 100%", "Nothing reaches Jazmine with a mistake in it."],
+  sc:["3:00 AM checks on every page, checkout and this office app.", "Bug list cleared.", "Uptime and speed report.", "Daily checks completed, 100%", "Every site up, every checkout working."],
+  tl:["Quick checks on the AEC tools.", "Full tool test run.", "Tool reliability report.", "Checks and tool tests run on time, 100%", "Members never hit a broken tool."],
+  gt:["8:00 AM “what is due” note; scoreboard updated.", "KPI against goal per team.", "Month scorecard: goals hit and missed.", "Due notes delivered by 8:00 AM, 100%", "Every goal is visible and nobody misses a deadline unseen."],
+  cmo:["7:30 AM priorities for Marketing, Content and Social; forward or send back their drafts.", "Monday 8:00 AM plan for the week.", "Marketing goals against results; next month’s focus.", "Marketing goals on track", "Marketing that fills the club, the camp and the list."],
+  coo:["7:30 AM priorities for Admin and Operations, IT and QA.", "Monday 8:00 AM plan; the slowest step fixed.", "Operations review: on time, nothing broken.", "Operations running smoothly", "An office that runs without Jazmine chasing it."],
+  cfo:["7:30 AM priorities for Finance; revenue and expenses read.", "Monday 8:00 AM plan; subscriptions against value.", "Month-end summary and cash position.", "Finance reviewed on time", "Jazmine always knows the numbers."],
+  clo:["7:30 AM priorities for the Club, the Camp and Build Day.", "Monday 8:00 AM plan; lesson plans and student progress.", "Program results and the next cohort.", "Learning programs on plan", "Students who finish and come back."],
+  lu:["7:30 AM priorities for Harry, Natalia and Ron; pipeline check.", "Monday 8:00 AM plan: replies, calls booked, pilots.", "Clinics live and renewing.", "Clinics live on a LUNA system, 10", "LUNA AI Systems grows one happy clinic at a time."],
+  af:["Affiliate links and earnings checked.", "Monday 10:00 AM affiliates update: links, earnings, what we owe.", "Payouts paid to the right person on time.", "Affiliate payouts checked and paid on time, 100%", "Affiliates paid right, every month."]
+};
 const PERSONA = {
   jaz:['That’s you: the founder, the only human here, the reason everyone shows up. ', ['That’s me! 💛','Boss in the building. ✨','Okay team, let’s win today. 🏆']],
   lloyd:['Co-founder and Jazmine’s partner. Lloyd sits beside her, visits the teams, and keeps everyone smiling.', ['Hi! Lloyd here 😊','Keeping the boss company 💛','Coffee? I’m making a round ☕']],
@@ -2094,11 +2141,18 @@ function accessHTML(){
         (pl[1] !== 'Connected' && x.how ? '<span class="sub how">'+howHTML(x.how)+'</span>' : '')+'</div><span class="pill '+pl[0]+'">'+pl[1]+'</span></div>'; }).join('')+
     (live ? '<p class="sub" style="margin-top:14px">“Key saved, not in use yet” means the key is stored safely but the agent’s wiring for it is still being built. The office re-checks every minute.</p>' : '');
 }
+function rhythmHTML(a, c){ // daily / weekly / monthly, then KPI and goal; the live card first, the page table as the fallback
+  const t = RHYTHM[a.id] || null, r = (c && c.rhythm && typeof c.rhythm === 'object') ? c.rhythm : t ? {daily:t[0], weekly:t[1], monthly:t[2]} : null;
+  if(!r && !t) return '';
+  const kpi = c && c.kpi_label ? c.kpi_label+(c.kpi_goal != null ? ', goal '+c.kpi_goal+(c.kpi_unit || '') : '') : t ? t[3] : (a.kpi ? a.kpi[0] : ''), goal = (c && c.goal) || (t ? t[4] : '');
+  const cell = (l, v) => v ? '<div><span class="label">'+l+'</span><p>'+esc(v)+'</p></div>' : '';
+  return '<div class="rhy" style="grid-column:1/-1">'+cell('Daily', r && r.daily)+cell('Weekly', r && r.weekly)+cell('Monthly', r && r.monthly)+'<div>'+(kpi ? '<span class="label">KPI</span><p>'+esc(kpi)+'</p>' : '')+(goal ? '<span class="label">Goal</span><p>'+esc(goal)+'</p>' : '')+'</div></div>';
+}
 function cardHTML(a, c){
   const L = (label, v) => v ? '<span class="label">'+label+'</span><p>'+esc(v)+'</p>' : '';
   const jobs = (c.jobs || []).length ? '<span class="label">Scheduled jobs</span><ul>'+c.jobs.map(j => '<li>'+esc(j.title)+(j.cadence ? ' · '+esc(j.cadence) : '')+(j.next_at ? ' · next '+esc(fmtWhen(j.next_at)) : '')+'</li>').join('')+'</ul>' : '';
   const needs = (c.needs || []).length ? '<span class="label">Needs connected</span><ul class="needs">'+c.needs.map(n => { const pl = accPill(accOf(n.key) || n); return '<li><span class="pill '+pl[0]+'">'+pl[1]+'</span> <b>'+esc(n.name)+'</b></li>'; }).join('')+'</ul>' : '';
-  return '<div class="rmore">'+recRow(a)+'<div>'+L('The job', c.job)+L('Does alone', c.alone)+L('Needs your OK for', c.needs_ok)+(c.connected === false ? L('Why not working yet', c.why) : '')+'</div>'+
+  return '<div class="rmore">'+recRow(a)+rhythmHTML(a, c)+'<div>'+L('The job', c.job)+L('Does alone', c.alone)+L('Needs your OK for', c.needs_ok)+(c.connected === false ? L('Why not working yet', c.why) : '')+'</div>'+
     '<div>'+L('When they work', c.runs)+jobs+L('Hands work to', c.hands_off)+L('Goes live', c.goes_live)+'</div>'+
     '<div>'+L('Where the information comes from', c.data)+L('Access', c.access)+needs+L('Thinks with', c.model)+'<button class="btn sm" type="button" data-find="'+a.id+'">Follow in the office</button></div>'+
     (PLAYBOOK[a.id] ? '<div style="grid-column:1/-1">'+playHTML(a)+'</div>' : c.playbook ? '<div style="grid-column:1/-1">'+L('Playbook', c.playbook)+'</div>' : '')+'</div>';
@@ -2106,7 +2160,7 @@ function cardHTML(a, c){
 function moreHTML(a){
   if(isLive() && LV.card && LV.card[a.id]) return cardHTML(a, LV.card[a.id]);
   const to = uniq(a.to.map(nameOf)), from = uniq(AG.filter(b => b !== a && b.to.indexOf(a.dept) >= 0).map(b => b.name));
-  return '<div class="rmore">'+recRow(a)+'<div><span class="label">Typical tasks</span><ul>'+a.tasks.map(t => '<li>'+esc(t)+'</li>').join('')+'</ul></div>'+
+  return '<div class="rmore">'+recRow(a)+rhythmHTML(a, null)+'<div><span class="label">Typical tasks</span><ul>'+a.tasks.map(t => '<li>'+esc(t)+'</li>').join('')+'</ul></div>'+
     '<div><span class="label">How the work goes</span><ol>'+a.steps.map(t => '<li>'+esc(t)+'</li>').join('')+'</ol></div>'+
     '<div><span class="label">Gets work from</span><p>'+esc(from.length ? from.join(', ') : a.staff ? 'Everyone who drops by' : 'You and the daily plan')+'</p><span class="label">Reports to</span><p>'+esc(a.dept === 'you' ? 'Nobody, this is your office' : reportsDirect(a) ? 'You, directly' : (bossOf(a).name+', '+bossOf(a).role+(bossOf(a).id === 'cos' ? '' : ', who brings it to you')))+'</p><span class="label">Hands work to</span><p>'+esc(to.length ? to.map(n => n === 'You (your inbox)' && bossOf(a) ? bossOf(a).name : n).join(', ') : a.id === 'cos' ? 'You, at report time' : 'Whoever needs it')+'</p>'+
     '<span class="label">Needs your OK for</span><p>Anything that gets sent, posted, or spent.</p>'+(a.brain ? '<span class="label">Brain</span><p>'+esc(a.brain)+'</p>' : '')+'<button class="btn sm" type="button" data-find="'+a.id+'">Follow in the office</button></div>'+(PLAYBOOK[a.id] ? '<div style="grid-column:1/-1">'+playHTML(a)+'</div>' : '')+'</div>';
