@@ -10,7 +10,8 @@ Cut-outs come from rembg first (isnet-general-use). Run from brand/people:
 
 Per person: enhance (2x upscale, denoise, local contrast, sharpen) for small
 or harsh photos, strong (stricter edge clean-up for busy backgrounds), fill
-(continue clothing cut off at the left/right edge), hero:false (no cover).
+(continue clothing cut off at the left/right edge), fill_top: N (draw N px
+of the head cut off at the top edge), hero:false (no cover).
 Writes cutouts/<name>-tile.png (684x600), -tilewide.png (918x600) and
 -poster.png (1080x1350). Photos stay local: cutouts/ is git-ignored."""
 import json, sys
@@ -62,6 +63,24 @@ def fill_edges(rgba, pad=260):
     img.putalpha(a)
     return img
 
+def fill_top(rgba, ext):
+    """Draw the top of a head cut off by the photo's top edge: a dome of
+    hair above the cut, textured by mirroring the hair just below it."""
+    arr = np.array(rgba); h, w = arr.shape[:2]
+    out = np.zeros((h + ext, w, 4), np.uint8); out[ext:] = arr
+    cols = np.where(arr[0, :, 3] > 128)[0]
+    if not len(cols): return rgba
+    L, R = cols.min(), cols.max(); c, half = (L + R) / 2, (R - L) / 2
+    for x in range(L, R + 1):
+        dh = int(ext * np.sqrt(max(0.0, 1 - ((x - c) / half) ** 2)))
+        for k in range(dh):
+            px = arr[min(h - 1, k), x].copy()
+            px[3] = int(px[3] * min(1.0, (dh - k) / 4))
+            out[ext - 1 - k, x] = px
+    img = Image.fromarray(out)
+    img.putalpha(img.getchannel('A').filter(ImageFilter.GaussianBlur(1.5)))
+    return img
+
 def face(rgba):
     im = Image.new('RGB', rgba.size, (128, 128, 128)); im.paste(rgba, (0, 0), rgba)
     bgr = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR)
@@ -88,26 +107,32 @@ def grade(rgba, fbox, enhance=False):
         bgr = cv2.bilateralFilter(bgr, 7, 30, 7)
         lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
         l, aa, bb = cv2.split(lab)
-        l = cv2.createCLAHE(clipLimit=1.6, tileGridSize=(8, 8)).apply(l)
+        l = cv2.createCLAHE(clipLimit=1.1, tileGridSize=(8, 8)).apply(l)
         bgr = cv2.cvtColor(cv2.merge((l, aa, bb)), cv2.COLOR_LAB2BGR)
         rgb = Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)).filter(ImageFilter.UnsharpMask(2.2, 90, 2))
     x, y, fw, fh = fbox
     region = np.array(rgb.crop((int(x + fw * .2), int(y + fh * .3), int(x + fw * .8), int(y + fh * .8)))).astype(np.float32) / 255
     lum = (region @ [0.299, 0.587, 0.114]).mean()
-    gamma = np.clip(np.log(0.56) / np.log(max(lum, 0.05)), 0.7, 1.35)
+    gamma = np.clip(np.log(0.60) / np.log(max(lum, 0.05)), 0.72, 1.0)  # only ever brighten
     arr = (np.array(rgb).astype(np.float32) / 255) ** gamma
     # neutralise heavy colour casts a little (towards grey-world on the face)
     rm = region ** gamma; means = rm.reshape(-1, 3).mean(0); target = means.mean()
     gain = np.clip((target / means) ** 0.25, 0.92, 1.08)
     arr = np.clip(arr * gain, 0, 1)
     rgb = Image.fromarray((arr * 255).astype(np.uint8))
-    rgb = ImageEnhance.Contrast(rgb).enhance(1.05)
-    rgb = ImageEnhance.Color(rgb).enhance(0.95)
+    rgb = ImageEnhance.Contrast(rgb).enhance(0.95)
+    rgb = ImageEnhance.Color(rgb).enhance(1.0)
     out = rgb.convert('RGBA'); out.putalpha(a)
     return out, fbox
 
-def place(rgba, fbox, W, H, face_h, face_top, cx):
+def place(rgba, fbox, W, H, face_h, face_top, cx, fit=None):
     x, y, fw, fh = fbox
+    if fit is not None:  # whole cut-out, top of head `fit` x H from the top
+        bb = rgba.getbbox(); s = H * (1 - fit) / (bb[3] - bb[1])
+        img = rgba.resize((round(rgba.width * s), round(rgba.height * s)), Image.LANCZOS)
+        canvas = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        canvas.paste(img, (round(cx - (x + fw / 2) * s), round(H * fit - bb[1] * s)), img)
+        return canvas
     s = face_h / fh
     img = rgba.resize((max(1, round(rgba.width * s)), max(1, round(rgba.height * s))), Image.LANCZOS)
     bb = img.getbbox()
@@ -123,12 +148,16 @@ for p in people:
     n = p['name']
     im = clean(Image.open(p['src']).convert('RGBA'), p.get('strong', False))
     if p.get('fill'): im = clean(fill_edges(im), True)
+    if p.get('fill_top'): im = fill_top(im, p['fill_top'])
     im = im.crop(im.getbbox())
     fb = face(im)
     im, fb = grade(im, fb, p.get('enhance', False))
     # tiles: coaches 684x600, founders 918x600 (face 34% of height, top at 17%)
-    for kind, W, H in (('tile', 684, 600), ('tilewide', 918, 600)):
-        place(im, fb, W, H, 0.40 * H, 0.15 * H, W / 2).save(f'cutouts/{n}-{kind}.png')
+    # grid tiles: coaches 684x600 (face 36% of the height, its top at 22%, so
+    # there is headroom above the hair); first-row tiles 918x600 show the
+    # whole cut-out with 12% headroom (founders' photos are close-ups)
+    place(im, fb, 684, 600, 0.36 * 600, 0.22 * 600, 342).save(f'cutouts/{n}-tile.png')
+    place(im, fb, 918, 600, 0, 0, 459, fit=0.12).save(f'cutouts/{n}-tilewide.png')
     if p.get('hero', True):
         place(im, fb, 1080, 1350, 215, 430, 540).save(f'cutouts/{n}-poster.png')
     print(n, 'face', [round(v) for v in fb])

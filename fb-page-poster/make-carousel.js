@@ -297,10 +297,10 @@ body{background:#2A1690}
 .rt.big{width:360px}
 .rph{position:relative;height:200px;overflow:hidden;background:
   radial-gradient(circle at 50% 34%,rgba(150,120,255,.6) 0,rgba(112,85,250,.18) 38%,transparent 62%),
-  radial-gradient(rgba(0,0,0,.35) 1px,transparent 1.3px) 0 0/6px 6px,#1A0B2E}
+  radial-gradient(rgba(0,0,0,.22) 1px,transparent 1.3px) 0 0/6px 6px,#2A1656}
 .rt.big .rph{height:236px}
 .rph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0}
-.rph::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,rgba(26,11,46,.55))}
+.rph::after{content:'';position:absolute;left:0;right:0;bottom:0;height:26%;background:linear-gradient(180deg,transparent,rgba(26,11,46,.28))}
 .rt.big .rph{outline:3px solid ${BRAND.gold};outline-offset:-3px}
 .bar{background:#7055FA;color:#fff;font-family:'Archivo Black';font-size:30px;text-align:center;padding:9px 6px 8px;letter-spacing:.5px;line-height:1}
 .rt.big .bar{background:${BRAND.gold};color:#1A0B2E;font-size:36px}
