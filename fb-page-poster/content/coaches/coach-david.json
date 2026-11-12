@@ -5,13 +5,13 @@
     "facebook",
     "instagram"
   ],
-  "caption": "Coach Spotlight: meet Coach David (David Cuenco)! 💜\n\nMultimedia Designer. Has spent years turning complex ideas into simple, meaningful visual solutions.\n\nKnown for: AI skills, motion graphics, animation, video and web-app development.\n\nBuilt with AI: Readycopy, a prepublication preflight skill, and KailanUwi, a homecoming calculator for OFWs (kailanuwi.com).\n\nWant to learn with Coach David? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
+  "caption": "Coach Spotlight: meet Coach David (David Cuenco)! 💜\n\n🎨 The Visual Storyteller · Multimedia Designer. Has spent years turning complex ideas into simple, meaningful visual solutions.\n\nKnown for: AI skills, motion graphics, animation, video and web-app development.\n\nBuilt with AI: Readycopy, a skill that checks your files before they're published, and KailanUwi (kailanuwi.com), a homecoming calculator that helps OFWs work out when they can finally come home.\n\nWant to learn with Coach David? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "spotlight",
       "tag": "Coach Spotlight",
       "name": "Coach David",
-      "role": "Multimedia Designer",
+      "role": "The Visual Storyteller",
       "tagline": "AI skills, motion graphics, animation, video and web-app development.",
       "photo": "brand/people/coach-david.jpg"
     },
@@ -26,7 +26,7 @@
       "theme": "light",
       "kicker": "What I built with AI",
       "title": "*Readycopy* and *KailanUwi*",
-      "body": "Readycopy, a prepublication preflight skill, and KailanUwi, a homecoming calculator for OFWs at kailanuwi.com."
+      "body": "Readycopy is an AI skill that checks your files before they're published, so mistakes get caught before anyone else sees them. KailanUwi (kailanuwi.com) helps OFWs work out when they can finally come home."
     },
     {
       "layout": "cta",

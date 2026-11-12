@@ -5,13 +5,13 @@
     "facebook",
     "instagram"
   ],
-  "caption": "Coach Spotlight: meet Coach Gab! 💜\n\nMeta Ads Specialist. Helps businesses generate leads and acquire customers through paid advertising, and now builds AI-powered marketing systems.\n\nKnown for: Combines Meta Ads and AI to build smarter marketing systems and automate repetitive work.\n\nBuilt with AI: an email automation system and a Claude-powered client reporting workflow that cut reporting time from hours to minutes.\n\nWant to learn with Coach Gab? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
+  "caption": "Coach Spotlight: meet Coach Gab! 💜\n\n🎯 The Ads & Automation Pro · Meta Ads Specialist. Helps businesses generate leads and acquire customers through paid advertising, and now builds AI-powered marketing systems.\n\nKnown for: Combines Meta Ads and AI to build smarter marketing systems and automate repetitive work.\n\nBuilt with AI: an email automation system that contributed to ₱2.4M in client value, and a Claude-powered client reporting workflow that cut reporting time from hours to minutes.\n\nWant to learn with Coach Gab? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "spotlight",
       "tag": "Coach Spotlight",
       "name": "Coach Gab",
-      "role": "Meta Ads Specialist",
+      "role": "The Ads & Automation Pro",
       "tagline": "Combines Meta Ads and AI to build smarter marketing systems and automate repetitive work.",
       "photo": "brand/people/coach-gab.jpg"
     },
@@ -26,7 +26,7 @@
       "theme": "light",
       "kicker": "What I built with AI",
       "title": "AI email and *client reporting*",
-      "body": "Used Claude Skills to build an email automation system and a client reporting workflow that cut reporting time from hours to minutes."
+      "body": "Used Claude Skills to build an email automation system that contributed to ₱2.4M in client value, plus a client reporting workflow that cut reporting time from hours to minutes."
     },
     {
       "layout": "cta",

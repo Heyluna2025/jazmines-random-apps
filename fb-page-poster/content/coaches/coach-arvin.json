@@ -1,35 +1,36 @@
 {
-  "post": "Coach Spotlight · Coach Arvin",
+  "post": "Coach Spotlight · Coach Arv",
   "when": "[[date and time]]",
   "platforms": [
     "facebook",
     "instagram"
   ],
-  "caption": "Coach Spotlight: meet Coach Arvin! 💜\n\nFull-Stack No-Code Dev.\n\nKnown for: Builds no-code apps and creates content around AI.\n\nBuilt with AI: Vera (formerly AffiliateFlow), a ChatGPT plugin that creates affiliate marketing content so you don't start from scratch.\n\nWant to learn with Coach Arvin? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
+  "caption": "Coach Spotlight: meet Coach Arv! 💜\n\n🛠️ The No-Code Maker · Full-Stack No-Code Dev. An entrepreneur and AI content creator, proof you don't need to code to build with AI.\n\nKnown for: Builds no-code apps and creates content around AI.\n\nBuilt with AI: Vera (formerly AffiliateFlow), a ChatGPT plugin that does the heavy lifting on affiliate marketing content, so you start with a draft instead of a blank page.\n\nWant to learn with Coach Arv? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "spotlight",
       "tag": "Coach Spotlight",
-      "name": "Coach Arvin",
-      "role": "Full-Stack No-Code Dev",
+      "name": "Coach Arv",
+      "role": "The No-Code Maker",
       "tagline": "Builds no-code apps and creates content around AI.",
       "photo": "brand/people/coach-arvin.jpg"
     },
     {
       "layout": "statement",
       "kicker": "Outside ABC",
-      "title": "Entrepreneur and *AI content creator*"
+      "title": "Entrepreneur and *AI content creator*",
+      "body": "An entrepreneur who builds no-code apps and makes AI content: proof you don't need to code to build with AI."
     },
     {
       "layout": "statement",
       "theme": "light",
       "kicker": "What I built with AI",
       "title": "*Vera* (formerly AffiliateFlow)",
-      "body": "A ChatGPT plugin that takes the work out of creating affiliate marketing content from scratch."
+      "body": "Writing affiliate marketing content from scratch takes hours. Vera is a ChatGPT plugin that does the heavy lifting, so you start with a draft instead of a blank page."
     },
     {
       "layout": "cta",
-      "title": "Learn with\n*Coach Arvin.*",
+      "title": "Learn with\n*Coach Arv.*",
       "body": "Batch 3 is coming. Learn more at aibuilderscamp.ph",
       "button": "aibuilderscamp.ph"
     }

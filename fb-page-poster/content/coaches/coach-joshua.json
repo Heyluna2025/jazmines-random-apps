@@ -5,13 +5,13 @@
     "facebook",
     "instagram"
   ],
-  "caption": "Coach Spotlight: meet Coach Joshua (Joshua Ladero)! 💜\n\nAI Specialist & System Architect. Focused on building AI-powered solutions and digital products.\n\nKnown for: Builds AI agents, workflow automations and AI-powered apps with no-code and AI development tools.\n\nBuilt with AI: Kasya, a gait analyzer, and Cuely, a teleprompter app.\n\nWant to learn with Coach Joshua? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
+  "caption": "Coach Spotlight: meet Coach Joshua (Joshua Ladero)! 💜\n\n🏗️ The AI Systems Architect · AI Specialist & System Architect. Focused on building AI-powered solutions and digital products.\n\nKnown for: Builds AI agents, workflow automations and AI-powered apps with no-code and AI development tools.\n\nBuilt with AI: Kasya, a gait analyzer that reads how a person walks, and Cuely, a teleprompter app that keeps your script on screen while you record.\n\nWant to learn with Coach Joshua? Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #CoachSpotlight #AIEmpoweredClub #YourAIBestie",
   "slides": [
     {
       "layout": "spotlight",
       "tag": "Coach Spotlight",
       "name": "Coach Joshua",
-      "role": "AI Specialist & System Architect",
+      "role": "The AI Systems Architect",
       "tagline": "Builds AI agents, workflow automations and AI-powered apps with no-code and AI development tools.",
       "photo": "brand/people/coach-joshua.jpg"
     },
@@ -26,7 +26,7 @@
       "theme": "light",
       "kicker": "What I built with AI",
       "title": "*Kasya* and *Cuely*",
-      "body": "Kasya, a gait analyzer, and Cuely, a teleprompter app."
+      "body": "Kasya is a gait analyzer that reads how a person walks. Cuely is a teleprompter app that keeps your script on screen while you record, so you can talk to the camera with confidence."
     },
     {
       "layout": "cta",
