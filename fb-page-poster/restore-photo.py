@@ -3,7 +3,7 @@ Real-ESRGAN x4 rebuilds detail across the whole image (then it's brought down
 to 2x for a clean result), and GFPGAN restores the face, blended back at
 `--face-strength` so the person still looks like themselves.
 
-    python restore-photo.py MODELS in.png out.png [--face-strength 0.7]
+    python restore-photo.py MODELS in.png out.png [--face-strength 0.7] [--eye-strength 0.15]
 
 MODELS must hold real_esrgan_x4.onnx and gfpgan_1.4.onnx (facefusion-assets
 release models-3.0.0) and OpenCV's yunet.onnx face detector.
@@ -15,6 +15,9 @@ from PIL import Image
 
 M, src, dst = sys.argv[1:4]
 strength = float(sys.argv[sys.argv.index('--face-strength') + 1]) if '--face-strength' in sys.argv else 0.7
+# eyes behind tinted glasses are where face restoration tends to invent
+# things, so they get a lighter touch of their own
+eye_strength = float(sys.argv[sys.argv.index('--eye-strength') + 1]) if '--eye-strength' in sys.argv else strength
 opts = ort.SessionOptions(); opts.intra_op_num_threads = 4
 
 def esrgan(rgb, tile=192, pad=12):
@@ -65,6 +68,11 @@ def restore_faces(rgb):
         back = cv2.warpAffine(r, Ai, (rgb.shape[1], rgb.shape[0]), flags=cv2.INTER_CUBIC)
         mask = np.zeros((512, 512), np.float32); cv2.ellipse(mask, (256, 290), (190, 230), 0, 0, 360, 1, -1)
         mask = cv2.GaussianBlur(mask, (0, 0), 25)
+        if eye_strength < strength:
+            eyes = np.zeros((512, 512), np.float32)
+            for ex, ey in TEMPLATE[:2]: cv2.ellipse(eyes, (int(ex), int(ey)), (58, 38), 0, 0, 360, 1, -1)
+            eyes = cv2.GaussianBlur(eyes, (0, 0), 9)
+            mask = mask * (1 - eyes * (1 - eye_strength / strength))
         m = cv2.warpAffine(mask, Ai, (rgb.shape[1], rgb.shape[0]))[..., None] * strength
         out = out * (1 - m) + back * m
     return out.clip(0, 255).astype(np.uint8)
