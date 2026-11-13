@@ -2230,8 +2230,9 @@ function writtenReportsHTML(){
   return items.map(x => { const a = byId[x.agent_id]; return '<details class="rep"><summary><b>'+esc(x.title || '')+'</b><span class="sub">'+esc((a ? a.name : x.agent_id)+' · '+new Date(x.at).toLocaleString('en-PH', {timeZone:'Asia/Manila', weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}))+'</span></summary><div class="rep-body">'+esc(x.body || '').replace(/\n/g, '<br>')+'</div></details>'; }).join('');
 }
 function reportsHTML(){
-  const tabs = '<div class="soc-tabs" style="margin:4px 0 12px">'+[['written','Written reports'],['leads','Scraped leads'],['social','Social media'],['revenue','Revenue']].map(t => '<button type="button" data-rep="'+t[0]+'" aria-pressed="'+(REP.tab === t[0])+'">'+t[1]+'</button>').join('')+'</div>';
+  const tabs = '<div class="soc-tabs" style="margin:4px 0 12px">'+[['written','Written reports'],['leads','Scraped leads'],['outreach','Clinic outreach'],['social','Social media'],['revenue','Revenue']].map(t => '<button type="button" data-rep="'+t[0]+'" aria-pressed="'+(REP.tab === t[0])+'">'+t[1]+'</button>').join('')+'</div>';
   if(REP.tab === 'leads') return tabs + proHTML();
+  if(REP.tab === 'outreach') return tabs + outHTML();
   if(REP.tab === 'social') return tabs + socialHTML();
   if(REP.tab === 'revenue') return tabs + revenueHTML();
   return tabs + '<h3>From the team</h3>' + writtenReportsHTML() + reportsHTML0();
@@ -3381,6 +3382,31 @@ function loadPro(force){ if(!isLive() || !LV.key || PRO.busy) return; const now 
   .catch(e => { if(e.message !== '401') PRO.err = true; }).then(() => { PRO.busy = false; const showing = () => !$('roster').hidden && navView === 'reports' && REP.tab === 'leads'; if(showing()) renderView(true);
     clearTimeout(PRO.timer); PRO.timer = setTimeout(() => { if(showing()) loadPro(true); }, 60000); }); }
 const proN = n => (Number(n) || 0).toLocaleString('en-PH');
+/* Clinic outreach (Reports > Clinic outreach). Her words (13 Nov): "If I wanna know the emails sent out and if somebody replied, where will I go".
+   Live reads ao-state?view=outreach: every clinic the office wrote to, delivery, follow-ups, replies and calls booked, from the office's own records. */
+const OUT = {data:null, err:false, at:0, busy:false, timer:null};
+const DEMO_OUT = {counts:{sent:26, delivered:24, bounced:1, followup1:0, followup2:0, replied:2, positive:1, negative:1, booked:0, opted_out:0, waiting_ok:46}, variants:{A:{sent:13, replied:1, positive:1}, B:{sent:13, replied:1, positive:0}},
+  days:[[new Date(Date.now()-864e5).toISOString().slice(0,10), 10],[new Date().toISOString().slice(0,10), 16]], from:'hello@jazmine.ai', reply_to:'jazmine@gotoluna.com', replies_checked_at:Date.now()-3600e3,
+  sent:[{id:1,name:'Sample Aesthetic Clinic',niche:'Aesthetic clinics',area:'Makati',email:'hello@example.com',variant:'A',sent_at:new Date(Date.now()-5*3600e3).toISOString(),delivered_at:new Date().toISOString(),replied_at:new Date().toISOString(),reply_kind:'positive'},{id:2,name:'Sample Dental Clinic',niche:'Dental clinics',area:'Quezon City',email:'care@example.com',variant:'B',sent_at:new Date(Date.now()-6*3600e3).toISOString(),delivered_at:new Date().toISOString()}],
+  replies:[{id:1,name:'Sample Aesthetic Clinic',niche:'Aesthetic clinics',area:'Makati',replied_at:new Date().toISOString(),reply_kind:'positive',note:'Asked for a call on Thursday.'}]};
+function loadOut(force){ if(!isLive() || !LV.key || OUT.busy) return; const now = Date.now(); if(!force && OUT.data && now - OUT.at < 20000) return; OUT.busy = true;
+  api('ao-state?view=outreach').then(r => { if(r && r.ok){ OUT.data = r; OUT.err = false; OUT.at = Date.now(); } else OUT.err = true; })
+  .catch(e => { if(e.message !== '401') OUT.err = true; }).then(() => { OUT.busy = false; const showing = () => !$('roster').hidden && navView === 'reports' && REP.tab === 'outreach'; if(showing()) renderView(true);
+    clearTimeout(OUT.timer); OUT.timer = setTimeout(() => { if(showing()) loadOut(true); }, 60000); }); }
+function outHTML(){
+  const live = isLive(), d = live ? OUT.data : DEMO_OUT;
+  if(live && !d) return '<p class="empty">'+(OUT.err ? 'The office is not answering. Try again in a minute.' : 'Loading the outreach list…')+'</p>';
+  const c = d.counts || {}, v = d.variants || {}, when = iso => iso ? new Date(iso).toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit', timeZone:TZ}) : '';
+  const tile = (label, n, sub, warn) => '<div class="kpi"><span>'+label+'</span><b'+(warn ? ' style="color:var(--need)"' : '')+'>'+n+'</b>'+(sub ? '<span>'+sub+'</span>' : '')+'</div>';
+  const kp = '<div class="kpis">'+tile('Emails sent', c.sent || 0, 'first emails to clinics')+tile('Delivered', c.delivered || 0, (c.bounced || 0)+' bounced', !!c.bounced)+tile('Replied', c.replied || 0, (c.positive || 0)+' positive · '+(c.negative || 0)+' no')+tile('Calls booked', c.booked || 0, '')+tile('Follow-ups sent', (c.followup1 || 0)+(c.followup2 || 0), 'day 3 and day 5')+tile('Waiting for your OK', c.waiting_ok || 0, 'in Approvals', !!c.waiting_ok)+'</div>';
+  const ab = '<p class="sub" style="margin:6px 0 10px">Subject A: '+((v.A || {}).sent || 0)+' sent, '+((v.A || {}).replied || 0)+' replied · Subject B: '+((v.B || {}).sent || 0)+' sent, '+((v.B || {}).replied || 0)+' replied</p>';
+  const how = '<div class="card" style="margin:0 0 14px;display:block"><b>Where the answers land</b><span class="sub">Every email goes out from '+esc(d.from || 'the outreach address')+' with replies addressed to '+esc(d.reply_to || 'jazmine@gotoluna.com')+', so a clinic’s answer arrives in that Gmail inbox. The office checks the connected inboxes every 2 hours'+(d.replies_checked_at ? ' (last check '+esc(when(d.replies_checked_at))+')' : '')+', marks the clinic as replied, and Ron drafts the answer for your OK. Positive replies are offered two 15-minute slots.</span></div>';
+  const kind = p => p.reply_kind === 'positive' ? '<span class="pill ok">Positive</span>' : p.reply_kind === 'negative' ? '<span class="pill">Not now</span>' : p.reply_kind ? '<span class="pill">'+esc(p.reply_kind)+'</span>' : '';
+  const replies = (d.replies || []).length ? '<h3>Replies</h3>'+(d.replies || []).map(p => '<div class="row" style="cursor:default"><span class="row-main"><b>'+esc(p.name || '')+'</b><span class="sub">'+esc([p.niche, p.area].filter(Boolean).join(' · '))+' · replied '+esc(when(p.replied_at))+(p.note ? ' · '+esc(p.note) : '')+'</span></span>'+kind(p)+'</div>').join('') : '<h3>Replies</h3><p class="sub">No clinic has replied yet.</p>';
+  const state = p => p.replied_at ? kind(p) || '<span class="pill ok">Replied</span>' : p.bounced_at ? '<span class="pill need">Bounced</span>' : p.call_booked_at ? '<span class="pill ok">Call booked</span>' : p.opted_out ? '<span class="pill">Opted out</span>' : p.followup2_at ? '<span class="pill">Follow-up 2 sent</span>' : p.followup1_at ? '<span class="pill">Follow-up 1 sent</span>' : p.delivered_at ? '<span class="pill ok">Delivered</span>' : '<span class="pill">Sent</span>';
+  const list = (d.sent || []).length ? '<h3 style="margin-top:14px">Every email sent</h3>'+(d.sent || []).map(p => '<div class="row" style="cursor:default"><span class="row-main"><b>'+esc(p.name || '')+'</b><span class="sub">'+esc([p.niche, p.area].filter(Boolean).join(' · '))+(p.email ? ' · '+esc(p.email) : '')+' · '+esc(when(p.sent_at))+(p.variant ? ' · subject '+esc(p.variant) : '')+'</span></span>'+state(p)+'</div>').join('') : '<p class="sub">Nothing has been sent yet.</p>';
+  return kp+ab+how+replies+list;
+}
 function proHTML(){
   const live = isLive(), d = live ? PRO.data : DEMO_PRO;
   if(live && !d) return '<p class="empty">'+(PRO.err ? 'The office is not answering. Try again in a minute.' : 'Loading the leads report…')+'</p>';
@@ -3577,7 +3603,7 @@ function socialHTML(){
 }
 $('rosterList').addEventListener('change', e => { if(e.target && e.target.id === 'socAcc') socSet('account', e.target.value); });
 $('rosterList').addEventListener('click', e => { if(e.target && e.target.closest && e.target.closest('[data-socretry]')){ SOC.err = ''; SOC.data = null; loadSocial(true); renderView(true); } });
-$('rosterList').addEventListener('click', e => { const r = e.target.closest && e.target.closest('button[data-rep]'); if(r){ REP.tab = r.getAttribute('data-rep'); if(REP.tab === 'social') loadSocial(); if(REP.tab === 'revenue') loadRev(); if(REP.tab === 'leads') loadPro(true); renderView(true); return; } const b = e.target.closest && e.target.closest('button[data-range]'); if(b){ socSet('range', b.getAttribute('data-range')); return; } const c = e.target.closest && e.target.closest('button[data-cal]'); if(c){ SOC.cal = c.getAttribute('data-cal'); SOC.day = 0; renderView(true); return; } const n = e.target.closest && e.target.closest('button[data-calnav]'); if(n){ SOC.day += Number(n.getAttribute('data-calnav')); renderView(true); } });
+$('rosterList').addEventListener('click', e => { const r = e.target.closest && e.target.closest('button[data-rep]'); if(r){ REP.tab = r.getAttribute('data-rep'); if(REP.tab === 'social') loadSocial(); if(REP.tab === 'revenue') loadRev(); if(REP.tab === 'leads') loadPro(true); if(REP.tab === 'outreach') loadOut(true); renderView(true); return; } const b = e.target.closest && e.target.closest('button[data-range]'); if(b){ socSet('range', b.getAttribute('data-range')); return; } const c = e.target.closest && e.target.closest('button[data-cal]'); if(c){ SOC.cal = c.getAttribute('data-cal'); SOC.day = 0; renderView(true); return; } const n = e.target.closest && e.target.closest('button[data-calnav]'); if(n){ SOC.day += Number(n.getAttribute('data-calnav')); renderView(true); } });
 function revenueHTML(){ return targetsHTML() + revenueHTML0(); }
 /* ---- Dashboard: this month at a glance, from the revenue rows and the student stats the page already reads. */
 const DASH_BD = [['ai-build-day-baguio', 'Baguio · Nov 29'], ['ai-build-day-qc', 'Quezon City · Dec 6']];
