@@ -216,7 +216,7 @@ function createClient({
     return call('GET', mediaId, { fields: 'caption,timestamp,permalink,media_type' });
   }
 
-  return { whoAmI, publish, show, remove, instagramAccount, publishInstagram, publishInstagramReel, pageVideoSource, showInstagram };
+  return { whoAmI, publish, show, remove, instagramAccount, hostImage, publishInstagram, publishInstagramReel, pageVideoSource, showInstagram };
 }
 
 function normalize(post) {
