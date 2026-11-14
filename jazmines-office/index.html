@@ -3524,7 +3524,7 @@ function crmListHTML(){ const rows = crmFiltered(); if(!rows.length) return '<p 
 }
 const REV_BIZ = ['AI Empowered Club','AI Builders Camp','AI Build Day','Breakfast Club'];
 let revAt = 0, revBiz = 'all', revBusy = false, revPreset = 'm6', revFrom = '', revTo = '';
-const REV_PRESETS = [['m0','This month'],['m1','Last month'],['d30','Last 30 days'],['d90','Last 90 days'],['m6','Last 6 months'],['y','This year'],['all','All time'],['custom','Custom dates']];
+const REV_PRESETS = [['d0','Today'],['d1','Yesterday'],['d7','Last 7 days'],['d30','Last 30 days'],['m0','This month'],['q0','This quarter'],['m1','Last month'],['d90','Last 90 days'],['m6','Last 6 months'],['y','This year'],['all','All time'],['custom','Custom dates']];
 const REV_SRC = {'Payment tracker':'Payment tracker · all payment types', 'Stripe':'Stripe · cards only', 'Site records':'Site records · paid seats'};
 const MON3 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const money = (cur, n) => (cur === 'PHP' ? '₱' : cur === 'USD' ? '$' : cur+' ')+(Number(n) || 0).toLocaleString('en-US', {maximumFractionDigits:2});
@@ -3536,6 +3536,8 @@ const monEnd = ym => dayAdd(monAdd(ym, 1)+'-01', -1);
 const dayNice = d => { const p = d.split('-'); return MON3[+p[1]-1]+' '+(+p[2])+', '+p[0]; };
 function revRange(){ const t = phDay(), ym = t.slice(0,7), days = (LV.rev && LV.rev.days) || [];
   if(revPreset === 'custom'){ let a = revFrom || ym+'-01', b = revTo || t; if(a > b){ const x = a; a = b; b = x; } return [a, b]; }
+  if(revPreset === 'd0') return [t, t]; if(revPreset === 'd1'){ const y = dayAdd(t, -1); return [y, y]; } if(revPreset === 'd7') return [dayAdd(t, -6), t];
+  if(revPreset === 'q0'){ const qm = String(Math.floor((Number(ym.slice(5)) - 1) / 3) * 3 + 1).padStart(2, '0'); return [ym.slice(0, 4)+'-'+qm+'-01', t]; }
   if(revPreset === 'm0') return [ym+'-01', t]; if(revPreset === 'm1'){ const m = monAdd(ym, -1); return [m+'-01', monEnd(m)]; }
   if(revPreset === 'd30') return [dayAdd(t, -29), t]; if(revPreset === 'd90') return [dayAdd(t, -89), t];
   if(revPreset === 'y') return [t.slice(0,4)+'-01-01', t];
@@ -3646,26 +3648,28 @@ function dashHTML(){
    From the daily revenue read: per account and month, sales, Stripe's processing fees, its other charges, refunds and what lands. */
 function feesHTML(a, b){
   const f = LV.rev && LV.rev.fees; if(!f) return '';
-  const from = a.slice(0, 7), to = b.slice(0, 7);
-  const rows = (f.rows || []).map(r => ({biz:String(r[0]), month:String(r[1]), cur:String(r[2] || 'USD'), gross:+r[3] || 0, proc:+r[4] || 0, other:+r[5] || 0, refunds:+r[6] || 0, fees:+r[7] || 0, net:+r[8] || 0, n:+r[9] || 0}))
-    .filter(r => r.month >= from && r.month <= to && (revBiz === 'all' || r.biz === revBiz));
-  rows.sort((x, y) => x.month === y.month ? (x.biz < y.biz ? -1 : 1) : (x.month < y.month ? 1 : -1));
-  const m2 = (cur, n) => (cur === 'PHP' ? '₱' : cur === 'USD' ? '$' : cur+' ')+(Number(n) || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const daily = Array.isArray(f.days) && f.days.length > 0, span = Math.round((Date.parse(b) - Date.parse(a)) / 864e5) + 1, byDay = daily && span <= 31;
+  const src = daily ? f.days : (f.rows || []), lo = daily ? a : a.slice(0, 7), hi = daily ? b : b.slice(0, 7);
+  const picked = src.map(r => ({biz:String(r[0]), when:String(r[1]), cur:String(r[2] || 'USD'), gross:+r[3] || 0, proc:+r[4] || 0, other:+r[5] || 0, refunds:+r[6] || 0, fees:+r[7] || 0, net:+r[8] || 0, n:+r[9] || 0}))
+    .filter(r => r.when >= lo && r.when <= hi && (revBiz === 'all' || r.biz === revBiz));
+  const groups = new Map(); picked.forEach(r => { const per = byDay ? r.when : r.when.slice(0, 7), k = per+'|'+r.biz+'|'+r.cur; if(!groups.has(k)) groups.set(k, {per, biz:r.biz, cur:r.cur, gross:0, proc:0, other:0, refunds:0, fees:0, net:0, n:0}); const g = groups.get(k); ['gross','proc','other','refunds','fees','net','n'].forEach(x => { g[x] += r[x]; }); });
+  const rows = [...groups.values()].sort((x, y) => x.per === y.per ? (x.biz < y.biz ? -1 : 1) : (x.per < y.per ? 1 : -1));
+  const m2 = (cur, n) => { const v = Number(n) || 0; return (v < 0 ? '−' : '')+(cur === 'PHP' ? '₱' : cur === 'USD' ? '$' : cur+' ')+Math.abs(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); };
   const miss = (f.missing || []).filter(Boolean);
   if(!rows.length) return '<h3 style="margin-top:6px">Stripe fees</h3><p class="sub">'+(miss.length ? 'Stripe could not be read for fees: '+esc(miss.join('; ')) : 'No Stripe payments in these dates'+(revBiz !== 'all' ? ' for '+esc(revBiz) : '')+'.')+'</p>';
   const curs = [...new Set(rows.map(r => r.cur))];
-  const tot = cur => rows.filter(r => r.cur === cur).reduce((t, r) => ({gross:t.gross + r.gross, fees:t.fees + r.fees, proc:t.proc + r.proc, other:t.other + r.other, refunds:t.refunds + r.refunds, net:t.net + r.net, n:t.n + r.n}), {gross:0, fees:0, proc:0, other:0, refunds:0, net:0, n:0});
+  const tot = cur => rows.filter(r => r.cur === cur).reduce((t, r) => ({gross:t.gross + r.gross, fees:t.fees + r.fees, refunds:t.refunds + r.refunds, net:t.net + r.net, n:t.n + r.n}), {gross:0, fees:0, refunds:0, net:0, n:0});
   const pct = (x, y) => y ? (x / y * 100).toFixed(1)+'%' : '–';
-  const mon = m => new Date(m+'-15T00:00:00Z').toLocaleString('en-US', {month:'short', year:'numeric', timeZone:'UTC'});
+  const label = per => per.length > 7 ? new Date(per+'T00:00:00Z').toLocaleString('en-US', {weekday:'short', month:'short', day:'numeric', timeZone:'UTC'}) : new Date(per+'-15T00:00:00Z').toLocaleString('en-US', {month:'short', year:'numeric', timeZone:'UTC'});
   const tiles = curs.map(c => { const t = tot(c); return '<div class="kpis">'+
     '<div class="kpi"><span>Stripe fees'+(curs.length > 1 ? ' ('+c+')' : '')+'</span><b>'+m2(c, t.fees)+'</b><span>'+pct(t.fees, t.gross)+' of sales</span></div>'+
     '<div class="kpi"><span>Card sales</span><b>'+m2(c, t.gross)+'</b><span>'+t.n+' payments</span></div>'+
     '<div class="kpi"><span>Refunds</span><b>'+m2(c, t.refunds)+'</b><span>paid back to buyers</span></div>'+
     '<div class="kpi"><span>What lands in Stripe</span><b>'+m2(c, t.net)+'</b><span>after fees and refunds</span></div></div>'; }).join('');
-  const table = '<div class="tablewrap"><table class="revtable"><thead><tr><th>Month</th><th>Business</th><th>Card sales</th><th>Processing fees</th><th>Other Stripe charges</th><th>Fee %</th><th>Refunds</th><th>What lands</th></tr></thead><tbody>'+
-    rows.map(r => '<tr><td>'+esc(mon(r.month))+'</td><td>'+esc(r.biz)+'</td><td>'+m2(r.cur, r.gross)+'</td><td>'+m2(r.cur, r.proc)+'</td><td>'+m2(r.cur, r.other)+'</td><td>'+pct(r.fees, r.gross)+'</td><td>'+m2(r.cur, r.refunds)+'</td><td><b>'+m2(r.cur, r.net)+'</b></td></tr>').join('')+'</tbody></table></div>';
+  const table = '<div class="tablewrap"><table class="revtable"><thead><tr><th>'+(byDay ? 'Day' : 'Month')+'</th><th>Business</th><th>Card sales</th><th>Processing fees</th><th>Other Stripe charges</th><th>Fee %</th><th>Refunds</th><th>What lands</th></tr></thead><tbody>'+
+    rows.map(r => '<tr><td>'+esc(label(r.per))+'</td><td>'+esc(r.biz)+'</td><td>'+m2(r.cur, r.gross)+'</td><td>'+m2(r.cur, r.proc)+'</td><td>'+m2(r.cur, r.other)+'</td><td>'+pct(r.fees, r.gross)+'</td><td>'+m2(r.cur, r.refunds)+'</td><td><b>'+m2(r.cur, r.net)+'</b></td></tr>').join('')+'</tbody></table></div>';
   return '<h3 style="margin-top:6px">Stripe fees</h3>'+tiles+table+
-    '<p class="sub" style="margin:6px 0 18px">Processing fees are what Stripe keeps on each card payment. Other Stripe charges are its separate fees (currency conversion, disputes, billing). Read from Stripe once a day with the rest of this page; Wise cash-out charges come next.'+(miss.length ? ' Not read: '+esc(miss.join('; '))+'.' : '')+(f.partial ? ' Some older months were cut short.' : '')+'</p>';
+    '<p class="sub" style="margin:6px 0 18px">Processing fees are what Stripe keeps on each card payment. Other Stripe charges are its separate fees (currency conversion, disputes, billing). Read from Stripe once a day with the rest of this page; press Refresh for today’s latest. Wise cash-out charges come next.'+(miss.length ? ' Not read: '+esc(miss.join('; '))+'.' : '')+(f.partial ? ' Some older months were cut short.' : '')+'</p>';
 }
 function revenueHTML0(){
   if(!isLive()) return '<p class="empty">The revenue report only shows in Live mode.</p>';
