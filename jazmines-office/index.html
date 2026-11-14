@@ -204,6 +204,11 @@ button,input{font:inherit;color:inherit}
 .navgroup[hidden]{display:none}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0 4px}
 .kpi{background:var(--surface-2);border-radius:12px;padding:12px 14px;min-width:0}
+.tablewrap{overflow-x:auto;margin:8px 0 0}
+.revtable{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+.revtable th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:6px 10px;border-bottom:1px solid var(--line)}
+.revtable td{padding:7px 10px;border-bottom:1px solid var(--line)}
+.revtable td:nth-child(n+3),.revtable th:nth-child(n+3){text-align:right}
 .kpi span{display:block;font-size:12px;color:var(--muted)}
 .kpi b{display:block;font-family:var(--font-display);font-size:22px;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .revbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
@@ -3637,6 +3642,31 @@ function dashHTML(){
   h += '<p class="sub">Registrations = paid + pending on each event site. Camp money is the hand-kept payment tracker (QR, bank, card); Stripe lines are card money only. Breakfast “paid” means the organizer marked the food fee as received.</p>';
   return h;
 }
+/* Stripe's own charges (her words, 14 Nov: "I wanna know the charges we are incurring in Stripe ... display Stripe first").
+   From the daily revenue read: per account and month, sales, Stripe's processing fees, its other charges, refunds and what lands. */
+function feesHTML(a, b){
+  const f = LV.rev && LV.rev.fees; if(!f) return '';
+  const from = a.slice(0, 7), to = b.slice(0, 7);
+  const rows = (f.rows || []).map(r => ({biz:String(r[0]), month:String(r[1]), cur:String(r[2] || 'USD'), gross:+r[3] || 0, proc:+r[4] || 0, other:+r[5] || 0, refunds:+r[6] || 0, fees:+r[7] || 0, net:+r[8] || 0, n:+r[9] || 0}))
+    .filter(r => r.month >= from && r.month <= to && (revBiz === 'all' || r.biz === revBiz));
+  rows.sort((x, y) => x.month === y.month ? (x.biz < y.biz ? -1 : 1) : (x.month < y.month ? 1 : -1));
+  const m2 = (cur, n) => (cur === 'PHP' ? '₱' : cur === 'USD' ? '$' : cur+' ')+(Number(n) || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const miss = (f.missing || []).filter(Boolean);
+  if(!rows.length) return '<h3 style="margin-top:6px">Stripe fees</h3><p class="sub">'+(miss.length ? 'Stripe could not be read for fees: '+esc(miss.join('; ')) : 'No Stripe payments in these dates'+(revBiz !== 'all' ? ' for '+esc(revBiz) : '')+'.')+'</p>';
+  const curs = [...new Set(rows.map(r => r.cur))];
+  const tot = cur => rows.filter(r => r.cur === cur).reduce((t, r) => ({gross:t.gross + r.gross, fees:t.fees + r.fees, proc:t.proc + r.proc, other:t.other + r.other, refunds:t.refunds + r.refunds, net:t.net + r.net, n:t.n + r.n}), {gross:0, fees:0, proc:0, other:0, refunds:0, net:0, n:0});
+  const pct = (x, y) => y ? (x / y * 100).toFixed(1)+'%' : '–';
+  const mon = m => new Date(m+'-15T00:00:00Z').toLocaleString('en-US', {month:'short', year:'numeric', timeZone:'UTC'});
+  const tiles = curs.map(c => { const t = tot(c); return '<div class="kpis">'+
+    '<div class="kpi"><span>Stripe fees'+(curs.length > 1 ? ' ('+c+')' : '')+'</span><b>'+m2(c, t.fees)+'</b><span>'+pct(t.fees, t.gross)+' of sales</span></div>'+
+    '<div class="kpi"><span>Card sales</span><b>'+m2(c, t.gross)+'</b><span>'+t.n+' payments</span></div>'+
+    '<div class="kpi"><span>Refunds</span><b>'+m2(c, t.refunds)+'</b><span>paid back to buyers</span></div>'+
+    '<div class="kpi"><span>What lands in Stripe</span><b>'+m2(c, t.net)+'</b><span>after fees and refunds</span></div></div>'; }).join('');
+  const table = '<div class="tablewrap"><table class="revtable"><thead><tr><th>Month</th><th>Business</th><th>Card sales</th><th>Processing fees</th><th>Other Stripe charges</th><th>Fee %</th><th>Refunds</th><th>What lands</th></tr></thead><tbody>'+
+    rows.map(r => '<tr><td>'+esc(mon(r.month))+'</td><td>'+esc(r.biz)+'</td><td>'+m2(r.cur, r.gross)+'</td><td>'+m2(r.cur, r.proc)+'</td><td>'+m2(r.cur, r.other)+'</td><td>'+pct(r.fees, r.gross)+'</td><td>'+m2(r.cur, r.refunds)+'</td><td><b>'+m2(r.cur, r.net)+'</b></td></tr>').join('')+'</tbody></table></div>';
+  return '<h3 style="margin-top:6px">Stripe fees</h3>'+tiles+table+
+    '<p class="sub" style="margin:6px 0 18px">Processing fees are what Stripe keeps on each card payment. Other Stripe charges are its separate fees (currency conversion, disputes, billing). Read from Stripe once a day with the rest of this page; Wise cash-out charges come next.'+(miss.length ? ' Not read: '+esc(miss.join('; '))+'.' : '')+(f.partial ? ' Some older months were cut short.' : '')+'</p>';
+}
 function revenueHTML0(){
   if(!isLive()) return '<p class="empty">The revenue report only shows in Live mode.</p>';
   const R = revRange(), a = R[0], b = R[1];
@@ -3672,7 +3702,7 @@ function revenueHTML0(){
     return h;
   }).join('');
   const miss = (LV.rev.days_missing || []).filter(Boolean);
-  return bar+out+(miss.length ? '<p class="sub" style="margin-top:14px">Could not be read just now, so it is missing from the dates and graphs: '+esc(miss.join('; '))+'.</p>' : '')+
+  return bar+feesHTML(a, b)+out+(miss.length ? '<p class="sub" style="margin-top:14px">Could not be read just now, so it is missing from the dates and graphs: '+esc(miss.join('; '))+'.</p>' : '')+
     '<p class="sub" style="margin-top:14px">A bar with * covers only part of that month. Stripe figures are card payments after refunds, read back 13 months (the camp from its first payment). Site records are each site’s own count, and a seat paid by card may be in both, so do not add sources together. For the camp, the payment tracker includes QR, bank and card payments; the Stripe card total covers every batch, so the two will not match. Promissory notes are not collections.</p>';
 }
 let cardsAt = 0;
