@@ -223,3 +223,21 @@ test('empty posts and missing settings are refused', async () => {
   const fb = createClient({ pageId: '1', token: 'tok', fetch: fakeFetch().fetch });
   await assert.rejects(fb.publish({ text: '   ' }), /needs text/);
 });
+
+test('Instagram Stories: one STORIES container per image, published in order', async () => {
+  let n = 0;
+  const { fetch, calls } = fakeGraph((method, p) => {
+    if (p === '900/media') return { id: `c${++n}` };
+    if (/^c\d$/.test(p)) return { status_code: 'FINISHED' };
+    if (p === '900/media_publish') return { id: `s${n}` };
+    throw new Error(`unexpected ${method} ${p}`);
+  });
+  const fb = createClient({ pageId: '123', token: 'tok', igUserId: '900', fetch, sleep: async () => {} });
+  const out = await fb.publishInstagramStories({ images: ['https://img.example/1.jpg', 'https://img.example/2.jpg'] });
+  assert.deepEqual(out.ids, ['s1', 's2']);
+  const creates = calls.filter((c) => c.path === '900/media');
+  assert.equal(creates.length, 2);
+  assert.equal(creates[0].form.media_type, 'STORIES');
+  assert.equal(creates[1].form.image_url, 'https://img.example/2.jpg');
+  assert.equal(creates[0].form.caption, undefined);
+});

@@ -205,6 +205,23 @@ function createClient({
     return { id: await publishContainer(ig.id, containerId) };
   }
 
+  // Each image becomes its own Story, published in order. Stories take no
+  // caption, and the API can't add stickers or put them in a Highlight; that
+  // is done in the Instagram app.
+  async function publishInstagramStories(post) {
+    const { images } = normalize(post);
+    if (!images.length) throw new Error('Stories need at least one image.');
+    const ig = await instagramAccount();
+    const ids = [];
+    for (const image of images) {
+      const url = await hostImage(image);
+      const containerId = (await call('POST', `${ig.id}/media`, { media_type: 'STORIES', image_url: url })).id;
+      await waitUntilReady(containerId);
+      ids.push(await publishContainer(ig.id, containerId));
+    }
+    return { id: ids.join(','), ids, photos: ids.length };
+  }
+
   // A Page video's direct URL, for cross-posting it to Instagram.
   async function pageVideoSource(videoId) {
     const v = await call('GET', String(videoId), { fields: 'source,description,length' });
@@ -216,7 +233,7 @@ function createClient({
     return call('GET', mediaId, { fields: 'caption,timestamp,permalink,media_type' });
   }
 
-  return { whoAmI, publish, show, remove, instagramAccount, hostImage, publishInstagram, publishInstagramReel, pageVideoSource, showInstagram };
+  return { whoAmI, publish, show, remove, instagramAccount, hostImage, publishInstagram, publishInstagramStories, publishInstagramReel, pageVideoSource, showInstagram };
 }
 
 function normalize(post) {

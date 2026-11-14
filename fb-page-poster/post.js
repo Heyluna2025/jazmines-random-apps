@@ -5,7 +5,7 @@
 //
 //   node post.js check
 //   node post.js "Hello from AI Empowered Club" [--link URL] [--image FILE|URL ...] [--at 2026-11-03T10:00+08:00] [--platform facebook,instagram] [--dry-run]
-//   node post.js queue posts.json [--dry-run]
+//   node post.js queue posts.json [--dry-run]   (an entry with "story": true posts each image as an Instagram Story)
 //   node post.js show POST_ID [--platform instagram]
 //   node post.js delete POST_ID
 //   node post.js crosspost-video PAGE_VIDEO_ID [--dry-run]
@@ -68,7 +68,7 @@ function describe(post) {
   if (post.link) bits.push(`link ${post.link}`);
   const images = [].concat(post.images || [], post.image || []);
   if (images.length === 1) bits.push(`image ${images[0]}`);
-  else if (images.length) bits.push(`${images.length}-photo carousel`);
+  else if (images.length) bits.push(post.story ? `${images.length} Instagram Stories` : `${images.length}-photo carousel`);
   bits.push(post.at ? `for ${post.at}` : 'now');
   return bits.join(', ');
 }
@@ -163,9 +163,12 @@ async function main() {
         }
         if (opts.dryRun) { console.log(`would send to ${platform}: ${describe(post)}`); continue; }
 
+        if (post.story && platform !== 'instagram') throw new Error('Stories are Instagram-only; set "platforms": ["instagram"].');
         const result = platform === 'facebook'
           ? await fb.publish({ ...post, image: undefined, images })
-          : await fb.publishInstagram({ ...post, image: undefined, images });
+          : post.story
+            ? await fb.publishInstagramStories({ images })
+            : await fb.publishInstagram({ ...post, image: undefined, images });
         post[idField] = result.id;
         post[`${platform}_sent_at`] = new Date().toISOString();
         // Save after each post so a failure halfway never double-posts on retry.
