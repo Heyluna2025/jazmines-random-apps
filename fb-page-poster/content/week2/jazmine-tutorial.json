@@ -1,0 +1,56 @@
+{
+  "post": "Week 2 · Tue · Coach Jazmine teaches one practical AI task (carousel version of the Tutorial Reel)",
+  "when": "2026-11-17 (Tue) 9:00 AM",
+  "brand": "aec",
+  "platforms": ["facebook", "instagram"],
+  "caption": "Too many tasks and no clear plan? Try this with Coach Jazmine. 💜\n\nTurn your brain dump into a weekly plan in 5 minutes with Claude or ChatGPT:\n\n1️⃣ Dump everything on your mind, in any order.\n2️⃣ Paste the prompt on slide 4.\n3️⃣ Review it, move things around, and lock in your week.\n\nSave this so it's ready on Monday morning, and tell us in the comments how it went! 👇\n\nLearn AI with friends inside AI Empowered Club.\n\n#AIEmpoweredClub #YourAIBestie #AIForBeginners",
+  "slides": [
+    {
+      "layout": "cover",
+      "tag": "Try this with Coach Jazmine",
+      "title": "Turn your brain dump into a *weekly plan*",
+      "subtitle": "One practical AI task you can do in 5 minutes with Claude or ChatGPT."
+    },
+    {
+      "layout": "statement",
+      "kicker": "The problem",
+      "title": "Too many tasks.\n*No clear plan.*",
+      "body": "Your to-dos are scattered across your head, your chats and sticky notes. AI can sort them for you in minutes."
+    },
+    {
+      "layout": "steps",
+      "theme": "light",
+      "kicker": "How to do it",
+      "title": "3 steps, 5 minutes",
+      "steps": [
+        { "icon": "chat", "title": "Dump everything", "text": "Type or voice-note every task on your mind. No order, no filter." },
+        { "icon": "spark", "title": "Paste the prompt", "text": "Copy the prompt on the next slide and send it with your list." },
+        { "icon": "check", "title": "Review and lock it in", "text": "Move, delete or approve. You decide; AI does the sorting." }
+      ]
+    },
+    {
+      "layout": "quote",
+      "kicker": "Copy this prompt",
+      "text": "Here's everything on my mind this week. Sort it into must do, should do and can wait. Then build a Monday-to-Friday plan with at most 3 priorities a day, and flag anything I should delegate or drop.",
+      "by": "Paste into Claude or ChatGPT"
+    },
+    {
+      "layout": "bullets",
+      "theme": "light",
+      "kicker": "Level it up",
+      "title": "Make the plan *even better*",
+      "icon": "spark",
+      "items": [
+        "Add your working hours and fixed meetings first.",
+        "Ask it to estimate how long each task takes.",
+        "Ask for a 5-minute Friday review checklist."
+      ]
+    },
+    {
+      "layout": "cta",
+      "title": "Save it.\n*Try it today.*",
+      "body": "Tell us how it went in the comments. Want to learn AI with friends? Join AI Empowered Club.",
+      "button": "Save this post"
+    }
+  ]
+}
