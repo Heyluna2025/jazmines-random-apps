@@ -55,6 +55,10 @@ html, body { margin: 0; background: #fff; font-family: 'Nunito', sans-serif;
 .line { position: absolute; left: 0.2in; right: 0.2in; bottom: 0.32in; border-bottom: 1pt solid var(--lavender-300); }
 .foot { position: absolute; left: 0.2in; right: 0.2in; bottom: 0.1in; display: flex; justify-content: space-between;
   align-items: center; font-size: 6pt; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--lavender-500); }
+.name { position: absolute; left: 0.2in; right: 0.2in; bottom: 0.36in; text-align: center;
+  font-family: 'Bebas Neue', sans-serif; font-size: 40pt; line-height: 1; letter-spacing: .03em; color: var(--violet-700); }
+.staff .tag { border-color: var(--violet-600); }
+.staff .foot .role { color: #fff; background: var(--violet-700); padding: 2pt 7pt; border-radius: 1in; }
 .foot i { width: 0.5in; height: 0.045in; border-radius: 1in; background: linear-gradient(90deg, var(--violet-600), var(--lavender-500)); }
 </style>
 </head>
@@ -69,13 +73,14 @@ html, body { margin: 0; background: #fff; font-family: 'Nunito', sans-serif;
     <div class="body">
       <div class="label">My name is</div>
       <div class="line"></div>
-      <div class="foot"><span>Member</span><i></i></div>
+      <div class="name"></div>
+      <div class="foot"><span class="role"></span><i></i></div>
     </div>
   </div></div>
 </template>
 
 <section class="sheet" id="designed">
-  <div class="note">AEC name tags · 3.5 × 2.2 in · 9 per sheet · Short bond (Letter) landscape · Print at 100% / Actual size, margins None · Cut on the dashed lines</div>
+  <div class="note"><span class="kind"></span> · 3.5 × 2.2 in · 9 per sheet · Short bond (Letter) landscape · Print at 100% / Actual size, margins None · Cut on the dashed lines</div>
   <div class="grid"></div><div class="cuts"></div>
 </section>
 
@@ -83,7 +88,18 @@ html, body { margin: 0; background: #fff; font-family: 'Nunito', sans-serif;
   const tpl = document.getElementById('tag');
   const sheet = document.getElementById('designed');
   const grid = sheet.querySelector('.grid');
-  for (let i = 0; i < 9; i++) grid.appendChild(tpl.content.cloneNode(true));
+  // ?sheet=participant (blank, write-in) or ?sheet=staff (names printed)
+  const STAFF = ['Pat', 'Maron', 'Lloyd', 'Jaz', 'Anna', 'David', 'Papi Louie', 'Tin', 'Julian'];
+  const kind = new URLSearchParams(location.search).get('sheet') === 'staff' ? 'staff' : 'participant';
+  const names = kind === 'staff' ? STAFF : Array(9).fill('');
+  sheet.classList.add(kind);
+  sheet.querySelector('.kind').textContent = kind === 'staff' ? 'AEC staff name tags' : 'AEC participant name tags';
+  for (let i = 0; i < 9; i++) {
+    const t = tpl.content.cloneNode(true);
+    t.querySelector('.name').textContent = names[i] || '';
+    t.querySelector('.role').textContent = kind === 'staff' ? 'Staff' : 'Participant';
+    grid.appendChild(t);
+  }
   // crop marks in the margins, lined up with every cut
   const IN = 96, L = 0.25, T = 0.95, W = 3.5, H = 2.2;
   const add = (x, y, w, h) => { const d = document.createElement('div'); d.className = 'crop';
