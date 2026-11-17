@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AEC Name Tags</title>
+<!-- 3.5 x 2.2 in name tags, 9 per sheet, Letter (short bond) landscape.
+     Print at 100% / Actual size, margins: None. -->
+<style>
+@font-face { font-family: 'Bebas Neue'; src: url(fonts/bebas-neue-400-latin.woff2) format('woff2'); }
+@font-face { font-family: 'Nunito'; font-weight: 200 1000; src: url(fonts/nunito-variable-latin.woff2) format('woff2'); }
+:root {
+  --violet-900: #160b3a; --violet-700: #2a1868; --violet-600: #3a2487;
+  --lavender-100: #f3eeff; --lavender-300: #c9b8f5; --lavender-500: #8f74d9;
+  --cut: #9a8fbf;
+}
+@page { size: 11in 8.5in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #fff; font-family: 'Nunito', sans-serif;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet { position: relative; width: 11in; height: 8.5in; overflow: hidden; break-after: page; }
+.sheet:last-child { break-after: auto; }
+.note { position: absolute; top: 0.32in; left: 0; right: 0; text-align: center;
+  font-size: 7.5pt; color: #8a83a3; letter-spacing: .02em; }
+.grid { position: absolute; left: 0.25in; top: 0.95in; width: 10.5in; height: 6.6in;
+  display: grid; grid-template-columns: repeat(3, 3.5in); grid-template-rows: repeat(3, 2.2in); }
+.cell { position: relative; padding: 0.11in; }
+/* dashed cut lines */
+.cuts { position: absolute; inset: 0.95in 0.25in; pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, var(--cut) 0 3px, transparent 3px 6px) 0 0 / 0.6pt 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--cut) 0 3px, transparent 3px 6px) 3.5in 0 / 0.6pt 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--cut) 0 3px, transparent 3px 6px) 7in 0 / 0.6pt 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--cut) 0 3px, transparent 3px 6px) 100% 0 / 0.6pt 100% no-repeat,
+    repeating-linear-gradient(to right, var(--cut) 0 3px, transparent 3px 6px) 0 0 / 100% 0.6pt no-repeat,
+    repeating-linear-gradient(to right, var(--cut) 0 3px, transparent 3px 6px) 0 2.2in / 100% 0.6pt no-repeat,
+    repeating-linear-gradient(to right, var(--cut) 0 3px, transparent 3px 6px) 0 4.4in / 100% 0.6pt no-repeat,
+    repeating-linear-gradient(to right, var(--cut) 0 3px, transparent 3px 6px) 0 100% / 100% 0.6pt no-repeat; }
+.crop { position: absolute; background: #000; }
+
+/* ---- the tag ---- */
+.tag { width: 100%; height: 100%; border-radius: 0.14in; overflow: hidden;
+  border: 1pt solid var(--lavender-300); display: flex; flex-direction: column; background: #fff; }
+.band { height: 0.52in; flex: none; display: flex; align-items: center; gap: 0.08in; padding: 0 0.16in;
+  color: #fff; background: linear-gradient(120deg, var(--violet-900), var(--violet-700) 55%, var(--violet-600)); }
+.mark { width: 0.32in; height: auto; fill: currentColor; flex: none; }
+.brand { line-height: 1; }
+.brand b { display: block; font-weight: 900; font-size: 10pt; letter-spacing: .01em; }
+.brand span { display: block; font-weight: 700; font-size: 6.5pt; letter-spacing: .32em; text-transform: uppercase;
+  color: var(--lavender-300); margin-top: 1.5pt; }
+.hello { margin-left: auto; font-family: 'Bebas Neue', sans-serif; font-size: 17pt; letter-spacing: .04em;
+  color: var(--lavender-100); }
+.body { flex: 1; position: relative; padding: 0.08in 0.2in 0;
+  background: radial-gradient(ellipse at 100% 100%, var(--lavender-100), #fff 60%); }
+.label { font-family: 'Bebas Neue', sans-serif; font-size: 11pt; letter-spacing: .14em; color: var(--lavender-500); }
+.line { position: absolute; left: 0.2in; right: 0.2in; bottom: 0.32in; border-bottom: 1pt solid var(--lavender-300); }
+.foot { position: absolute; left: 0.2in; right: 0.2in; bottom: 0.1in; display: flex; justify-content: space-between;
+  align-items: center; font-size: 6pt; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--lavender-500); }
+.foot i { width: 0.5in; height: 0.045in; border-radius: 1in; background: linear-gradient(90deg, var(--violet-600), var(--lavender-500)); }
+</style>
+</head>
+<body>
+<template id="tag">
+  <div class="cell"><div class="tag">
+    <div class="band">
+      <svg class="mark" viewBox="0 0 240 200" aria-hidden="true"><path d="M76 45A24 24 0 0 1 114 45L232 192H114L32 100Z"/><circle cx="34" cy="164" r="28"/></svg>
+      <div class="brand"><b>AI Empowered</b><span>Club</span></div>
+      <div class="hello">Hello!</div>
+    </div>
+    <div class="body">
+      <div class="label">My name is</div>
+      <div class="line"></div>
+      <div class="foot"><span>Member</span><i></i></div>
+    </div>
+  </div></div>
+</template>
+
+<section class="sheet" id="designed">
+  <div class="note">AEC name tags · 3.5 × 2.2 in · 9 per sheet · Short bond (Letter) landscape · Print at 100% / Actual size, margins None · Cut on the dashed lines</div>
+  <div class="grid"></div><div class="cuts"></div>
+</section>
+
+<script>
+  const tpl = document.getElementById('tag');
+  const sheet = document.getElementById('designed');
+  const grid = sheet.querySelector('.grid');
+  for (let i = 0; i < 9; i++) grid.appendChild(tpl.content.cloneNode(true));
+  // crop marks in the margins, lined up with every cut
+  const IN = 96, L = 0.25, T = 0.95, W = 3.5, H = 2.2;
+  const add = (x, y, w, h) => { const d = document.createElement('div'); d.className = 'crop';
+    Object.assign(d.style, { left: x + 'in', top: y + 'in', width: w + 'in', height: h + 'in' }); sheet.appendChild(d); };
+  for (let i = 0; i <= 3; i++) { const x = L + i * W - 0.003;
+    add(x, T - 0.5, 0.006, 0.42); add(x, T + 3 * H + 0.08, 0.006, 0.42); }
+  for (let j = 0; j <= 3; j++) { const y = T + j * H - 0.003;
+    add(0.04, y, 0.17, 0.006); add(L + 3 * W + 0.04, y, 0.17, 0.006); }
+</script>
+</body>
+</html>
