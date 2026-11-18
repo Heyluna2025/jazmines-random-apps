@@ -101,9 +101,11 @@ html, body { margin: 0; background: #fff; font-family: 'Nunito', sans-serif;
     // Added later
     'Maann',
   ];
+  // Extra participants printed on their own sheet (not reprinting the full list)
+  const EXTRA = ['Hulyo', 'Gabriel', 'Maan', 'Fiona'];
   const mode = new URLSearchParams(location.search).get('sheet') || 'participants';
   const kind = mode === 'staff' ? 'staff' : 'participant';
-  const names = mode === 'staff' ? STAFF : mode === 'participants' ? PARTICIPANTS : Array(9).fill('');
+  const names = mode === 'staff' ? STAFF : mode === 'participants' ? PARTICIPANTS : mode === 'extra' ? EXTRA : Array(9).fill('');
   const role = kind === 'staff' ? 'Staff' : 'Participant';
   const tpl = document.getElementById('tag'), sheetTpl = document.getElementById('sheet');
   const pages = Math.max(1, Math.ceil(names.length / 9));
@@ -115,6 +117,7 @@ html, body { margin: 0; background: #fff; font-family: 'Nunito', sans-serif;
     sheet.querySelector('.kind').textContent = `AEC ${kind} name tags` + (pages > 1 ? ` · page ${pg + 1} of ${pages}` : '');
     const grid = sheet.querySelector('.grid');
     for (let i = 0; i < 9; i++) {           // leftover slots on the last page stay blank (walk-ins)
+      if (mode === 'extra' && pg * 9 + i >= names.length) { grid.appendChild(document.createElement('div')); continue; }
       const t = tpl.content.cloneNode(true);
       t.querySelector('.name').textContent = names[pg * 9 + i] || '';
       t.querySelector('.role').textContent = role;
