@@ -1,0 +1,56 @@
+{
+  "post": "Week 3 · Tue · Coach Lloyd teaches one practical AI task (carousel version of the Tutorial Reel)",
+  "when": "2026-11-24 (Tue) 9:00 AM",
+  "brand": "aec",
+  "platforms": ["facebook", "instagram"],
+  "caption": "Out of content ideas? Try this with Coach Lloyd. 💜\n\nTurn ONE idea into a week of posts in 10 minutes with Claude or ChatGPT:\n\n1️⃣ Pick one idea: a lesson, a win, or a question your audience keeps asking.\n2️⃣ Paste the prompt on slide 4.\n3️⃣ Edit in your own voice. Keep what sounds like you, cut the rest.\n\nSave this for your next content day, and tell us in the comments what idea you'll use! 👇\n\nLearn AI with friends inside AI Empowered Club.\n\n#AIEmpoweredClub #YourAIBestie #AIForBeginners",
+  "slides": [
+    {
+      "layout": "cover",
+      "tag": "Try this with Coach Lloyd",
+      "title": "Turn one idea into a *week of content*",
+      "subtitle": "One practical AI task you can do in 10 minutes with Claude or ChatGPT."
+    },
+    {
+      "layout": "statement",
+      "kicker": "The problem",
+      "title": "Posting every day?\n*Out of ideas?*",
+      "body": "You don't need 7 ideas. You need 1 good one, and AI can help you stretch it into a whole week."
+    },
+    {
+      "layout": "steps",
+      "theme": "light",
+      "kicker": "How to do it",
+      "title": "3 steps, 10 minutes",
+      "steps": [
+        { "icon": "spark", "title": "Pick one idea", "text": "A lesson, a win, or a question your audience keeps asking." },
+        { "icon": "chat", "title": "Paste the prompt", "text": "Copy the prompt on the next slide and add your idea." },
+        { "icon": "check", "title": "Edit in your voice", "text": "Keep what sounds like you. Cut the rest. You stay in charge." }
+      ]
+    },
+    {
+      "layout": "quote",
+      "kicker": "Copy this prompt",
+      "text": "Here's one idea I want to share: [your idea]. Turn it into 5 posts for this week: a short story, a quick tip, a myth vs fact, a question for my audience and a call to action. Keep each under 80 words, in a warm, conversational tone.",
+      "by": "Paste into Claude or ChatGPT"
+    },
+    {
+      "layout": "bullets",
+      "theme": "light",
+      "kicker": "Level it up",
+      "title": "Make it sound *like you*",
+      "icon": "spark",
+      "items": [
+        "Paste 2 or 3 of your past posts so it matches your voice.",
+        "Ask for 3 hook options for each post.",
+        "Ask which post would work best as a carousel or a Reel."
+      ]
+    },
+    {
+      "layout": "cta",
+      "title": "Save it.\n*Try it this week.*",
+      "body": "Tell us in the comments what idea you'll use. Want to learn AI with friends? Join AI Empowered Club.",
+      "button": "Save this post"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "post": "Week 3 · Sun · How we help ABC learners move forward (carousel version of the founder + leader conversation)",
+  "when": "2026-11-29 (Sun) 9:00 AM",
+  "platforms": ["facebook", "instagram"],
+  "caption": "What happens when you get stuck inside AI Builder's Camp? 🤔\n\nYou're never on your own. Here's how we help builders keep moving, week after week:\n\n📅 A Saturday main session to learn the big idea\n🛠️ A Tuesday hands-on lab to build it with guidance\n🤝 Small-group coaching to get unstuck with your coach\n▶️ Replays and a community for when life gets busy\n✅ One weekly task, so progress adds up\n\nBy week 8: your purpose blueprint, your own digital product, and a plan to sell it.\n\nHave a question about ABC? Drop it in the comments or send us a message. Batch 3 is coming. 👉 aibuilderscamp.ph\n\n#AIBuildersCamp #AIEmpoweredClub #YourAIBestie",
+  "slides": [
+    {
+      "layout": "cover",
+      "tag": "Inside ABC",
+      "title": "How we help builders\n*move forward*",
+      "subtitle": "What support looks like inside AI Builder's Camp, week after week."
+    },
+    {
+      "layout": "steps",
+      "theme": "light",
+      "kicker": "Every week",
+      "title": "Learn it. Build it. *Get help.*",
+      "steps": [
+        { "icon": "calendar", "title": "Saturday main session", "text": "Learn the big idea for the week." },
+        { "icon": "flask", "title": "Tuesday hands-on lab", "text": "Build it step by step, with guidance." },
+        { "icon": "users", "title": "Small-group coaching", "text": "Get unstuck with your coach and your group." }
+      ]
+    },
+    {
+      "layout": "bullets",
+      "kicker": "When life gets busy",
+      "title": "You won't *fall behind*",
+      "icon": "check",
+      "items": [
+        "Session replays, so you can catch up anytime.",
+        "A community to ask questions between sessions.",
+        "Your coach guides you every week."
+      ]
+    },
+    {
+      "layout": "statement",
+      "theme": "light",
+      "kicker": "One weekly task",
+      "title": "Small steps,\n*real progress*",
+      "body": "Each week ends with one task. By week 8, you have your purpose blueprint, your own digital product and a plan to sell it."
+    },
+    {
+      "layout": "cta",
+      "values": ["Own it", "Speak up", "Move forward"],
+      "title": "Have a question\nabout *ABC?*",
+      "body": "Send it our way. Batch 3 is coming: aibuilderscamp.ph",
+      "button": "aibuilderscamp.ph"
+    }
+  ]
+}
