@@ -241,3 +241,19 @@ test('Instagram Stories: one STORIES container per image, published in order', a
   assert.equal(creates[1].form.image_url, 'https://img.example/2.jpg');
   assert.equal(creates[0].form.caption, undefined);
 });
+
+test('Facebook Stories: unpublished photo, then photo_stories, per image', async () => {
+  let n = 0;
+  const { fetch, calls } = fakeGraph((method, p) => {
+    if (p === '123/photos') return { id: `ph${++n}` };
+    if (p === '123/photo_stories') return { success: true, post_id: `st${n}` };
+    throw new Error(`unexpected ${method} ${p}`);
+  });
+  const fb = createClient({ pageId: '123', token: 'tok', fetch, sleep: async () => {} });
+  const out = await fb.publishFacebookStories({ images: ['https://img.example/1.jpg', 'https://img.example/2.jpg'] });
+  assert.deepEqual(out.ids, ['st1', 'st2']);
+  const photos = calls.filter((c) => c.path === '123/photos');
+  assert.equal(photos[0].form.published, 'false');
+  assert.equal(photos[1].form.url, 'https://img.example/2.jpg');
+  assert.deepEqual(calls.filter((c) => c.path === '123/photo_stories').map((c) => c.form.photo_id), ['ph1', 'ph2']);
+});

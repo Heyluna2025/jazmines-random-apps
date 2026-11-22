@@ -205,6 +205,21 @@ function createClient({
     return { id: await publishContainer(ig.id, containerId) };
   }
 
+  // Facebook Page Stories: each image is uploaded as an unpublished photo,
+  // then shared as its own Story, in order. Like Instagram, the API can't add
+  // stickers or links.
+  async function publishFacebookStories(post) {
+    const { images } = normalize(post);
+    if (!images.length) throw new Error('Stories need at least one image.');
+    const ids = [];
+    for (const image of images) {
+      const photo = await call('POST', `${pageId}/photos`, photoBody(image, { published: 'false' }));
+      const story = await call('POST', `${pageId}/photo_stories`, { photo_id: photo.id });
+      ids.push(story.post_id || story.id);
+    }
+    return { id: ids.join(','), ids, photos: ids.length };
+  }
+
   // Each image becomes its own Story, published in order. Stories take no
   // caption, and the API can't add stickers or put them in a Highlight; that
   // is done in the Instagram app.
@@ -233,7 +248,7 @@ function createClient({
     return call('GET', mediaId, { fields: 'caption,timestamp,permalink,media_type' });
   }
 
-  return { whoAmI, publish, show, remove, instagramAccount, hostImage, publishInstagram, publishInstagramStories, publishInstagramReel, pageVideoSource, showInstagram };
+  return { whoAmI, publish, show, remove, instagramAccount, hostImage, publishFacebookStories, publishInstagram, publishInstagramStories, publishInstagramReel, pageVideoSource, showInstagram };
 }
 
 function normalize(post) {

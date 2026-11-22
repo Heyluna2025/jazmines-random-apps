@@ -5,7 +5,7 @@
 //
 //   node post.js check
 //   node post.js "Hello from AI Empowered Club" [--link URL] [--image FILE|URL ...] [--at 2026-11-03T10:00+08:00] [--platform facebook,instagram] [--dry-run]
-//   node post.js queue posts.json [--dry-run]   (an entry with "story": true posts each image as an Instagram Story)
+//   node post.js queue posts.json [--dry-run]   (an entry with "story": true posts each image as a Story on its platforms)
 //   node post.js show POST_ID [--platform instagram]
 //   node post.js delete POST_ID
 //   node post.js crosspost-video PAGE_VIDEO_ID [--dry-run]
@@ -68,7 +68,7 @@ function describe(post) {
   if (post.link) bits.push(`link ${post.link}`);
   const images = [].concat(post.images || [], post.image || []);
   if (images.length === 1) bits.push(`image ${images[0]}`);
-  else if (images.length) bits.push(post.story ? `${images.length} Instagram Stories` : `${images.length}-photo carousel`);
+  else if (images.length) bits.push(post.story ? `${images.length} Stories` : `${images.length}-photo carousel`);
   bits.push(post.at ? `for ${post.at}` : 'now');
   return bits.join(', ');
 }
@@ -156,18 +156,20 @@ async function main() {
         const idField = `${platform}_id`;
         if (post[idField]) continue;
 
-        // Instagram can't be scheduled ahead, so it waits here until due.
-        if (platform === 'instagram' && post.at && parseTime(post.at) > now) {
+        // Instagram posts and all Stories can't be scheduled ahead, so they
+        // wait here until due.
+        if ((platform === 'instagram' || post.story) && post.at && parseTime(post.at) > now) {
           waiting.push(post.at);
           continue;
         }
         if (opts.dryRun) { console.log(`would send to ${platform}: ${describe(post)}`); continue; }
 
-        if (post.story && platform !== 'instagram') throw new Error('Stories are Instagram-only; set "platforms": ["instagram"].');
-        const result = platform === 'facebook'
-          ? await fb.publish({ ...post, image: undefined, images })
-          : post.story
-            ? await fb.publishInstagramStories({ images })
+        const result = post.story
+          ? platform === 'facebook'
+            ? await fb.publishFacebookStories({ images })
+            : await fb.publishInstagramStories({ images })
+          : platform === 'facebook'
+            ? await fb.publish({ ...post, image: undefined, images })
             : await fb.publishInstagram({ ...post, image: undefined, images });
         post[idField] = result.id;
         post[`${platform}_sent_at`] = new Date().toISOString();
@@ -180,7 +182,7 @@ async function main() {
 
     if (waiting.length) {
       const next = waiting.sort((a, b) => parseTime(a) - parseTime(b))[0];
-      console.log(`${waiting.length} Instagram post(s) waiting for their time; next at ${next}. Run the queue again then.`);
+      console.log(`${waiting.length} post(s) waiting for their time; next at ${next}. Run the queue again then.`);
     }
     if (!opts.dryRun) console.log(sent ? `Done: ${sent} sent.` : 'Nothing new to send.');
     return;
