@@ -479,5 +479,41 @@
     "at": "2026-11-29T09:00+08:00",
     "spec": "content/week3/abc-support.json",
     "plan": "Week 3 Sun: how we help ABC learners"
+  },
+  {
+    "text": "Too many tasks and no clear plan? Try this with Coach Jazmine. 💜\n\nTurn your brain dump into a weekly plan in 5 minutes with Claude or ChatGPT:\n\n1️⃣ Dump everything on your mind, in any order.\n2️⃣ Paste the prompt on slide 4.\n3️⃣ Review it, move things around, and lock in your week.\n\nSave this so it's ready on Monday morning, and tell us in the comments how it went! 👇\n\nLearn AI with friends inside AI Empowered Club.\n\n#AIEmpoweredClub #YourAIBestie #AIForBeginners",
+    "images": [
+      "graphics/week2/2026-11-17-jazmine-tutorial-01.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-02.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-03.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-04.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-05.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-06.png"
+    ],
+    "platforms": [
+      "facebook"
+    ],
+    "at": "2026-11-28T09:00+08:00",
+    "spec": "content/week2/jazmine-tutorial.json",
+    "plan": "Week 3 Sat slot: Coach Jazmine tutorial (from Week 2)",
+    "facebook_id": "1231207646740791_122141215467391416",
+    "facebook_sent_at": "2026-11-25T10:34:48.907Z"
+  },
+  {
+    "text": "Too many tasks and no clear plan? Try this with Coach Jazmine. 💜\n\nTurn your brain dump into a weekly plan in 5 minutes with Claude or ChatGPT:\n\n1️⃣ Dump everything on your mind, in any order.\n2️⃣ Paste the prompt on slide 4.\n3️⃣ Review it, move things around, and lock in your week.\n\nSave this so it's ready on Monday morning, and tell us in the comments how it went! 👇\n\nLearn AI with friends inside AI Empowered Club.\n\n#AIEmpoweredClub #YourAIBestie #AIForBeginners",
+    "images": [
+      "graphics/week2/2026-11-17-jazmine-tutorial-01.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-02.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-03.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-04.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-05.png",
+      "graphics/week2/2026-11-17-jazmine-tutorial-06.png"
+    ],
+    "platforms": [
+      "instagram"
+    ],
+    "at": "2026-11-28T09:00+08:00",
+    "spec": "content/week2/jazmine-tutorial.json",
+    "plan": "Week 3 Sat slot: Coach Jazmine tutorial (from Week 2)"
   }
 ]
